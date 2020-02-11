@@ -238,7 +238,7 @@ setwd("X:/libraries/RTutor_BA")
 
 temp <- read.csv("./Data/Emissions_Unit_Type.csv")
 
-list <- c("Power Plants")
+list <- c("Power Plants", "Power Plants, Refineries", "Power Plants, Suppliers of CO2", "Power Plants, Waste")
 list
 
 
@@ -247,7 +247,9 @@ temp3 <- tail(names(sort(table(temp$Industry.Type..sectors.))), 5)
 temp3
 
 temp <- temp %>%
-  mutate(Industry.Type..sectors. = ifelse(!list,"Andere",Industry.Type..sectors.))
+  mutate(Industry.Type..sectors. = ifelse(!Industry.Type..sectors.%in%list,"Andere",Industry.Type..sectors.)) 
+
+
 
 unique(temp$Industry.Type..sectors.)
 
@@ -276,7 +278,7 @@ temp2 <- temp %>%
 #stacked bar plot
 
 
-ggplot(temp1, aes(fill=Indus, y=emission, x=Reporting.Year)) + 
+ggplot(temp1, aes(fill=Industry.Type..sectors., y=emission, x=Reporting.Year)) + 
     geom_bar(position="fill", stat="identity")
 
 temp

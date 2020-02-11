@@ -48,7 +48,7 @@ $\qquad$ References
 
 ## Exercise Content
 
-$\qquad$ *Exercise 1* - Motivation
+$\qquad$ *Exercise 1* - Motivation // evtl. aufteilen in Motivation, Daten, deskr. Analyse?
 
 $\qquad$ *Exercise 2* - TBA
 
@@ -92,22 +92,15 @@ After you finish a chapter, click `Go to next exercise` on the bottom or navigat
 ## Exercise 1 -- Motivation
 
 The goal of this problem set is to analyse how carbon pricing would effect emission in the energy sector. `Coal` is the **world's biggest source of energy and carbon emissions**, mostly because it is easy to store, transport, doesn't alter and can be mined in huge quantities around the world. This makes it very desirable and cheap to use as a energy source. Given that the coal supply will last for decades, it is a major goal to find incentitives to reduce emissions from coal consumption.  
-The Obama administration introduced the `Clean Power Plan`, which estimates that sorely switching from Coal to Gas powered plants could reduce carbon dioxide emissions from the 
-
-
-
-
-One alternative to coal is `natural gas`. Even though it is still considered fossil fuel, its emissions and heat density are way superior to coal. Despite that, natural gas wasn't considered to be a real alternative to coal as an energy supplier due to its higher prices and the more difficult handling. This changed with the `Shale Revolution`, where natural gas 
-byproduct of oil production
-
-
-However, for a long time natural gas wasn't considered to be a real alternative to coal as an energy supplier, due to its' higher costs and more difficult handling.
-
-
-To start off, in `Exercise 1` you will explore various data sets to get insights in the current situation of the energy market. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.
-The data sets are provided by 
-
+One alternative to coal is `natural gas`. Even though it is still considered fossil fuel, its emissions and heat density are way superior to coal. Nevertheless, natural gas wasn't considered to be an real alternative to coal  as an energy supplier until the early 2000s due to its higher prices and the more difficult handling.  
+This has changed due to the `Shale Revolution`, whereby natural gas was not only a by-product of the oil industry, but could now be extracted in a targeted manner and in large quantities. Lanfrancois (2012) estimates, based on the Clean Power Plan introduced by the Obama administration in 2015, carbon dioxide emissions from the electricity industry could be reduced by 23 to 42 percent by switching existing coal powered generators to gas powered ones.  
+  
 info("Shale-Revolution") # Run this line (Strg-Enter) to show info
+  
+With this in mind, in `Exercise 1` you will explore various data to get insights in the current situation of the U.S. energy sector. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.
+The data sets are provided by ???????
+
+
 
 
 **Task:**
@@ -121,20 +114,76 @@ info("read.csv() and write.csv()") # Run this line (Strg-Enter) to show info
 PaGP <- read.csv("./Data/PaGP.csv")
 ```
 
+```{r "1__6"}
+PaGP <- as.data.frame(PaGP)
+PaGP$date <- as.Date(PaGP$date)
 
-Treibhausdaten -> zu viel ausstoss -> gas besser -> wie verteilt -> entwicklung gaspreise
-HEIZWERT Coal Preise
 
-Rougly 1000 Pounds of Coal / MwH
-0.453592 metric tons of coal / MwH
+PaGP <- PaGP %>% 
+  select(c(1:5, 10:13))
+```
 
-Rougly 3.412 mmBtu of natural gas / MwH
 
-heat rates are different, therefore these angaben are a bit confusing. To clear things up lets umrechnen LG
 
-DATA RECONSTRUCTION!!!11
+**Task:** Lets take a look at the data we just imported. Use the `head()` command to show the first **eight** rows of the data set. 
 
-![some caption](./Material/interconnections.png) (SOURCE)
+
+```{r "1__7"}
+# head(PaGP, ...)
+head(PaGP, 8)
+
+```
+
+
+Alternatively you can press the `data` button to get redirected to the `Data Explorer` Tab.  
+  
+The data frame contains monthly numbers of generated MwH with coal and gas as well as prices of Energy commodities. 
+Keep in mind that different commodities are traded in different units. Oil is traded in barrels ($/bbl), coal in metric tons ($/mt) and gas in British thermal units($/mmbtu). The natural gas index is set to 100 in the year 2010 and changes accordingly.
+Prior to visualizing the data, we should clean the data set. First, as we are just interested in coal and natural gas, the other commodities prices can be removed. Secondly, as mentioned above, commodities are traded in different units. Therefore we will add new entries for normalized prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
+
+The date column is currently stored as a character. To be able visualize the date variable as a continuous variable, we have to convert is. Therefore, R has a build in date class.
+**Task:** Just press *check*.
+
+```{r "1__8"}
+PaGP <- as.data.frame(PaGP)
+PaGP$date <- as.Date(PaGP$date)
+```
+
+
+
+**Task:** Perform the above data cleaning and calculations. Just press *check*.
+  
+info("Pipe, mutate, select") # Run this line (Strg-Enter) to show info
+
+info("ggplot2") # Run this line (Strg-Enter) to show info
+
+
+
+```{r "1__9"}
+PaGP <- PaGP %>% 
+  #select(c(1:5, 10:13)) %>%
+  mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412) %>% 
+  mutate(price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412) %>% 
+  mutate(price_coal_australia_normalized = price_coal_australia * 0.453) %>% 
+  mutate(price_coal_africa_normalized = price_coal_africa * 0.453)
+```
+
+**Task:** Output a graphic. Just press *check*.
+```{r "1__10"}
+ggplot(data=PaGP, aes(x=date)) +
+  geom_line(aes(y=PaGP$price_coal_australia_normalized, color="Coal Autralia"), size=1) +
+  geom_line(aes(y=PaGP$price_coal_africa_normalized, color="Coal Africa"), size=1) +
+  geom_line(aes(y=PaGP$price_naturalgas_USA_normalized, color="Gas US"), size=1) +
+  geom_line(aes(y=PaGP$price_naturalgas_Europe_normalized, color="Gas Europe"), size=1) +
+  labs(x = "Year", y = "", title = "Normalized Ressource Prices", subtitle = "Y=$/MwH")+
+  scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
+```
+
+Text zu oben.
+
+
+In the next Step we will look at the generated Power for Coal / Gas in the U.S. 
+
 
 
 
@@ -147,50 +196,11 @@ Quiz: Do you think that the proportion of gas generated electicity compared to c
 &nbsp;
 
 
-To get a detailed answer to this question we will use the just imported data frame. To get a feeling on how the data look, use head to get example
-
-
-```{r "1__6"}
-head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise???? evtl sample_n()
-```
-
-
-SELECT wichtigen spalten
-
-iwas berechnen, danach grafik zum schluss, ggplot erklaeren etc.
-
-
-The date column is currently stored as a character. To be able visualize the date variable as a continuous variable, we have to convert is. Therefore, R has a build in date class.
-**Task:** Just press *check*.
-
-```{r "1__7"}
-PaGP <- as.data.frame(PaGP)
-PaGP$date <- as.Date(PaGP$date)
-```
-
-
-
-info("ggplot2") # Run this line (Strg-Enter) to show info
-
-
-
-
 
 
 **Task:** Just press *check*.
 
-```{r "1__8"}
-ggplot(data=PaGP, aes(x=date)) +
-  geom_line(aes(y=PaGP$price_naturalgas_USA, color="US"), size=1) +
-  geom_line(aes(y=PaGP$price_naturalgas_Europe, color="Europe"), size=1) +
-  labs(x = "Year", y = "", title = "US and European Natural Gas Prices", subtitle = "Y=$/MMBTU")+
-  scale_color_manual(name="Region",values = c("blue","red"))
-```
-
-
-**Task:** Just press *check*.
-
-```{r "1__9"}
+```{r "1__11"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1) +
   geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
@@ -210,6 +220,17 @@ ggplot(data=PaGP, aes(x=date)) +
 
 
 
+**Task:** Just press *check*.
+
+```{r "1__12"}
+ggplot(data=PaGP, aes(x=date)) +
+  geom_line(aes(y=PaGP$price_coal_australia, color="Coal Autralia"), size=1) +
+  geom_line(aes(y=PaGP$price_coal_africa, color="Coal Africa"), size=1) +
+  geom_line(aes(y=PaGP$price_naturalgas_USA, color="Gas US"), size=1) +
+  geom_line(aes(y=PaGP$price_naturalgas_Europe, color="Gas Europe"), size=1) +
+  labs(x = "Year", y = "", title = "Ressource Prices", subtitle = "Y= $/MMBTU (Gas) ; $/Mt (Coal)")+
+  scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
+```
 
 
 
@@ -223,19 +244,42 @@ ggplot(data=PaGP, aes(x=date)) +
 
 
 
+## Exercise 2 -- Interconnections
+
+
+![some caption](./Material/interconnections.png) (SOURCE)
 
 
 
 
 
+////////////////////////////////////Temp///////////////////////////////////
 
 
+### Summary on data
 
 
+**Task:** Just press *check*.
+```{r "2"}
+library(dplyr)
+#TABLE 1 Summary Statistics
+finaldata_allgens <- read_dta("Data/finaldata_allgens.dta")
+
+table1 <- finaldata_allgens %>% 
+  group_by(intercn) %>% 
+  select(CO2MASS, load, gasprice2, coal_price) %>% 
+  mutate(CO2MASS = CO2MASS/1000, load=load/1000, "Emission Rate"=CO2MASS/load, "Cost Ratio"=coal_price/gasprice2) %>% 
+  rename("CO2 Emissions" = CO2MASS, Load=load, "Gas Price"=gasprice2, "Coal Price"=coal_price)   %>% 
+  summarise_all("mean") 
+  
+#table1 <- table1 %>% 
+ # rownames_to_column %>% 
+  #gather(var, value, -rowname) %>% 
+  #spread(rowname,value)
 
 
-
-
+table1
+```
 
 
 
@@ -245,15 +289,24 @@ ggplot(data=PaGP, aes(x=date)) +
 
 ### Bibliography
 
-- Placeholder
+- Cullen, Joseph A., and Erin T. Mansur. 2017. "Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach Using the Shale Revolution." American Economic Journal: Economic Policy, 9 (3): 106-33.
+
+- Lafrancois, B. A. (2012), ‘A lot left over: Reducing CO2 emissions in the United States’ electric power sector through the use of natural gas’, Energy Policy 50, 428–435.
+
 
 ### R Packages
 
-- Placeholder
+- Kranz, S. (2015): RTutor. "Creating R problem sets with automatic assessment of student's solutions", R package version 2019.10.11, https://github.com/skranz/RTutor
+
+- Wickham, H. (2016): ggplot2. "Elegant Graphics for Data Analysis", Springer-Verlag, New York, R package version 3.2.1, http://CRAN.R-project.org/package=ggplot2
+
+- Wickham, H., Francois, R., Henry, L., Muller, K., (2018): dplyr. "A Grammar of Data Manipulation", R package version 0.8.3, http://CRAN.R-project.org/package=dplyr
 
 ### Data Sources
 
-- Placeholder
+- The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
+
+monthly load data 
 
 
 *All of the above links were accessable as of March 31, 2020.*
