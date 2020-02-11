@@ -1,0 +1,252 @@
+{"type":["init_ps"],"time":["2020-02-09 17:01:45"],"user":["default_user"],"umph":[1581264105.5355],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:02:16"],"user":["default_user"],"umph":[1581264136.5106],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:34:44"],"user":["default_user"],"umph":[1581266084.7994],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:35:41"],"user":["default_user"],"umph":[1581266141.3023],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:36:21"],"user":["default_user"],"umph":[1581266181.6975],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:36:45"],"user":["default_user"],"umph":[1581266205.1766],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:37:08"],"user":["default_user"],"umph":[1581266228.8924],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:38:28"],"user":["default_user"],"umph":[1581266308.8177],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:39:08"],"user":["default_user"],"umph":[1581266348.5139],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:41:18"],"user":["default_user"],"umph":[1581266478.7272],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:41:46"],"user":["default_user"],"umph":[1581266506.6073],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:42:28"],"user":["default_user"],"umph":[1581266548.1183],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:43:03"],"user":["default_user"],"umph":[1581266583.3611],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:43:31"],"user":["default_user"],"umph":[1581266611.0175],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:45:15"],"user":["default_user"],"umph":[1581266715.1464],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:49:00"],"user":["default_user"],"umph":[1581266940.1059],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 17:53:32"],"user":["default_user"],"umph":[1581267212.6775],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 17:53:40"],"user":["default_user"],"umph":[1581267220.5017],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-09 18:11:03"],"user":["default_user"],"umph":[1581268263.2189],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 18:14:00"],"user":["default_user"],"umph":[1581268440.1212],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 18:14:07"],"user":["default_user"],"umph":[1581268447.5203],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["z = 1:100 * 1:100"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 18:14:11"],"user":["default_user"],"umph":[1581268451.828],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["z = 1:100 * 1:100"],"message":[""]}
+,
+{"type":["hint"],"time":["2020-02-09 18:14:11"],"user":["default_user"],"umph":[1581268451.831],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[1]}
+,
+{"type":["init_ps"],"time":["2020-02-09 18:16:07"],"user":["default_user"],"umph":[1581268567.1762],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 18:16:14"],"user":["default_user"],"umph":[1581268574.6662],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["dat = tibble(a = sample(1:4,100, replace=TRUE), x=runif(100,0,a))\ndat %>%\n  group_by(a) %>%\n  summarize(mean_x = mean(x)) %>%\n  arrange(-mean_x)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-09 18:18:12"],"user":["default_user"],"umph":[1581268692.9905],"ok":[true]}
+,
+{"type":["check_ps"],"time":["2020-02-09 18:18:39"],"user":["default_user"],"umph":[1581268719.5005],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 18:18:39"],"user":[""],"umph":[1581268719.5615],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 18:18:39"],"user":[""],"umph":[1581268719.5904],"ok":[false],"chunk":[1],"ex":[2],"e.ind":[1],"code":["# ... <- read.csv(\"./Data/data_1.csv\")"],"message":["\nYou have not yet made an assignment to data1 in chunk 1__5."]}
+,
+{"type":["init_ps"],"time":["2020-02-09 20:46:36"],"user":["default_user"],"umph":[1581277596.4095],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:01:58"],"user":["default_user"],"umph":[1581278518.6086],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:02:18"],"user":["default_user"],"umph":[1581278538.2145],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:02:51"],"user":["default_user"],"umph":[1581278571.1415],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:03:31"],"user":["default_user"],"umph":[1581278611.2415],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:04:03"],"user":["default_user"],"umph":[1581278643.0887],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:06:20"],"user":["default_user"],"umph":[1581278780.3999],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:06:44"],"user":["default_user"],"umph":[1581278804.6223],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:09:06"],"user":["default_user"],"umph":[1581278946.0715],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:09:46"],"user":["default_user"],"umph":[1581278986.3013],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:10:13"],"user":["default_user"],"umph":[1581279013.1544],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:11:30"],"user":["default_user"],"umph":[1581279090.6704],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:11:55"],"user":["default_user"],"umph":[1581279115.8788],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:13:51"],"user":["default_user"],"umph":[1581279231.4206],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:14:43"],"user":["default_user"],"umph":[1581279283.5919],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:15:03"],"user":["default_user"],"umph":[1581279303.7168],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:15:26"],"user":["default_user"],"umph":[1581279326.7562],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:15:47"],"user":["default_user"],"umph":[1581279347.2872],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:16:10"],"user":["default_user"],"umph":[1581279370.9571],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:16:41"],"user":["default_user"],"umph":[1581279401.405],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:17:05"],"user":["default_user"],"umph":[1581279425.3301],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:17:36"],"user":["default_user"],"umph":[1581279456.7661],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:18:56"],"user":["default_user"],"umph":[1581279536.5174],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:24:06"],"user":["default_user"],"umph":[1581279846.2182],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:24:34"],"user":["default_user"],"umph":[1581279874.5643],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:26:46"],"user":["default_user"],"umph":[1581280006.3032],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:27:46"],"user":["default_user"],"umph":[1581280066.9344],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:29:54"],"user":["default_user"],"umph":[1581280194.9098],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:30:36"],"user":["default_user"],"umph":[1581280236.2159],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:30:54"],"user":["default_user"],"umph":[1581280254.3802],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 21:32:36"],"user":["default_user"],"umph":[1581280356.0393],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 22:12:47"],"user":["default_user"],"umph":[1581282767.4766],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-09 22:22:00"],"user":["default_user"],"umph":[1581283320.9928],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 22:22:09"],"user":["default_user"],"umph":[1581283329.5827],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 22:22:13"],"user":["default_user"],"umph":[1581283333.4658],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# exercise 1\ndata_1 <- read.csv(\"./Data/data_1.csv\") # infobox\n#exercise 2\n\n\n#You need to convert your date column, which is currently stored as a character to a date class that can be displayed as a continuous variable. Lucky for us, R has a date class. You can convert the date field to a date class using the function as.Date().\n\n\ndata_1 <- as.data.frame(data_1)\ndata_1$date <- as.Date(data_1$date)\n\n#exercise 3\nhead(data_1)\n\n\n\n\n#exercise 4\nggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color=\"US\"), size=1) +\n  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 22:22:21"],"user":["default_user"],"umph":[1581283341.4029],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$coal, color=\"Coal Generation (TWh)\"), size=1) +\n  geom_line(aes(y=data_1$gas, color=\"Natural Gas Generation (TWh)\"), size=1, linetype=\"dotted\") +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-09 22:23:04"],"user":["default_user"],"umph":[1581283384.159],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 22:23:08"],"user":["default_user"],"umph":[1581283388.68],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 22:23:09"],"user":["default_user"],"umph":[1581283389.7659],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# exercise 1\ndata_1 <- read.csv(\"./Data/data_1.csv\") # infobox\n#exercise 2\n\n\n#You need to convert your date column, which is currently stored as a character to a date class that can be displayed as a continuous variable. Lucky for us, R has a date class. You can convert the date field to a date class using the function as.Date().\n\n\ndata_1 <- as.data.frame(data_1)\ndata_1$date <- as.Date(data_1$date)\n\n#exercise 3\nhead(data_1)\n\n\n\n\n#exercise 4\nggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color=\"US\"), size=1) +\n  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 22:23:12"],"user":["default_user"],"umph":[1581283392.584],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$coal, color=\"Coal Generation (TWh)\"), size=1) +\n  geom_line(aes(y=data_1$gas, color=\"Natural Gas Generation (TWh)\"), size=1, linetype=\"dotted\") +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-09 23:11:54"],"user":["default_user"],"umph":[1581286314.2911],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 23:12:11"],"user":["default_user"],"umph":[1581286331.6142],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 23:12:15"],"user":["default_user"],"umph":[1581286335.0033],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# exercise 1\ndata_1 <- read.csv(\"./Data/data_1.csv\") # infobox\n#exercise 2\n\n\n#You need to convert your date column, which is currently stored as a character to a date class that can be displayed as a continuous variable. Lucky for us, R has a date class. You can convert the date field to a date class using the function as.Date().\n\n\ndata_1 <- as.data.frame(data_1)\ndata_1$date <- as.Date(data_1$date)\n\n#exercise 3\nhead(data_1)\n\n\n\n\n#exercise 4\nggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color=\"US\"), size=1) +\n  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-09 23:12:18"],"user":["default_user"],"umph":[1581286338.1891],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$coal, color=\"Coal Generation (TWh)\"), size=1) +\n  geom_line(aes(y=data_1$gas, color=\"Natural Gas Generation (TWh)\"), size=1, linetype=\"dotted\") +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 16:01:22"],"user":["default_user"],"umph":[1581346882.4825],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 16:01:42"],"user":["default_user"],"umph":[1581346902.7827],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 16:01:54"],"user":["default_user"],"umph":[1581346914.7214],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(data1) #schoener, beispiel iwo anders"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 16:02:06"],"user":["default_user"],"umph":[1581346926.7901],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["data_1 <- as.data.frame(data_1)\ndata_1$date <- as.Date(data_1$date)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 16:02:53"],"user":["default_user"],"umph":[1581346973.8668],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-10 16:03:58"],"user":["default_user"],"umph":[1581347038.1329],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-10 19:34:25"],"user":["default_user"],"umph":[1581359665.1518],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-10 20:17:27"],"user":["default_user"],"umph":[1581362247.0434],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-10 20:18:20"],"user":["default_user"],"umph":[1581362300.5595],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-10 20:19:00"],"user":["default_user"],"umph":[1581362340.7354],"ok":[true]}
+,
+{"type":["check_ps"],"time":["2020-02-10 20:21:26"],"user":["default_user"],"umph":[1581362486.4962],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-10 20:21:26"],"user":[""],"umph":[1581362486.6221],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 20:21:26"],"user":[""],"umph":[1581362486.664],"ok":[false],"chunk":[1],"ex":[2],"e.ind":[1],"code":["# ... <- read.csv(\"./Data/data_1.csv\")"],"message":["\nYou have not yet made an assignment to data_1 in chunk 1__5."]}
+,
+{"type":["init_ps"],"time":["2020-02-10 21:42:19"],"user":["default_user"],"umph":[1581367339.3832],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 21:42:31"],"user":["default_user"],"umph":[1581367351.3687],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata_1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 21:42:33"],"user":["default_user"],"umph":[1581367353.1394],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(data_1) #schoener, beispiel iwo anders"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 21:42:34"],"user":["default_user"],"umph":[1581367354.4495],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["data_1 <- as.data.frame(data_1)\ndata_1$date <- as.Date(data_1$date)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 21:42:35"],"user":["default_user"],"umph":[1581367355.9915],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color=\"US\"), size=1) +\n  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 21:42:38"],"user":["default_user"],"umph":[1581367358.1833],"ok":[true],"chunk":[5],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$coal, color=\"Coal Generation (TWh)\"), size=1) +\n  geom_line(aes(y=data_1$gas, color=\"Natural Gas Generation (TWh)\"), size=1, linetype=\"dotted\") +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 22:50:38"],"user":["default_user"],"umph":[1581371438.2853],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 22:50:42"],"user":["default_user"],"umph":[1581371442.5385],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\ndata_1 <- read.csv(\"./Data/data_1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 22:50:44"],"user":["default_user"],"umph":[1581371444.9166],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(data_1) #schoener, beispiel iwo anders"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 22:50:46"],"user":["default_user"],"umph":[1581371446.7662],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["data_1 <- as.data.frame(data_1)\ndata_1$date <- as.Date(data_1$date)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 22:50:49"],"user":["default_user"],"umph":[1581371449.7307],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color=\"US\"), size=1) +\n  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 22:50:55"],"user":["default_user"],"umph":[1581371455.1313],"ok":[true],"chunk":[5],"ex":[2],"e.ind":[0],"code":["ggplot(data=data_1, aes(x=date)) +\n  geom_line(aes(y=data_1$coal, color=\"Coal Generation (TWh)\"), size=1) +\n  geom_line(aes(y=data_1$gas, color=\"Natural Gas Generation (TWh)\"), size=1, linetype=\"dotted\") +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 23:03:06"],"user":["default_user"],"umph":[1581372186.582],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:03:09"],"user":["default_user"],"umph":[1581372189.9321],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\nPaGP <- read.csv(\"./Data/PaGP.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:03:13"],"user":["default_user"],"umph":[1581372193.9821],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise????"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 23:03:52"],"user":["default_user"],"umph":[1581372232.1411],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:03:55"],"user":["default_user"],"umph":[1581372235.8768],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\nPaGP <- read.csv(\"./Data/PaGP.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:03:58"],"user":["default_user"],"umph":[1581372238.661],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise????"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 23:32:14"],"user":["default_user"],"umph":[1581373934.3581],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:32:19"],"user":["default_user"],"umph":[1581373939.1502],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\nPaGP <- read.csv(\"./Data/PaGP.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:32:22"],"user":["default_user"],"umph":[1581373942.369],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise????"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:32:31"],"user":["default_user"],"umph":[1581373951.9719],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["PaGP <- as.data.frame(PaGP)\nPaGP$date <- as.Date(PaGP$date)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:32:34"],"user":["default_user"],"umph":[1581373954.0563],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=PaGP, aes(x=date)) +\n  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color=\"US\"), size=1) +\n  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 23:35:01"],"user":["default_user"],"umph":[1581374101.4927],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:35:05"],"user":["default_user"],"umph":[1581374105.7239],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\nPaGP <- read.csv(\"./Data/PaGP.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:35:09"],"user":["default_user"],"umph":[1581374109.0476],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise????"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:35:10"],"user":["default_user"],"umph":[1581374110.5726],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["PaGP <- as.data.frame(PaGP)\nPaGP$date <- as.Date(PaGP$date)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:35:11"],"user":["default_user"],"umph":[1581374111.8967],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=PaGP, aes(x=date)) +\n  geom_line(aes(y=PaGP$price_naturalgas_USA, color=\"US\"), size=1) +\n  geom_line(aes(y=PaGP$price_naturalgas_USA, color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:35:15"],"user":["default_user"],"umph":[1581374115.2549],"ok":[true],"chunk":[5],"ex":[2],"e.ind":[0],"code":["ggplot(data=PaGP, aes(x=date)) +\n  geom_line(aes(y=PaGP$generated_coal, color=\"Coal Generation (TWh)\"), size=1) +\n  geom_line(aes(y=PaGP$generated_gas, color=\"Natural Gas Generation (TWh)\"), size=1, linetype=\"dotted\") +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 23:55:31"],"user":["default_user"],"umph":[1581375331.5603],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:55:35"],"user":["default_user"],"umph":[1581375335.5952],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read.csv(\"./Data/data_1.csv\")\nPaGP <- read.csv(\"./Data/PaGP.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:55:38"],"user":["default_user"],"umph":[1581375338.2021],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise????"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:55:46"],"user":["default_user"],"umph":[1581375346.235],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["PaGP <- as.data.frame(PaGP)\nPaGP$date <- as.Date(PaGP$date)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-10 23:55:48"],"user":["default_user"],"umph":[1581375348.739],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=PaGP, aes(x=date)) +\n  geom_line(aes(y=PaGP$price_naturalgas_USA, color=\"US\"), size=1) +\n  geom_line(aes(y=PaGP$price_naturalgas_Europe, color=\"Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"US and European Natural Gas Prices\", subtitle = \"Y=$/MMBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-10 23:56:47"],"user":["default_user"],"umph":[1581375407.9349],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-11 13:55:46"],"user":["default_user"],"umph":[1581425746.4185],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-11 13:56:45"],"user":["default_user"],"umph":[1581425805.1803],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-11 15:20:05"],"user":["default_user"],"umph":[1581430805.0758],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-11 16:32:38"],"user":["default_user"],"umph":[1581435158.3924],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-11 17:19:39"],"user":["default_user"],"umph":[1581437979.0011],"ok":[true]}
+,

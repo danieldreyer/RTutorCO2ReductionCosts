@@ -1,0 +1,329 @@
+# Problem Set: Estimating Carbon Dioxide reduction costs
+
+Author: Daniel Dreyer
+
+#< ignore
+```{r "create_ps"}
+library(restorepoint)
+# facilitates error detection
+# set.restore.point.options(display.restore.point=TRUE)
+library(RTutor)
+library(yaml)
+#library(restorepoint)
+setwd("X:/libraries/RTutor_BA")
+ps.name = "myps"; sol.file = paste0(ps.name,"_sol.Rmd")
+libs = c("dplyr", "ggplot2", "choroplethr", "lfe", "gridExtra", "evd", "htmlTable", "stargazer", "magick", "reshape2", "pracma") # character vector of all packages you load in the problem set
+#name.rmd.chunks(sol.file) # set auto chunk names in this file
+create.ps(sol.file=sol.file, ps.name=ps.name, user.name=NULL,libs=libs, stop.when.finished=FALSE, addons="quiz") # extra.code.file="dp.R", var.txt.file ="variables.txt")
+show.shiny.ps(ps.name, load.sav=FALSE,  sample.solution=TRUE, is.solved=TRUE, catch.errors=TRUE, launch.browser=TRUE)
+stop.without.error()
+rtutor.package.skel(sol.file=sol.file, ps.name=ps.name,libs=libs,
+                    pkg.name="RTutorCarbonReductionCosts",   # Name of the problem set package
+                    pkg.parent.dir = "X:/libraries/RTutor_BA", # Parent directory 
+                    author="Daniel Dreyer", # Your name
+                    github.user="daniel.dreyer",     # Your github user name
+                    extra.code.file="dp.R", # name of extra.code.file
+                    var.txt.file="variables.txt",    # name of var.txt.file
+                    overwrite=FALSE  # Do you want to override if package directory exists?
+)
+```
+#>
+
+
+Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Sorely questioning the moral of the population won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
+In this problem set we will approach one possible countermeasure by analysing how carbon pricing would reduce emissions in the electricty sector. The analysis is based on **"Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach using the Shale Revolution"** by Joseph A. Cullen, Erin T. Mansur (2016) - further simply referred as Cullen. The paper and further ressources can be downloaded from <a href="https://www.aeaweb.org/articles?id=10.1257/pol.20150388   target = "_blank"> https://www.aeaweb.org/articles?id=10.1257/pol.20150388</a>
+
+You will use the `Statstical Programming Language R` to replicate the analysis. Basic Knowledge is required , but further information on important logic or function will be provided. Furthermore, you are not forced to solve the tasks in order, but it is recommended, since each new task is based on the results of the previous ones. Even if you are a complete novice in R you should not be put off here. You can find useful information 
+[here](https://cran.r-project.org/manuals.html).
+
+
+
+### Contents
+
+$\qquad$  Overview
+  
+$\qquad$  1
+
+$\qquad$  2
+
+$\qquad$ $\qquad$ 2.1 
+
+$\qquad$  3 
+
+$\qquad$  4
+
+$\qquad$  8 Conclusion
+
+$\qquad$ References
+
+
+## Exercise Content
+
+$\qquad$ *Exercise 1* - Motivation
+
+$\qquad$ *Exercise 2* - TBA
+
+$\qquad$ *Exercise 3* - TBA
+
+$\qquad$ *Exercise 4* - TBA
+
+$\qquad$ *Exercise 5* - TBA
+
+
+### ReadME
+
+
+The problem set offers different ways to interact with. Coding exercises are marked as **TASK**. Some only require you to run them, in others you need to complement a small part of the code. Below the different types of interactions with their corresponding functions are explained:   
+
+
+ - Code Chunks: Require you to complete small parts of Code. The work flow of solving code chunks is intuitive and as follows:
+                
+  + `edit` : Click to insert your own Code into the chunk.
+  + `run chunk`: Runs the chunk and displays the outputs in the corresponding console of the task.
+  + `check`: Check your input for correctness.  
+&nbsp;
+
+  
+  Additional functions:    
+                   
+  + `data`: Redirects you to the data browser - you can view the data that are loaded.
+  + `hint` : Shows a hint to help solve the code chunk.
+  + `solution` : Shows the solution of the task.  
+&nbsp;
+
+  
+ - Quizzes: To give you a feeling of the data we work with, i placed some quizzes to blabal
+    
+ - Info Boxes: Contain additional information, that provide further information on technical terms and documentation of functions.
+ 
+
+After you finish a chapter, click `Go to next exercise` on the bottom or navigate around with the help of the bar on top.
+
+
+## Exercise 1 -- Motivation
+
+The goal of this problem set is to analyse how carbon pricing would effect emission in the energy sector. `Coal` is the **world's biggest source of energy and carbon emissions**, mostly because it is easy to store, transport, doesn't alter and can be mined in huge quantities around the world. This makes it very desirable and cheap to use as a energy source. Given that the coal supply will last for decades, it is a major goal to find incentitives to reduce emissions from coal consumption.  
+The Obama administration introduced the `Clean Power Plan`, which estimates that sorely switching from Coal to Gas powered plants could reduce carbon dioxide emissions from the 
+
+
+
+
+One alternative to coal is `natural gas`. Even though it is still considered fossil fuel, its emissions and heat density are way superior to coal. Despite that, natural gas wasn't considered to be a real alternative to coal as an energy supplier due to its higher prices and the more difficult handling. This changed with the `Shale Revolution`, where natural gas 
+byproduct of oil production
+
+
+However, for a long time natural gas wasn't considered to be a real alternative to coal as an energy supplier, due to its' higher costs and more difficult handling.
+
+
+To start off, in `Exercise 1` you will explore various data sets to get insights in the current situation of the energy market. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.
+The data sets are provided by 
+
+#< info "Shale-Revolution"
+Shale gas is a form of natural gas and is extracted from shale formation, known as fracking. Since the start of the century, shale gas became a increasingly more important source of natural gas in the United States. Whereas in 2000 shale gas only provided 1% of the natural gas, nowadays in 2020 it makes up roughly 50%.
+However at the same time, the environmental concerns of fracking are heavily debated.  
+
+
+https://en.wikipedia.org/wiki/Shale_gas
+https://en.wikipedia.org/wiki/Hydraulic_fracturing
+#>
+
+
+**Task:**
+Use the `read.csv` command to *load the data set* and store it in a variable called `PaGP`.
+The basic structure of the command is already given in the code chunk as a comment.
+
+#< info "read.csv() and write.csv()"
+The command `read.csv()` reads in a **csv file** and stores it into a given name. Csv is a format for data, that uses commas as seperators and periods as decimals. Another version of are **csv2 files**, where semicolons are used for seperators and commas for decimals. We only use csv files here.
+
+Given the file you want to read it is in the same working directory, you can use the command below:
+
+```{r "1",eval=FALSE}
+example <- read.csv("example.csv")
+```
+
+If the file is saved outside of your working directory there are two possibilities. For one you can insert the whole file path, if the file is you can navigate through the whole file path if your file is above 
+
+If the file is saved in an structure above your working directory you have to additionally insert the full file path:
+
+```{r "1__2",eval=FALSE}
+example <- read.csv("C:/Data/example.csv")
+```
+
+For files that are located below the working directory it is sufficient to specify the following file path:
+
+```{r "1__3",eval=FALSE}
+example <- read.csv("./Data/example.csv")
+```
+
+
+Csv files can be saved using the `write.csv` command.
+
+```{r "1__4",eval=FALSE}
+write.csv(example, file="example.csv")
+```
+
+For further information, use `help(write.csv)`.
+#>
+
+```{r "1__5"}
+#< task
+# ... <- read.csv("./Data/data_1.csv")
+#>
+PaGP <- read.csv("./Data/PaGP.csv")
+#< hint
+display("Replace the variable name with the one given in the exercise description. No other changes are needed.")
+#>
+```
+
+
+Treibhausdaten -> zu viel ausstoss -> gas besser -> wie verteilt -> entwicklung gaspreise
+HEIZWERT Coal Preise
+
+Rougly 1000 Pounds of Coal / MwH
+0.453592 metric tons of coal / MwH
+
+Rougly 3.412 mmBtu of natural gas / MwH
+
+heat rates are different, therefore these angaben are a bit confusing. To clear things up lets umrechnen LG
+
+DATA RECONSTRUCTION!!!11
+
+![some caption](./Material/interconnections.png) (SOURCE)
+
+
+#< quiz "Proportion of Sectors"
+question: Do you think that the proportion of gas generated electicity compared to coal generated electricity has increased or decreased over time?
+
+sc:
+    - increased*
+    - decreased
+success: Great, your answer is correct!
+failure: Try again.
+#>  
+&nbsp;
+
+
+To get a detailed answer to this question we will use the just imported data frame. To get a feeling on how the data look, use head to get example
+
+
+```{r "1__6"}
+head(PaGP) #schoener, beispiel iwo anders UMBENNEN OMG, Coal preise???? evtl sample_n()
+```
+
+
+SELECT wichtigen spalten
+
+iwas berechnen, danach grafik zum schluss, ggplot erklaeren etc.
+
+
+The date column is currently stored as a character. To be able visualize the date variable as a continuous variable, we have to convert is. Therefore, R has a build in date class.
+**Task:** Just press *check*.
+
+```{r "1__7"}
+#< task_notest
+PaGP <- as.data.frame(PaGP)
+PaGP$date <- as.Date(PaGP$date)
+#>
+```
+
+
+
+#< info "ggplot2"
+The package `ggplot2` is a powerful data visualization package for `R`, which is part of the `tidyverse` environment. Besides basic functions that are also provided by native `R`, it allows the user to highly modify graphs by **altering**, **adding** or **removing** components.
+
+The problem set doesn't require you to have any knowledge about functionalities of the package. However, you find further documentation [here](https://ggplot2.tidyverse.org/) or type `help(ggplot2)` into the console.
+#>
+
+
+
+
+
+
+**Task:** Just press *check*.
+
+```{r "1__8"}
+#< task_notest
+ggplot(data=PaGP, aes(x=date)) +
+  geom_line(aes(y=PaGP$price_naturalgas_USA, color="US"), size=1) +
+  geom_line(aes(y=PaGP$price_naturalgas_Europe, color="Europe"), size=1) +
+  labs(x = "Year", y = "", title = "US and European Natural Gas Prices", subtitle = "Y=$/MMBTU")+
+  scale_color_manual(name="Region",values = c("blue","red"))
+#>
+```
+
+
+**Task:** Just press *check*.
+
+```{r "1__9"}
+#< task_notest
+ggplot(data=PaGP, aes(x=date)) +
+  geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1) +
+  geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
+  labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
+  scale_color_manual(name="",values = c("black","red"))+
+  scale_y_continuous(breaks=seq(0,200,25))
+#>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Exercise References
+
+
+### Bibliography
+
+- Placeholder
+
+### R Packages
+
+- Placeholder
+
+### Data Sources
+
+- Placeholder
+
+
+*All of the above links were accessable as of March 31, 2020.*
+
+
+
+
