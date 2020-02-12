@@ -1,4 +1,4 @@
-# Problem Set: Estimating Carbon Dioxide reduction costs
+# Problem Set: Estimating Carbon Dioxide Reduction Costs
 
 
 ```{r 'check_ps', include=FALSE}
@@ -10,8 +10,8 @@ user.name = 'Jane Doe' # set to your user name
 # Alternatively run the following lines 
 library(RTutor)
 ps.dir = getwd() # directory of this file
-ps.file = 'myps.Rmd' # name of this file
-check.problem.set('myps', ps.dir, ps.file, user.name=user.name, reset=FALSE)
+ps.file = 'CarbonReductionCosts.Rmd' # name of this file
+check.problem.set('CarbonReductionCosts', ps.dir, ps.file, user.name=user.name, reset=FALSE)
 ```
 
 
@@ -19,11 +19,12 @@ Author: Daniel Dreyer
 
 
 
-Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Sorely questioning the moral of the population won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
+Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Sorely questioning the moral of the population though, won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
 In this problem set we will approach one possible countermeasure by analysing how carbon pricing would reduce emissions in the electricty sector. The analysis is based on **"Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach using the Shale Revolution"** by Joseph A. Cullen, Erin T. Mansur (2016) - further simply referred as Cullen. The paper and further ressources can be downloaded from <a href="https://www.aeaweb.org/articles?id=10.1257/pol.20150388   target = "_blank"> https://www.aeaweb.org/articles?id=10.1257/pol.20150388</a>
 
-You will use the `Statstical Programming Language R` to replicate the analysis. Basic Knowledge is required , but further information on important logic or function will be provided. Furthermore, you are not forced to solve the tasks in order, but it is recommended, since each new task is based on the results of the previous ones. Even if you are a complete novice in R you should not be put off here. You can find useful information 
-[here](https://cran.r-project.org/manuals.html).
+You will use the `Statstical Programming Language R` to replicate the analysis. Basic knowledge of `R` is required, but information on important function will be provided. 
+Since each new exercise inherits the results of previous exercises, it is recommendated to solve them in order. However you are free to skip to any exercise you like if you feel so.  
+If you are a complete novice in `R` you should not feel left behind. Understanding the basic concepts is straight forward, you can find useful information [here](https://cran.r-project.org/manuals.html).
 
 
 
@@ -31,24 +32,24 @@ You will use the `Statstical Programming Language R` to replicate the analysis. 
 
 $\qquad$  Overview
   
-$\qquad$  1
+$\qquad$  1 TBA
 
-$\qquad$  2
+$\qquad$  2 TBA
 
 $\qquad$ $\qquad$ 2.1 
 
-$\qquad$  3 
+$\qquad$  3 TBA
 
-$\qquad$  4
+$\qquad$  4 TBA
 
-$\qquad$  8 Conclusion
+$\qquad$  5 Conclusion
 
 $\qquad$ References
 
 
 ## Exercise Content
 
-$\qquad$ *Exercise 1* - Motivation // evtl. aufteilen in Motivation, Daten, deskr. Analyse?
+$\qquad$ *Exercise 1* - Motivation (rename later)
 
 $\qquad$ *Exercise 2* - TBA
 
@@ -62,28 +63,28 @@ $\qquad$ *Exercise 5* - TBA
 ### ReadME
 
 
-The problem set offers different ways to interact with. Coding exercises are marked as **TASK**. Some only require you to run them, in others you need to complement a small part of the code. Below the different types of interactions with their corresponding functions are explained:   
+The problem set offers different ways to interact with it. Coding exercises are marked as **TASK**. Some only need to be run, for others you need to complement a small part of the code, which is noted in the task description. Below you can read about the different types of interactions with their corresponding functions:   
 
 
  - Code Chunks: Require you to complete small parts of Code. The work flow of solving code chunks is intuitive and as follows:
                 
   + `edit` : Click to insert your own Code into the chunk.
-  + `run chunk`: Runs the chunk and displays the outputs in the corresponding console of the task.
-  + `check`: Check your input for correctness.  
+  + `run chunk`: Runs the chunk and displays outputs or errors in the corresponding console.
+  + `check`: Check your input for against the solution.
+  + `hint` : Should you have problem to solve a task, you can request a hint.  
 &nbsp;
 
   
   Additional functions:    
                    
-  + `data`: Redirects you to the data browser - you can view the data that are loaded.
-  + `hint` : Shows a hint to help solve the code chunk.
+  + `data`: Redirects you to the data browser - you can view the loaded data with the help of an interface.
   + `solution` : Shows the solution of the task.  
 &nbsp;
 
   
- - Quizzes: To give you a feeling of the data we work with, i placed some quizzes to blabal
+ - Quizzes: Evaluate your knownledge of topics before we dive in our analysis.
     
- - Info Boxes: Contain additional information, that provide further information on technical terms and documentation of functions.
+ - Info Boxes: Contain additional information on technical terms or documentation of functions.
  
 
 After you finish a chapter, click `Go to next exercise` on the bottom or navigate around with the help of the bar on top.
@@ -91,17 +92,13 @@ After you finish a chapter, click `Go to next exercise` on the bottom or navigat
 
 ## Exercise 1 -- Motivation
 
-The goal of this problem set is to analyse how carbon pricing would effect emission in the energy sector. `Coal` is the **world's biggest source of energy and carbon emissions**, mostly because it is easy to store, transport, doesn't alter and can be mined in huge quantities around the world. This makes it very desirable and cheap to use as a energy source. Given that the coal supply will last for decades, it is a major goal to find incentitives to reduce emissions from coal consumption.  
-One alternative to coal is `natural gas`. Even though it is still considered fossil fuel, its emissions and heat density are way superior to coal. Nevertheless, natural gas wasn't considered to be an real alternative to coal  as an energy supplier until the early 2000s due to its higher prices and the more difficult handling.  
-This has changed due to the `Shale Revolution`, whereby natural gas was not only a by-product of the oil industry, but could now be extracted in a targeted manner and in large quantities. Lanfrancois (2012) estimates, based on the Clean Power Plan introduced by the Obama administration in 2015, carbon dioxide emissions from the electricity industry could be reduced by 23 to 42 percent by switching existing coal powered generators to gas powered ones.  
+`Coal` is the **world's biggest source of energy and carbon emissions**, mostly because it is easy to store, transport, doesn't alter and can be mined in huge quantities around the world. This makes it desirable and cheap to use as a energy source. Given that the coal supply will last for decades, it is a major goal to find incentitives to reduce emissions from coal consumption.  
+One alternative to coal is `natural gas`. Even though still being a fossil fuel, its' emissions and heat density are way superior to coal. Nevertheless, natural gas wasn't considered to be an real alternative to coal because to its higher prices more difficult handling up until the early 2000s.  
+This changed due to the `Shale Revolution`, whereby natural gas was not only a by-product of the oil industry, but could now be extracted in a targeted manner and in large quantities. Lanfrancois (2012) estimates, that based on the Clean Power Plan introduced by the Obama administration in 2015, carbon dioxide emissions from the electricity industry could be reduced by 23 to 42 percent by switching existing coal powered generators to gas powered ones.  
   
 info("Shale-Revolution") # Run this line (Strg-Enter) to show info
   
-With this in mind, in `Exercise 1` you will explore various data to get insights in the current situation of the U.S. energy sector. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.
-The data sets are provided by ???????
-
-
-
+With this in mind, in `Exercise 1` you will explore data to get insights in the current situation of the U.S. energy sector. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.  
 
 **Task:**
 Use the `read.csv` command to *load the data set* and store it in a variable called `PaGP`.
@@ -114,54 +111,41 @@ info("read.csv() and write.csv()") # Run this line (Strg-Enter) to show info
 PaGP <- read.csv("./Data/PaGP.csv")
 ```
 
-```{r "1__6"}
-PaGP <- as.data.frame(PaGP)
-PaGP$date <- as.Date(PaGP$date)
-
-
-PaGP <- PaGP %>% 
-  select(c(1:5, 10:13))
-```
-
-
 
 **Task:** Lets take a look at the data we just imported. Use the `head()` command to show the first **eight** rows of the data set. 
 
 
-```{r "1__7"}
+```{r "1__6"}
 # head(PaGP, ...)
 head(PaGP, 8)
 
 ```
 
 
-Alternatively you can press the `data` button to get redirected to the `Data Explorer` Tab.  
-  
-The data frame contains monthly numbers of generated MwH with coal and gas as well as prices of Energy commodities. 
-Keep in mind that different commodities are traded in different units. Oil is traded in barrels ($/bbl), coal in metric tons ($/mt) and gas in British thermal units($/mmbtu). The natural gas index is set to 100 in the year 2010 and changes accordingly.
-Prior to visualizing the data, we should clean the data set. First, as we are just interested in coal and natural gas, the other commodities prices can be removed. Secondly, as mentioned above, commodities are traded in different units. Therefore we will add new entries for normalized prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
+Alternatively you can press the `data` button to get redirected to the `Data Explorer` Tab. 
 
-The date column is currently stored as a character. To be able visualize the date variable as a continuous variable, we have to convert is. Therefore, R has a build in date class.
+The date column is currently stored as a character. To be able visualize the date variable as a continuous variable, we have to convert is. Therefore, R has a build in date class.  
 **Task:** Just press *check*.
 
-```{r "1__8"}
+```{r "1__7"}
 PaGP <- as.data.frame(PaGP)
 PaGP$date <- as.Date(PaGP$date)
 ```
 
+  
+The data frame contains monthly numbers of generated MwH with coal and gas as well as prices of Energy commodities. 
+Keep in mind that different commodities are traded in different units. Oil is traded in barrels (\$/bbl), coal in metric tons (\$/mt) and gas in British thermal units($/mmbtu). The natural gas index is set to 100 in the year 2010 and changes accordingly.
+Prior to visualizing the data and to get clearer results, lets modifiy the data set. As mentioned before, commodities are traded in different units. Therefore we will add new entries for normalized prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
 
-
-**Task:** Perform the above data cleaning and calculations. Just press *check*.
+**Task:** Perform the above calculations. Just press *check*.
   
 info("Pipe, mutate, select") # Run this line (Strg-Enter) to show info
 
 info("ggplot2") # Run this line (Strg-Enter) to show info
 
 
-
-```{r "1__9"}
+```{r "1__8"}
 PaGP <- PaGP %>% 
-  #select(c(1:5, 10:13)) %>%
   mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412) %>% 
   mutate(price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412) %>% 
   mutate(price_coal_australia_normalized = price_coal_australia * 0.453) %>% 
@@ -169,7 +153,7 @@ PaGP <- PaGP %>%
 ```
 
 **Task:** Output a graphic. Just press *check*.
-```{r "1__10"}
+```{r "1__9"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$price_coal_australia_normalized, color="Coal Autralia"), size=1) +
   geom_line(aes(y=PaGP$price_coal_africa_normalized, color="Coal Africa"), size=1) +
@@ -179,7 +163,7 @@ ggplot(data=PaGP, aes(x=date)) +
   scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
 ```
 
-Text zu oben.
+////Text zu oben.
 
 
 In the next Step we will look at the generated Power for Coal / Gas in the U.S. 
@@ -200,7 +184,7 @@ Quiz: Do you think that the proportion of gas generated electicity compared to c
 
 **Task:** Just press *check*.
 
-```{r "1__11"}
+```{r "1__10"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1) +
   geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
@@ -210,58 +194,26 @@ ggplot(data=PaGP, aes(x=date)) +
 ```
 
 
+## Exercise 2 -- Interconnections
 
 
+![Interconnections](./Material/interconnections.png) (SOURCE)
+
+info("Interconnections") # Run this line (Strg-Enter) to show info
 
 
-
-
-
-
-
-
-**Task:** Just press *check*.
-
-```{r "1__12"}
-ggplot(data=PaGP, aes(x=date)) +
-  geom_line(aes(y=PaGP$price_coal_australia, color="Coal Autralia"), size=1) +
-  geom_line(aes(y=PaGP$price_coal_africa, color="Coal Africa"), size=1) +
-  geom_line(aes(y=PaGP$price_naturalgas_USA, color="Gas US"), size=1) +
-  geom_line(aes(y=PaGP$price_naturalgas_Europe, color="Gas Europe"), size=1) +
-  labs(x = "Year", y = "", title = "Ressource Prices", subtitle = "Y= $/MMBTU (Gas) ; $/Mt (Coal)")+
-  scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
+```{r "2"}
+Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 ```
 
 
 
 
-
-
-
-
-
-
-
-
-
-## Exercise 2 -- Interconnections
-
-
-![some caption](./Material/interconnections.png) (SOURCE)
-
-
-
-
-
-////////////////////////////////////Temp///////////////////////////////////
-
-
-### Summary on data
+## Exercise 3 -- Results - Part 1 (Graphs)
 
 
 **Task:** Just press *check*.
-```{r "2"}
-library(dplyr)
+```{r "3"}
 #TABLE 1 Summary Statistics
 finaldata_allgens <- read_dta("Data/finaldata_allgens.dta")
 
@@ -280,6 +232,9 @@ table1 <- finaldata_allgens %>%
 
 table1
 ```
+
+
+## Exercise 3.1 -- Results - Part 2 
 
 
 
@@ -306,11 +261,9 @@ table1
 
 - The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
 
-monthly load data 
+- Federal Energy Regulatory Comission, "Form  No. 714 Annual Electric Balancing Authority Area
+and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.asp
 
 
 *All of the above links were accessable as of March 31, 2020.*
-
-
-
 

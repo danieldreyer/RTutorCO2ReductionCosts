@@ -1,0 +1,266 @@
+---
+title: "BA_code_draft"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(haven)
+```
+
+
+```{r}
+#DATA RECONSTRUCTION
+
+#data chapter
+#erklaeren mit einzelnen dataframes, graphs -> daily load aggregate uebersicht uebere time usw.
+
+#uebersicht / einfuehrung mit data world
+
+
+dat = read.csv("dir/Part 3 Schedule 2 - Planning Area Hourly Demand.csv", header = TRUE)
+head(dat, 1000)
+
+```
+
+
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Graph Paper FIGURE 1 (Seite 2)
+# Daten nicht in Anlagen: World Bank Commodity Price Data (Pink Sheet) https://www.worldbank.org/en/research/commodity-markets#1
+# In Graph Daten nur bis 2013 genommen ?! -> evtl ganze Zeitreihe
+
+
+# angeben woher daten (link) https://www.eia.gov/electricity/data.php
+
+
+# exercise 1
+data_1 <- read.csv("~/R/BA/dir/data_1.csv") # infobox
+#exercise 2
+
+
+#You need to convert your date column, which is currently stored as a character to a date class that can be displayed as a continuous variable. Lucky for us, R has a date class. You can convert the date field to a date class using the function as.Date().
+
+
+data_1 <- as.data.frame(data_1)
+data_1$date <- as.Date(data_1$date)
+
+#exercise 3
+head(data_1)
+
+
+
+
+#exercise 4
+ggplot(data=data_1, aes(x=date)) +
+  geom_line(aes(y=data_1$Natural.gas..US....mmbtu., color="US"), size=1) +
+  geom_line(aes(y=data_1$Natural.gas..Europe....mmbtu., color="Europe"), size=1) +
+  labs(x = "Year", y = "", title = "US and European Natural Gas Prices", subtitle = "Y=$/MMBTU")+
+  scale_color_manual(name="Region",values = c("blue","red"))
+
+
+#Quiz: Was denkt man, hat Anteil von Gas zu oder abgenommen?
+  
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#Graph Paper FIGURE 2 (Page 6)
+#Daten graph_gas_coal_gen.dta
+#aktuelle Daten!
+
+graph_gas_coal_gen <- read_dta("dir/graph_gas_coal_gen.dta")
+
+results2 <- as.data.frame(graph_gas_coal_gen)
+results2$date <- as.Date(results2$date)
+
+data_1 <- read.csv("~/R/BA/dir/data_1.csv")
+data_1 <- as.data.frame(data_1)
+data_1$date <- as.Date(data_1$date)
+
+
+
+
+ggplot(data=results2, aes(x=date)) +
+  geom_line(aes(y=results2$coal, color="Coal Generation (TWh)"), size=1) +
+  geom_line(aes(y=results2$gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
+  labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
+  scale_color_manual(name="",values = c("black","red"))+
+  scale_y_continuous(breaks=seq(0,200,25))
+
+ggplot(data=data_1, aes(x=date)) +
+  geom_line(aes(y=data_1$coal, color="Coal Generation (TWh)"), size=1) +
+  geom_line(aes(y=data_1$gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
+  labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
+  scale_color_manual(name="",values = c("black","red"))+
+  scale_y_continuous(breaks=seq(0,200,25))
+  #scale_x_date(breaks = [2001,2014])
+
+
+
+
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#TABLE 1 Summary Statistics
+finaldata_allgens <- read_dta("dir/finaldata_allgens.dta")
+
+table1 <- finaldata_allgens %>% 
+  group_by(intercn) %>% 
+  select(CO2MASS, load, gasprice2, coal_price) %>% 
+  mutate(CO2MASS = CO2MASS/1000, load=load/1000, Emission_Rate=CO2MASS/load, Cost_Ratio=coal_price/gasprice2) %>% 
+  summarise_all("mean") 
+  
+table1 <- table1 %>% 
+  rownames_to_column %>% 
+  gather(var, value, -rowname) %>% 
+  spread(rowname,value)
+
+
+table1
+```
+
+
+![some caption](diri/interconnections.png)
+
+```{r}
+#FIGURE 4
+
+#A
+#hor line bei 2.25 und 5.75
+#
+
+
+# CREATE DATAFRAME HERE
+
+ggplot() +
+  geom_abline(yintercept=1:5, slope=1) +
+  geom_abline(yintercept=5.75, slope=0.1) +
+  geom_hline(yintercept = c(2.25, 5.75)) +
+  xlim(0,40) + ylim(0,14) 
+
+
+ggplot(data.frame(x=c(0,120), y=c(0,14)), aes(x)) +
+  stat_function(fun=function(x)5.75, geom="line", aes(colour="green")) +
+  stat_function(fun=function(x)2.25, geom="line", aes(colour="black")) +
+  stat_function(fun=function(x)0.39*x+5.75, geom="line", aes(colour="green")) +
+  stat_function(fun=function(x)0.146*x+2.25, geom="line", aes(colour="black")) +
+  labs(x = "Carbon Price $/ton", y = "$/mmBTU", title = "Carbon Prices") +
+  geom_vline(xintercept = c(40))
+  
+
+
+```
+
+```{r}
+#FIGURE 5
+
+
+library(plotly)
+
+x= list("Renewables Nuclear", "Gas CC", "Coal", "Gas GT")
+measure= c("relative", "relative", "relative", "relative")
+text= c("+60", "+80", "-40", "-20")
+y= c(0, 18, 2, 8)
+data = data.frame(x=factor(x,levels=x),measure,text,y)
+
+p <- plot_ly(
+  data, name = "20", type = "waterfall", measure = ~measure,
+  x = ~x, textposition = "outside", y= ~y, text =~text,
+  connector = list(line = list(color= "rgb(63, 63, 63)"))) %>%
+  layout(title = "Profit and loss statement 2018",
+        xaxis = list(title = ""),
+        yaxis = list(title = ""),
+        autosize = TRUE,
+        showlegend = TRUE)
+
+p
+
+
+
+
+```
+
+```{r}
+#FIGURE 6
+
+head(finaldata_allgens)
+
+finaldata_allgens_temp <- finaldata_allgens %>% 
+  mutate(PCO2 = (gasprice2/coal_price * gasprice2 - coal_price)/(0.0585-gasprice2/coal_price*0.1054)) %>% 
+  filter(intercn == "EAST")
+
+head(finaldata_allgens_temp)
+
+
+#cubic spline erklaeren
+
+temp <- finaldata_allgens_temp$PCO2
+head(temp)
+```
+
+
+
+
+```{r}
+library(evd)
+fun.1 <- function(x) dgumbel(x, loc=0, scale=1)
+fun.2 <- function(x) dgumbel(x, loc=1, scale=1)
+fun.3 <- function(x) dgumbel(x, loc=1, scale=2)
+fun.4 <- function(x) dnorm(x, mean=0, sd=1)
+p <- ggplot(data = data.frame(x = 0), mapping = aes(x = x))
+p +
+  ggtitle("Gumbel Distribution Densities") +
+  layer(geom="line", position = "identity", stat = "function",
+        params = list(fun = fun.1),
+        mapping = aes(color = "fun.1")
+  ) +
+  layer(geom="line", position = "identity", stat = "function",
+        params = list(fun = fun.2),
+        mapping = aes(color = "fun.2")
+  ) +
+  layer(geom="line", position = "identity", stat = "function",
+        params = list(fun = fun.3),
+        mapping = aes(color = "fun.3")
+  ) +
+  layer(geom="line", position = "identity", stat = "function",
+        params = list(fun = fun.4),
+        mapping = aes(color = "fun.4")
+  ) +
+  scale_x_continuous(limits = c(-5, 7)) +
+  scale_color_manual(name = "Densities",
+                     values = c("blue", "red", "green", "black"), # Color specification
+                     labels = c("Gumbel(0,1)", "Gumbel(1,1)", "Gumbel(1,2)", "N(0,1)"))
+```
+
+
+
+
+#APENDIX
+
+```{r}
+#Table A2
+
+
+
+
+
+
+```
+
+
