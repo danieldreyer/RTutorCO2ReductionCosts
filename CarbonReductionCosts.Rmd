@@ -1,4 +1,4 @@
-# Problem Set: Estimating Carbon Dioxide Reduction Costs
+# Problem Set: Estimating CO2 Reduction Costs
 
 
 ```{r 'check_ps', include=FALSE}
@@ -101,13 +101,13 @@ info("Shale-Revolution") # Run this line (Strg-Enter) to show info
 With this in mind, in `Exercise 1` you will explore data to get insights in the current situation of the U.S. energy sector. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.  
 
 **Task:**
-Use the `read.csv` command to *load the data set* and store it in a variable called `PaGP`.
+Use the `read_csv` command to *load the data set* and store it in a variable called `PaGP`.
 The basic structure of the command is already given in the code chunk as a comment.
 
 info("read.csv() and write.csv()") # Run this line (Strg-Enter) to show info
 
 ```{r "1__5"}
-# ... <- read.csv("./Data/data_1.csv")
+# ... <- read_csv("./Data/PaGP.csv")
 ```
 
 
@@ -172,16 +172,19 @@ In the next Step we will look at the generated Power for Coal / Gas in the U.S.
 
 ```{r "1__10"}
 ggplot(data=PaGP, aes(x=date)) +
-  geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1) +
-  geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
+  geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
+  geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
   labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
   scale_color_manual(name="",values = c("black","red"))+
   scale_y_continuous(breaks=seq(0,200,25))
 ```
 
+////Text zu oben.
 
 ## Exercise 2 -- Interconnections
 
+
+FIGURE 4! -- In R?
 
 ![Interconnections](./Material/interconnections.png) (SOURCE)
 
@@ -189,21 +192,224 @@ info("Interconnections") # Run this line (Strg-Enter) to show info
 
 
 ```{r "2"}
+Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 ```
 
 
 
+## Exercise 3 -- Road to a working model
 
-## Exercise 3 -- Results - Part 1 (Graphs)
+In this chapter we will develop a model, which tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
+&nbsp;
+ - You can find a rough timeline of what we do in each chapter of this exercise below:
+                
+  + `Stage 1` - Exercise 3.1: Linear Regression
+  + `Stage 2` - Exercise 3.2: Polonymal Regression
+  + `Stage 3` - Exercise 3.3: Cubic Spline Regression
+  + `Stage 4` - Exercise 3.4: More advanced Models??? Regression
+&nbsp;
+
+If you want to go faster through the problem set, you can skip to exercise `3.4`, which contains the final model and a brief overview of our results.  
+In this exercise you will get a feeling for the data set you are working with and with some 
+
+
+Erklaeren was wir machen usw.
+
+Why are we splitting our analysis in different interconnections?
+
+**Task:** Read in table.
+
+```{r "3"}
+data <- suppressMessages(read_csv("Data/main_data.csv"))
+```
+
+
+info("main_data") # Run this line (Strg-Enter) to show info
 
 
 **Task:** Just press *check*.
-```{r "3"}
+```{r "3__2"}
+table <- data %>% 
+  group_by(intercn) %>% 
+  select(intercn, CO2MASS, load, gasprice, coal_price) %>% 
+  mutate(CO2MASS = CO2MASS/1000, load=load/1000, "Emission Rate"=CO2MASS/load, "Cost Ratio"=coal_price/gasprice) %>% 
+  summarise_all("mean") %>% 
+  rename("CO2 Emissions"=CO2MASS, Load=load, "Gas Price"=gasprice, "Coal Price"=coal_price)
+
+table
+```
+
+
+
+
+
+
+**Task:** Just press *check*.
+```{r "3__4"}
+ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
+        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
+        theme_bw()+ 
+        labs(y="CO2 Emissions", 
+        x="Gas Price", 
+        title="CO2 Emissions vs. Gasprice")
+```
+
+TEXT
+
+
+
+## Exercise 3.1 -- E
+
+**Task:** To load the data set `main_data.csv`, press `edit` and `check` afterwards.
+
+```{r "3_1"}
+data <- suppressMessages(read_csv("Data/main_data.csv"))
+```
+
+As we have seen in the previous exercise, the data heavily differ in the different `intersections`. 
+
+As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on on each intersection.
+Since we observe substantial variation in coal and gas prices, we additionally add a new variable for relative costs `CR` (`Cost Ratio`), which is defined as below:
+
+$CR=\frac{C_{coal}}{C_{gas}}$
+
+//////////////CR ? CO2MASS/1000 EAJJAPODJAWPDJP
+
+**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `??`. Filter only for data with `intercn=="EAST"` and store the new data frame in variable `east`. 
+```{r "3_1__2"}
+# ... <- data %>% 
+#  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
+#  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>% 
+#  filter(intercn=="...")
 
 ```
 
 
-## Exercise 3.1 -- Results - Part 2 
+### Stage 1: Linear Regression
+
+
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}P_{co2}}{P_{gas}+CO_{2,gas}P_{co2}}$
+
+
+```{r "3_1__3"}
+```
+
+info("Predict") # Run this line (Strg-Enter) to show info
+
+INTERPRETATION LINEAR REGRESSION
+**Task:** To
+```{r "3_1__4"}
+
+```
+
+QUIZ: erwartung fallend oder steigend
+
+**Task:** To
+```{r "3_1__5"}
+
+```
+
+
+We will use the `stargazer()` function from the `stargazer` package to show summary statistics from our regressions. We don't need everything to know everything the basic functions displays, therefore we define a own custom function with statistics we need. Read below to find out more about `stargazer` and `custom functions` and continue with the next `task`.
+
+info("Stargazer") # Run this line (Strg-Enter) to show info
+
+info("Custon functions") # Run this line (Strg-Enter) to show info
+
+**Task:** Run the Code Chunk. It defines the function to show our custom regression tables.
+```{r "3_1__6"}
+regression.result= function(...){
+  library(stargazer)
+    stargazer(..., 
+            type = "text", 
+            style = "aer",  
+            digits = 3,
+            df = FALSE,
+            report = "vct*",
+            star.cutoffs = c(0.05, 0.01, 0.001),
+            #model.names = FALSE,
+            #object.names = TRUE,
+            #model.numbers = FALSE, 
+            omit.stat=c("f", "ser")
+    )
+} 
+```
+
+
+
+**Task:** Let's see what we just defined. Run the regression table for the linear model. Insert 
+```{r "3_1__7"}
+# regression.result(...)
+
+```
+
+TEXT
+
+**Task:** To
+```{r "3_1__8"}
+
+```
+
+QQ PLOT RESIDUALS?
+
+info("R-squared") # Run this line (Strg-Enter) to show info
+
+### Stage 2: Polonymal Regression
+
+```{r "3_1__9"}
+```
+
+```{r "3_1__10"}
+```
+
+
+```{r "3_1__11"}
+```
+
+
+```{r "3_1__12"}
+```
+
+
+```{r "3_1__13"}
+```
+
+
+### Stage 3: Linear Regression
+
+$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+D\gamma+\epsilon_t$
+
+Alle Kontrollvariablen
+
+PLOT?
+
+
+https://datasciencebeginners.com/2018/12/20/multinomial-logistic-regression-using-r/
+
+
+### Stage 4: Linear Regression
+
+
+spline regression,
+
+
+komplette eskalation
+
+https://stackoverflow.com/questions/37040552/cubic-spline-method-for-longitudinal-series-data
+
+
+
+
+
+## Exercise 3.2 -- Plotting Results
+
+
+Figure 6 plotten
+
+und Figure 7?
+
+
+## Exercise 4 -- Conclusion
 
 
 
@@ -220,18 +426,25 @@ info("Interconnections") # Run this line (Strg-Enter) to show info
 
 ### R Packages
 
+- Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.2. https://CRAN.R-project.org/package=stargazer 
+
 - Kranz, S. (2015): RTutor. "Creating R problem sets with automatic assessment of student's solutions", R package version 2019.10.11, https://github.com/skranz/RTutor
 
 - Wickham, H. (2016): ggplot2. "Elegant Graphics for Data Analysis", Springer-Verlag, New York, R package version 3.2.1, http://CRAN.R-project.org/package=ggplot2
 
 - Wickham, H., Francois, R., Henry, L., Muller, K., (2018): dplyr. "A Grammar of Data Manipulation", R package version 0.8.3, http://CRAN.R-project.org/package=dplyr
 
-### Data Sources
 
-- The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
+ 
+### Data Sources
 
 - Federal Energy Regulatory Comission, "Form  No. 714 Annual Electric Balancing Authority Area
 and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.asp
+
+- The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
+
+- U.S. Energy Information Administration, "Form EIA-923", https://www.eia.gov/electricity/data.php#generation
 
 
 *All of the above links were accessable as of March 31, 2020.*

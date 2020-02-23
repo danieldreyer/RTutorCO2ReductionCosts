@@ -1,0 +1,194 @@
+---
+title: "analysis_test"
+author: "danieldreyer"
+date: "2/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r}
+library(haven)
+data <- read_dta("Data/finaldata_allgens.dta")
+```
+
+```{r}
+library(tidyverse)
+
+
+data_1 <- data %>% 
+  select(date, intercn, CO2MASS, coal_price, gasprice2) %>% 
+  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% 
+  filter(intercn=="EAST")
+```
+
+```{r}
+fit <- lm(CO2MASS ~ CR, data=data_1)
+fit_resid <- resid(fit)
+```
+
+```{r}
+library(ggplot2)
+plot(data_1$CO2MASS ~ data_1$CR)
+
+#fitted(reg_1)
+
+err <- predict(fit, newdata = data_1, se.fit = TRUE)
+
+
+data_1$lci <- err$fit - 5 * err$se.fit
+data_1$fit <- err$fit
+data_1$uci <- err$fit + 5 * err$se.fit
+
+ggplot(data_1, aes(x = CR, y = fit)) +
+  theme_bw() +
+  geom_line() +
+  geom_smooth(aes(ymin = lci, ymax = uci), stat = "identity") +
+  geom_point(aes(x = CR, y = CO2MASS))
+
+
+#residual plots
+plot(data_1$CR, fit_resid,
+  ylab="Residuals", xlab="Cost Ratio", 
+  main="",
+  abline(0,0))
+```
+
+```{r}
+fit2 <- lm(CO2MASS ~ gasprice2, data=data_1)
+fit_resid2 <- resid(fit2)
+```
+
+```{r}
+library(ggplot2)
+plot(data_1$CO2MASS ~ data_1$gasprice2)
+
+#fitted(reg_1)
+
+err2 <- predict(fit2, newdata = data_1, se.fit = TRUE)
+
+
+data_1$lci2 <- err$fit2 - 5 * err2$se.fit
+data_1$fit2 <- err$fit2
+data_1$uci2 <- err$fit2 + 5 * err2$se.fit
+
+ggplot(data_1, aes(x = gasprice2, y = fit2)) +
+  theme_bw() +
+  geom_line() +
+  geom_smooth(aes(ymin = lci2, ymax = uci2), stat = "identity") +
+  geom_point(aes(x = gasprice2, y = CO2MASS))
+
+
+#residual plots
+plot(data_1$gasprice2, fit_resid2,
+  ylab="Residuals", xlab="Cost Ratio", 
+  main="",
+  abline(0,0))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+data_1$CR2 <- data_1$CR^2
+quadratic.model <-lm(CO2MASS ~ CR + CR2, data=data_1)
+
+summary(quadratic.model)
+predicted <- fitted(quadratic.model)
+
+#predict(quadratic.model, newdata = data_1, se.fit = TRUE)
+
+plot(data_1$CO2MASS ~ data_1$CR)
+#curve(predict(quadratic.model,newdata=data.frame(CR=x)),add=T)
+
+
+lines(data_1$CR, err2, col = "darkgreen", lwd = 3)
+
+
+ggplot(data_1, aes(x=CR, y=CO2MASS)) + geom_point()+stat_smooth(se=F, method='lm', formula=y~poly(x,2))
+
+
+
+fit_resid <- resid(fit)
+
+```
+
+
+```{r}
+plot(data_1$CO2MASS ~ data_1$CR)
+
+#fitted(reg_1)
+
+err <- predict(fit, newdata = data_1, se.fit = TRUE)
+
+
+data_1$lci <- err$fit - 5 * err$se.fit
+data_1$fit <- err$fit
+data_1$uci <- err$fit + 5 * err$se.fit
+
+ggplot(data_1, aes(x = CR, y = fit)) +
+  theme_bw() +
+  geom_line() +
+  geom_smooth(aes(ymin = lci, ymax = uci), stat = "identity") +
+  geom_point(aes(x = CR, y = CO2MASS))
+
+
+#residual plots
+plot(data_1$CR, fit_resid,
+  ylab="Residuals", xlab="Cost Ratio", 
+  main="",
+  abline(0,0))
+```
+
+
+
+
+
+
+```{r}
+
+model <- lm(CO2MASS ~ poly(CR,2), data=data_1)
+
+summary(model)
+
+
+confint(model, level=0.95)
+
+plot(fitted(model),residuals(model))
+
+
+
+
+
+predicted.intervals <- predict(model,data_1,interval='confidence',
+                               level=0.99)
+
+lines(data_1$CR,predicted.intervals[,1],col='green',lwd=3)
+lines(data_1,predicted.intervals[,2],col='black',lwd=1)
+lines(data_1,predicted.intervals[,3],col='black',lwd=1)
+```
+
+
+
+
+

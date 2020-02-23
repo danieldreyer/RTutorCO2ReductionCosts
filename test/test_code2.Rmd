@@ -256,10 +256,58 @@ p +
 ```{r}
 #Table A2
 
+options(scipen = 999)
+library(ggplot2)
+library(ggalt)
+#midwest_select <- midwest[midwest$poptotal > 350000 & 
+ #                           midwest$poptotal <= 500000 & 
+ #                           midwest$area > 0.01 & 
+ #                           midwest$area < 0.1, ]
+
+# Plot
+data_select <- data %>% filter(intercn=="EAST")
+
+
+ggplot(data, aes(x=gasprice2, y=CO2MASS)) + 
+  geom_point() +   # draw points
+  #geom_smooth(method="loess", se=F) + 
+  xlim(c(0, 15)) + 
+  ylim(c(250000, 1300000)) +   # draw smoothing line
+  geom_encircle(aes(x=gasprice2, y=CO2MASS), 
+                data=data_select, 
+                color="red", 
+                size=2, 
+                expand=0.08) +   # encircle
+  labs(subtitle="Area Vs Population", 
+       y="Population", 
+       x="Area", 
+       title="Scatterplot + Encircle", 
+       caption="Source: midwest")
+
+
+data$intercn
+
+
+find_hull <- function(birdsAll) birdsAll[chull(birdsAll$mass, birdsAll$length), ]
+hulls <- ddply(birdsAll, "age", find_hull)
+
+#plot with hull
+      ggplot(birdsAll,aes(x=mass,y=length,color=age))+geom_point()+
+                geom_polygon(data=hulls,fill=NA)+ theme_bw()
+
+findgroup
 
 
 
+find_hull <- function(df) df[chull(data$gasprice2, data$CO2MASS), ]
+hulls <- ddply(df, "intercn", find_hull)
 
+ggplot(data,aes(x=gasprice2,y=CO2MASS,color=intercn))+
+        #geom_point()+ 
+        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
+        theme_bw()+ 
+        labs(x = "Gas Price", y = "CO2 Emissions")
+  
 
 ```
 

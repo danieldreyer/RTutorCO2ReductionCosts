@@ -17,6 +17,8 @@ library(stargazer)
 library(reshape2)
 library(pracma)
 library(haven)
+library(tidyverse)
+library(ggalt)
 library(RTutor)
 
 
@@ -39,7 +41,7 @@ RTutor::set.knit.print.opts(data.frame.theme="code", table.max.rows=25, table.ma
 knitr::opts_chunk$set(error = TRUE) 
 ```
 
-# Problem Set: Estimating Carbon Dioxide Reduction Costs
+# Problem Set: Estimating CO2 Reduction Costs
 
 Author: Daniel Dreyer
 
@@ -139,19 +141,19 @@ You can find further information on the topic here:
 With this in mind, in `Exercise 1` you will explore data to get insights in the current situation of the U.S. energy sector. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.  
 
 **Task:**
-Use the `read.csv` command to *load the data set* and store it in a variable called `PaGP`.
+Use the `read_csv` command to *load the data set* and store it in a variable called `PaGP`.
 The basic structure of the command is already given in the code chunk as a comment.
 
 
 ***
 
 ### Info: read.csv() and write.csv()
-The command `read.csv()` reads in a **csv file** and stores it into a given name. Csv is a format for data, that uses commas as seperators and periods as decimals. Another version of are **csv2 files**, where semicolons are used for seperators and commas for decimals. We only use csv files here.
+The command `read_csv()` reads in a **csv file** and stores it into a given name. Csv is a format for data, that uses commas as seperators and periods as decimals. Another version of are **csv2 files**, where semicolons are used for seperators and commas for decimals. We only use csv files here.
 
 Given the file you want to read it is in the same working directory, you can use the command below:
 
 ```{r "1",eval=FALSE}
-example <- read.csv("example.csv")
+example <- read_csv("example.csv")
 ```
 
 If the file is saved outside of your working directory there are two possibilities. For one you can insert the whole file path, if the file is you can navigate through the whole file path if your file is above 
@@ -159,20 +161,20 @@ If the file is saved outside of your working directory there are two possibiliti
 If the file is saved in an structure above your working directory you have to additionally insert the full file path:
 
 ```{r "1__2",eval=FALSE}
-example <- read.csv("C:/Data/example.csv")
+example <- read_csv("C:/Data/example.csv")
 ```
 
 For files that are located below the working directory it is sufficient to specify the following file path:
 
 ```{r "1__3",eval=FALSE}
-example <- read.csv("./Data/example.csv")
+example <- read_csv("./Data/example.csv")
 ```
 
 
 Csv files can be saved using the `write.csv` command.
 
 ```{r "1__4",eval=FALSE}
-write.csv(example, file="example.csv")
+write_csv(example, file="example.csv")
 ```
 
 For further information, use `help(write.csv)`.
@@ -181,8 +183,8 @@ For further information, use `help(write.csv)`.
 
 
 ```{r "1__5"}
-# ... <- read.csv("./Data/data_1.csv")
-PaGP <- read.csv("./Data/PaGP.csv")
+# ... <- read_csv("./Data/PaGP.csv")
+PaGP <- read_csv("./Data/PaGP.csv")
 ```
 
 
@@ -224,7 +226,7 @@ example %>%
 &nbsp; mutate(new_column = old_column+1) %>% `mutate: create or alter columns`    
 &nbsp; select(1:5)  `select: keep certain columns, here column 1 to 5`   
 
-You can find a more detailed cheatsheet here [here](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) or use the `help()` function.
+You can find a more detailed cheatsheet [here](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) or use the `help()` function.
 
 ***
 
@@ -243,10 +245,10 @@ The problem set doesn't require you to have any knowledge about functionalities 
 
 ```{r "1__8"}
 PaGP <- PaGP %>% 
-  mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412) %>% 
-  mutate(price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412) %>% 
-  mutate(price_coal_australia_normalized = price_coal_australia * 0.453) %>% 
-  mutate(price_coal_africa_normalized = price_coal_africa * 0.453)
+  mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412,
+         price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412,
+         price_coal_australia_normalized = price_coal_australia * 0.453, 
+         price_coal_africa_normalized = price_coal_africa * 0.453)
 ```
 
 **Task:** Output a graphic. Just press *check*.
@@ -283,16 +285,19 @@ Quiz: Do you think that the proportion of gas generated electicity compared to c
 
 ```{r "1__10"}
 ggplot(data=PaGP, aes(x=date)) +
-  geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1) +
-  geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, linetype="dotted") +
+  geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
+  geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
   labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
   scale_color_manual(name="",values = c("black","red"))+
   scale_y_continuous(breaks=seq(0,200,25))
 ```
 
+////Text zu oben.
 
 ## Exercise 2 -- Interconnections
 
+
+FIGURE 4! -- In R?
 
 ![Interconnections](./Material/interconnections.png) (SOURCE)
 
@@ -317,33 +322,300 @@ Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 
 
 
+## Exercise 3 -- Road to a working model
 
-## Exercise 3 -- Results - Part 1 (Graphs)
+In this chapter we will develop a model, which tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
+&nbsp;
+ - You can find a rough timeline of what we do in each chapter of this exercise below:
+                
+  + `Stage 1` - Exercise 3.1: Linear Regression
+  + `Stage 2` - Exercise 3.2: Polonymal Regression
+  + `Stage 3` - Exercise 3.3: Cubic Spline Regression
+  + `Stage 4` - Exercise 3.4: More advanced Models??? Regression
+&nbsp;
+
+If you want to go faster through the problem set, you can skip to exercise `3.4`, which contains the final model and a brief overview of our results.  
+In this exercise you will get a feeling for the data set you are working with and with some 
 
 
-**Task:** Just press *check*.
+Erklaeren was wir machen usw.
+
+Why are we splitting our analysis in different interconnections?
+
+**Task:** Read in table.
+
 ```{r "3__12"}
-#TABLE 1 Summary Statistics
-finaldata_allgens <- read_dta("Data/finaldata_allgens.dta")
-
-table1 <- finaldata_allgens %>% 
-  group_by(intercn) %>% 
-  select(CO2MASS, load, gasprice2, coal_price) %>% 
-  mutate(CO2MASS = CO2MASS/1000, load=load/1000, "Emission Rate"=CO2MASS/load, "Cost Ratio"=coal_price/gasprice2) %>% 
-  rename("CO2 Emissions" = CO2MASS, Load=load, "Gas Price"=gasprice2, "Coal Price"=coal_price)   %>% 
-  summarise_all("mean") 
-  
-#table1 <- table1 %>% 
- # rownames_to_column %>% 
-  #gather(var, value, -rowname) %>% 
-  #spread(rowname,value)
-
-
-table1
+data <- suppressMessages(read_csv("Data/main_data.csv"))
 ```
 
 
-## Exercise 3.1 -- Results - Part 2 
+
+***
+
+### Info: main_data
+The data frame is a combination of data frames used in previous exercises and adds additional information. It contains `daily` information for each interconnection. Relevant columns are explained below:
+
+`CO2MASS` = CO2 emissions in tons  
+`gasprice` = Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
+`coal_price` = Price of Coal ($ per million BTU)  
+`load` = daily electricity consumption per interconnection in MWH  
+`meant` = average daily temperature per interconnection  
+
+***
+
+
+
+**Task:** Just press *check*.
+```{r "3__13"}
+table <- data %>% 
+  group_by(intercn) %>% 
+  select(intercn, CO2MASS, load, gasprice, coal_price) %>% 
+  mutate(CO2MASS = CO2MASS/1000, load=load/1000, "Emission Rate"=CO2MASS/load, "Cost Ratio"=coal_price/gasprice) %>% 
+  summarise_all("mean") %>% 
+  rename("CO2 Emissions"=CO2MASS, Load=load, "Gas Price"=gasprice, "Coal Price"=coal_price)
+
+table
+```
+
+
+
+
+
+
+**Task:** Just press *check*.
+```{r "3__14"}
+ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
+        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
+        theme_bw()+ 
+        labs(y="CO2 Emissions", 
+        x="Gas Price", 
+        title="CO2 Emissions vs. Gasprice")
+```
+
+TEXT
+
+
+
+## Exercise 3.1 -- E
+
+**Task:** To load the data set `main_data.csv`, press `edit` and `check` afterwards.
+
+```{r "3_1__15"}
+data <- suppressMessages(read_csv("Data/main_data.csv"))
+```
+
+As we have seen in the previous exercise, the data heavily differ in the different `intersections`. 
+
+As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on on each intersection.
+Since we observe substantial variation in coal and gas prices, we additionally add a new variable for relative costs `CR` (`Cost Ratio`), which is defined as below:
+
+$CR=\frac{C_{coal}}{C_{gas}}$
+
+//////////////CR ? CO2MASS/1000 EAJJAPODJAWPDJP
+
+**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `??`. Filter only for data with `intercn=="EAST"` and store the new data frame in variable `east`. 
+```{r "3_1__16"}
+# ... <- data %>% 
+#  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
+#  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>% 
+#  filter(intercn=="...")
+east <- data %>% 
+  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
+  mutate(CR = coal_price/gasprice) %>%  #, CO2MASS=CO2MASS/1000000
+  filter(intercn=="EAST")
+```
+
+
+### Stage 1: Linear Regression
+
+
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}P_{co2}}{P_{gas}+CO_{2,gas}P_{co2}}$
+
+
+```{r "3_1__17"}
+fit <- lm(CO2MASS ~ CR, data=east)
+```
+
+
+***
+
+### Info: Predict
+INFOBOX PREDICT
+
+***
+
+
+INTERPRETATION LINEAR REGRESSION
+**Task:** To
+```{r "3_1__18"}
+p1 <- predict(fit, newdata = east)
+```
+
+QUIZ: erwartung fallend oder steigend
+
+**Task:** To
+```{r "3_1__19"}
+plot(CO2MASS~CR, east)
+lines(east$CR, p1, col="red")
+```
+
+
+We will use the `stargazer()` function from the `stargazer` package to show summary statistics from our regressions. We don't need everything to know everything the basic functions displays, therefore we define a own custom function with statistics we need. Read below to find out more about `stargazer` and `custom functions` and continue with the next `task`.
+
+
+***
+
+### Info: Stargazer
+`stargazer` provides specialised `HTML` formatting for regression tables and summary statistics tables. It is easy to use, supports a large number of different model types and formats data in a pleasing way. The basic function is called by `stargazer()`, but can be customized heavily. For more information run `help(stargazer)` or read on [here](https://cran.r-project.org/web/packages/stargazer/).
+
+***
+
+
+
+***
+
+### Info: Custon functions
+`R` provides an easy framework to add your own functions. The syntax is quite similar to other `Programming Languages` you could be familiar with. Once you have defined a function, you can use it as long as you are in the same session. Below you can find the basic structure of a function:
+
+`myfunction <- function(arg1, arg2, ... ){`  
+`statements`  
+`return(object)`  
+  
+Here's an simple functions that adds `5` to the input integer and returns it.
+  
+`example <- function(x) {`  
+  `x + 5`  
+`}`  
+`example(1)`
+  
+You can find more detailed information [here](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/function).
+
+***
+
+
+**Task:** Run the Code Chunk. It defines the function to show our custom regression tables.
+```{r "3_1__20"}
+regression.result= function(...){
+  library(stargazer)
+    stargazer(..., 
+            type = "text", 
+            style = "aer",  
+            digits = 3,
+            df = FALSE,
+            report = "vct*",
+            star.cutoffs = c(0.05, 0.01, 0.001),
+            #model.names = FALSE,
+            #object.names = TRUE,
+            #model.numbers = FALSE, 
+            omit.stat=c("f", "ser")
+    )
+} 
+```
+
+
+
+**Task:** Let's see what we just defined. Run the regression table for the linear model. Insert 
+```{r "3_1__21"}
+# regression.result(...)
+regression.result(fit)
+```
+
+TEXT
+
+**Task:** To
+```{r "3_1__22"}
+plot(fit, 1)
+plot(fit, 2)
+```
+
+QQ PLOT RESIDUALS?
+
+
+***
+
+### Info: R-squared
+`R-Squared` is a statistical measurement that represents the correlation between the fitted values of y (predited values) and the observed values (data you put into the regression formula). R-squared is always positive and ranges from 0 to 1. An `R-squared` value closer to 1 indicates that the suggested model explains a major portion of variance in the outcome variable.  
+The problem with `R-squared` measurement is, that it always increases with higher numbers of variables in the model, even if these variables are only weakly responsible for the predicted values. An solution is to take the number of variables into account, this is called `Adjusted R-Squared` and also shown in the summary output.
+
+***
+
+
+### Stage 2: Polonymal Regression
+
+```{r "3_1__23"}
+CR.squared <- east$CR^2
+fit2 <- lm(CO2MASS ~ CR + CR.squared, east)
+
+CR.cubed <- east$CR^3
+fit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)
+```
+
+```{r "3_1__24"}
+p2 <- predict(fit2, east)
+p3 <- predict(fit3, east)
+```
+
+
+```{r "3_1__25"}
+plot(CO2MASS ~ CR, east)    # plot points
+lines(smooth.spline(east$CR, p1), col = "blue")
+lines(smooth.spline(east$CR, p2), col = "red")
+lines(smooth.spline(east$CR, p3), col = "green")# add regression line, using `predict` to generate y-values
+
+
+
+plot(CO2MASS~CR, east)
+lines(east$CR, p1, col="red")
+lines(east$CR, p2, col="blue")
+lines(east$CR, p3, col="green")
+```
+
+
+```{r "3_1__26"}
+regression.result(fit, fit2, fit3)
+```
+
+
+```{r "3_1__27"}
+anova(fit, fit2, fit3)
+```
+
+
+### Stage 3: Linear Regression
+
+$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+D\gamma+\epsilon_t$
+
+Alle Kontrollvariablen
+
+PLOT?
+
+
+https://datasciencebeginners.com/2018/12/20/multinomial-logistic-regression-using-r/
+
+
+### Stage 4: Linear Regression
+
+
+spline regression,
+
+
+komplette eskalation
+
+https://stackoverflow.com/questions/37040552/cubic-spline-method-for-longitudinal-series-data
+
+
+
+
+
+## Exercise 3.2 -- Plotting Results
+
+
+Figure 6 plotten
+
+und Figure 7?
+
+
+## Exercise 4 -- Conclusion
 
 
 
@@ -360,18 +632,25 @@ table1
 
 ### R Packages
 
+- Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.2. https://CRAN.R-project.org/package=stargazer 
+
 - Kranz, S. (2015): RTutor. "Creating R problem sets with automatic assessment of student's solutions", R package version 2019.10.11, https://github.com/skranz/RTutor
 
 - Wickham, H. (2016): ggplot2. "Elegant Graphics for Data Analysis", Springer-Verlag, New York, R package version 3.2.1, http://CRAN.R-project.org/package=ggplot2
 
 - Wickham, H., Francois, R., Henry, L., Muller, K., (2018): dplyr. "A Grammar of Data Manipulation", R package version 0.8.3, http://CRAN.R-project.org/package=dplyr
 
-### Data Sources
 
-- The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
+ 
+### Data Sources
 
 - Federal Energy Regulatory Comission, "Form  No. 714 Annual Electric Balancing Authority Area
 and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.asp
+
+- The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
+
+- U.S. Energy Information Administration, "Form EIA-923", https://www.eia.gov/electricity/data.php#generation
 
 
 *All of the above links were accessable as of March 31, 2020.*

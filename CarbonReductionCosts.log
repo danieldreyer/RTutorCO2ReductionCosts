@@ -38,3 +38,231 @@
 ,
 {"type":["check_chunk"],"time":["2020-02-12 22:52:17"],"user":["default_user"],"umph":[1581544337.0275],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\nfinaldata_allgens <- read_dta(\"Data/finaldata_allgens.dta\")\n\ntable1 <- finaldata_allgens %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \n#table1 <- table1 %>% \n # rownames_to_column %>% \n  #gather(var, value, -rowname) %>% \n  #spread(rowname,value)\n\n\ntable1"],"message":[""]}
 ,
+{"type":["init_ps"],"time":["2020-02-13 23:11:19"],"user":["default_user"],"umph":[1581631879.5417],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-13 23:11:30"],"user":["default_user"],"umph":[1581631890.8538],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\nfinaldata_allgens <- read_dta(\"Data/finaldata_allgens.dta\")\n\ntable1 <- finaldata_allgens %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \n#table1 <- table1 %>% \n # rownames_to_column %>% \n  #gather(var, value, -rowname) %>% \n  #spread(rowname,value)\n\n\ntable1"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-17 22:02:37"],"user":["default_user"],"umph":[1581973357.0487],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-18 20:44:41"],"user":["default_user"],"umph":[1582055081.3614],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-18 20:46:10"],"user":["default_user"],"umph":[1582055170.5702],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-18 20:49:31"],"user":["default_user"],"umph":[1582055371.7408],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 20:50:54"],"user":["default_user"],"umph":[1582055454.3369],"ok":[false],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":["evaluation error in \n  data <- read_csv(\"Data/main_data.csv\")\n  Error in read_csv(\"Data/main_data.csv\"): could not find function \"read_csv\"\n"]}
+,
+{"type":["init_ps"],"time":["2020-02-18 20:51:48"],"user":["default_user"],"umph":[1582055508.7699],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 20:51:54"],"user":["default_user"],"umph":[1582055514.3967],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 20:52:05"],"user":["default_user"],"umph":[1582055525.8748],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-18 20:56:28"],"user":["default_user"],"umph":[1582055788.4261],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-18 21:10:39"],"user":["default_user"],"umph":[1582056639.3348],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:10:51"],"user":["default_user"],"umph":[1582056651.0766],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:10:54"],"user":["default_user"],"umph":[1582056654.3369],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:10:56"],"user":["default_user"],"umph":[1582056656.211],"ok":[true],"chunk":[10],"ex":[5],"e.ind":[0],"code":["# Exemplarisch fuer \"EAST Interconnection\"\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:10:58"],"user":["default_user"],"umph":[1582056658.1735],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["fit <- lm(CO2MASS ~ CR, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:10:59"],"user":["default_user"],"umph":[1582056659.654],"ok":[false],"chunk":[12],"ex":[5],"e.ind":[0],"code":["p1 <- predict(fit, newdata = data_1)"],"message":["evaluation error in \n  p1 <- predict(fit, newdata = data_1)\n  Error in predict.lm(fit, newdata = data_1): object 'data_1' not found\n"]}
+,
+{"type":["init_ps"],"time":["2020-02-18 21:11:42"],"user":["default_user"],"umph":[1582056702.4043],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:11:48"],"user":["default_user"],"umph":[1582056708.6819],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:11:50"],"user":["default_user"],"umph":[1582056710.4721],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:11:52"],"user":["default_user"],"umph":[1582056712.1204],"ok":[true],"chunk":[10],"ex":[5],"e.ind":[0],"code":["# Exemplarisch fuer \"EAST Interconnection\"\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:11:53"],"user":["default_user"],"umph":[1582056713.434],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["fit <- lm(CO2MASS ~ CR, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:11:54"],"user":["default_user"],"umph":[1582056714.6248],"ok":[true],"chunk":[12],"ex":[5],"e.ind":[0],"code":["p1 <- predict(fit, newdata = east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:11:56"],"user":["default_user"],"umph":[1582056716.1722],"ok":[true],"chunk":[13],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS~CR, east)\nlines(data_1$CR, p1, col=\"red\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-18 21:14:37"],"user":["default_user"],"umph":[1582056877.7118],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-18 21:15:26"],"user":["default_user"],"umph":[1582056926.1058],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:36"],"user":["default_user"],"umph":[1582056936.2571],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:37"],"user":["default_user"],"umph":[1582056937.955],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:39"],"user":["default_user"],"umph":[1582056939.5359],"ok":[true],"chunk":[10],"ex":[5],"e.ind":[0],"code":["# Exemplarisch fuer \"EAST Interconnection\"\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:40"],"user":["default_user"],"umph":[1582056940.9709],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["fit <- lm(CO2MASS ~ CR, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:41"],"user":["default_user"],"umph":[1582056941.9939],"ok":[true],"chunk":[12],"ex":[5],"e.ind":[0],"code":["p1 <- predict(fit, newdata = east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:43"],"user":["default_user"],"umph":[1582056943.0818],"ok":[true],"chunk":[13],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS~CR, east)\nlines(east$CR, p1, col=\"red\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:47"],"user":["default_user"],"umph":[1582056947.2412],"ok":[true],"chunk":[14],"ex":[5],"e.ind":[0],"code":["regression.result= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            #model.names = FALSE,\n            #object.names = TRUE,\n            #model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n} "],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:50"],"user":["default_user"],"umph":[1582056950.3141],"ok":[true],"chunk":[15],"ex":[5],"e.ind":[0],"code":["regression.result(fit)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:55"],"user":["default_user"],"umph":[1582056955.874],"ok":[true],"chunk":[16],"ex":[5],"e.ind":[0],"code":["CR.squared <- east$CR^2\nfit2 <- lm(CO2MASS ~ CR + CR.squared, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:57"],"user":["default_user"],"umph":[1582056957.35],"ok":[true],"chunk":[17],"ex":[5],"e.ind":[0],"code":["p2 <- predict(fit2, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:15:58"],"user":["default_user"],"umph":[1582056958.7841],"ok":[true],"chunk":[18],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS ~ CR, east)    # plot points\nlines(smooth.spline(east$CR, p1), col = \"blue\")\nlines(smooth.spline(east$CR, p2), col = \"red\")\nlines(smooth.spline(east$CR, p3), col = \"green\")# add regression line, using `predict` to generate y-values"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-18 21:58:28"],"user":["default_user"],"umph":[1582059508.3821],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:58:37"],"user":["default_user"],"umph":[1582059517.5102],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:58:40"],"user":["default_user"],"umph":[1582059520.63],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:58:42"],"user":["default_user"],"umph":[1582059522.117],"ok":[true],"chunk":[10],"ex":[5],"e.ind":[0],"code":["# Exemplarisch fuer \"EAST Interconnection\"\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:58:43"],"user":["default_user"],"umph":[1582059523.9702],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["fit <- lm(CO2MASS ~ CR, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:58:45"],"user":["default_user"],"umph":[1582059525.0401],"ok":[true],"chunk":[12],"ex":[5],"e.ind":[0],"code":["p1 <- predict(fit, newdata = east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 21:58:47"],"user":["default_user"],"umph":[1582059527.4062],"ok":[true],"chunk":[13],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS~CR, east)\nlines(east$CR, p1, col=\"red\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-18 23:12:54"],"user":["default_user"],"umph":[1582063974.568],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:26"],"user":["default_user"],"umph":[1582064006.2002],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:28"],"user":["default_user"],"umph":[1582064008.3141],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:30"],"user":["default_user"],"umph":[1582064010.4524],"ok":[true],"chunk":[10],"ex":[5],"e.ind":[0],"code":["# Exemplarisch fuer \"EAST Interconnection\"\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:32"],"user":["default_user"],"umph":[1582064012.4354],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["fit <- lm(CO2MASS ~ CR, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:33"],"user":["default_user"],"umph":[1582064013.8385],"ok":[true],"chunk":[12],"ex":[5],"e.ind":[0],"code":["p1 <- predict(fit, newdata = east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:36"],"user":["default_user"],"umph":[1582064016.8674],"ok":[true],"chunk":[13],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS~CR, east)\nlines(east$CR, p1, col=\"red\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:39"],"user":["default_user"],"umph":[1582064019.6841],"ok":[true],"chunk":[14],"ex":[5],"e.ind":[0],"code":["regression.result= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            #model.names = FALSE,\n            #object.names = TRUE,\n            #model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n} "],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:43"],"user":["default_user"],"umph":[1582064023.3104],"ok":[true],"chunk":[15],"ex":[5],"e.ind":[0],"code":["regression.result(fit)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:46"],"user":["default_user"],"umph":[1582064026.3134],"ok":[true],"chunk":[16],"ex":[5],"e.ind":[0],"code":["CR.squared <- east$CR^2\nfit2 <- lm(CO2MASS ~ CR + CR.squared, east)\n\nCR.cubed <- east$CR^3\nfit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:47"],"user":["default_user"],"umph":[1582064027.8843],"ok":[true],"chunk":[17],"ex":[5],"e.ind":[0],"code":["p2 <- predict(fit2, east)\np3 <- predict(fit3, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:13:49"],"user":["default_user"],"umph":[1582064029.6345],"ok":[true],"chunk":[18],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS ~ CR, east)    # plot points\nlines(smooth.spline(east$CR, p1), col = \"blue\")\nlines(smooth.spline(east$CR, p2), col = \"red\")\nlines(smooth.spline(east$CR, p3), col = \"green\")# add regression line, using `predict` to generate y-values\n\n\n\nplot(CO2MASS~CR, east)\nlines(east$CR, p1, col=\"red\")\nlines(east$CR, p2, col=\"blue\")\nlines(east$CR, p3, col=\"green\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:14:10"],"user":["default_user"],"umph":[1582064050.1713],"ok":[true],"chunk":[19],"ex":[5],"e.ind":[0],"code":["regression.result(fit, fit2, fit3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-18 23:14:16"],"user":["default_user"],"umph":[1582064056.1303],"ok":[true],"chunk":[20],"ex":[5],"e.ind":[0],"code":["anova(fit, fit2, fit3)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-21 16:33:14"],"user":["default_user"],"umph":[1582299194.3007],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:36"],"user":["default_user"],"umph":[1582299216.3941],"ok":[true],"chunk":[8],"ex":[5],"e.ind":[0],"code":["# Daten einlesen\n# in chunk fehler ausblenden\ndata <- read_csv(\"Data/main_data.csv\")\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:42"],"user":["default_user"],"umph":[1582299222.0852],"ok":[true],"chunk":[9],"ex":[5],"e.ind":[0],"code":["#TABLE 1 Summary Statistics\n\ntable1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:45"],"user":["default_user"],"umph":[1582299225.0052],"ok":[true],"chunk":[10],"ex":[5],"e.ind":[0],"code":["# Exemplarisch fuer \"EAST Interconnection\"\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:46"],"user":["default_user"],"umph":[1582299226.4867],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["fit <- lm(CO2MASS ~ CR, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:47"],"user":["default_user"],"umph":[1582299227.9902],"ok":[true],"chunk":[12],"ex":[5],"e.ind":[0],"code":["p1 <- predict(fit, newdata = east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:52"],"user":["default_user"],"umph":[1582299232.8622],"ok":[true],"chunk":[13],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS~CR, east)\nlines(east$CR, p1, col=\"red\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:33:56"],"user":["default_user"],"umph":[1582299236.4855],"ok":[true],"chunk":[14],"ex":[5],"e.ind":[0],"code":["regression.result= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            #model.names = FALSE,\n            #object.names = TRUE,\n            #model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n} "],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:02"],"user":["default_user"],"umph":[1582299242.1926],"ok":[true],"chunk":[14],"ex":[5],"e.ind":[0],"code":["regression.result= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            #model.names = FALSE,\n            #object.names = TRUE,\n            #model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n} "],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:05"],"user":["default_user"],"umph":[1582299245.5522],"ok":[false],"chunk":[15],"ex":[5],"e.ind":[1],"code":[""],"message":["\nYou have not yet entered all correct commands."]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:07"],"user":["default_user"],"umph":[1582299247.718],"ok":[false],"chunk":[15],"ex":[5],"e.ind":[1],"code":[""],"message":["\nYou have not yet entered all correct commands."]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:14"],"user":["default_user"],"umph":[1582299254.9236],"ok":[true],"chunk":[15],"ex":[5],"e.ind":[0],"code":["regression.result(fit)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:17"],"user":["default_user"],"umph":[1582299257.4071],"ok":[true],"chunk":[16],"ex":[5],"e.ind":[0],"code":["CR.squared <- east$CR^2\nfit2 <- lm(CO2MASS ~ CR + CR.squared, east)\n\nCR.cubed <- east$CR^3\nfit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:27"],"user":["default_user"],"umph":[1582299267.7075],"ok":[true],"chunk":[16],"ex":[5],"e.ind":[0],"code":["CR.squared <- east$CR^2\nfit2 <- lm(CO2MASS ~ CR + CR.squared, east)\n\nCR.cubed <- east$CR^3\nfit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:29"],"user":["default_user"],"umph":[1582299269.2479],"ok":[false],"chunk":[17],"ex":[5],"e.ind":[1],"code":[""],"message":["\nYou have not yet made an assignment to p2."]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:30"],"user":["default_user"],"umph":[1582299270.6685],"ok":[true],"chunk":[17],"ex":[5],"e.ind":[0],"code":["p2 <- predict(fit2, east)\np3 <- predict(fit3, east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:32"],"user":["default_user"],"umph":[1582299272.8203],"ok":[true],"chunk":[18],"ex":[5],"e.ind":[0],"code":["plot(CO2MASS ~ CR, east)    # plot points\nlines(smooth.spline(east$CR, p1), col = \"blue\")\nlines(smooth.spline(east$CR, p2), col = \"red\")\nlines(smooth.spline(east$CR, p3), col = \"green\")# add regression line, using `predict` to generate y-values\n\n\n\nplot(CO2MASS~CR, east)\nlines(east$CR, p1, col=\"red\")\nlines(east$CR, p2, col=\"blue\")\nlines(east$CR, p3, col=\"green\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:45"],"user":["default_user"],"umph":[1582299285.1257],"ok":[true],"chunk":[19],"ex":[5],"e.ind":[0],"code":["regression.result(fit, fit2, fit3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 16:34:49"],"user":["default_user"],"umph":[1582299289.9338],"ok":[true],"chunk":[20],"ex":[5],"e.ind":[0],"code":["anova(fit, fit2, fit3)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-21 23:20:07"],"user":["default_user"],"umph":[1582323607.419],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:20:22"],"user":["default_user"],"umph":[1582323622.8159],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["data <- suppressMessages(read_csv(\"Data/main_data.csv\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:20:24"],"user":["default_user"],"umph":[1582323624.5751],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["table1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:20:26"],"user":["default_user"],"umph":[1582323626.634],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["ggplot(data,aes(x=gasprice2,y=CO2MASS,color=intercn))+\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +\n        theme_bw()+ \n        labs(y=\"CO2 Emissions\", \n        x=\"Gas Price\", \n        title=\"CO2 Emissions vs. Gasprice\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-21 23:22:44"],"user":["default_user"],"umph":[1582323764.0158],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-21 23:22:54"],"user":["default_user"],"umph":[1582323774.2801],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:22:59"],"user":["default_user"],"umph":[1582323779.9249],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["data <- suppressMessages(read_csv(\"Data/main_data.csv\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:23:01"],"user":["default_user"],"umph":[1582323781.4159],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["table1 <- data %>% \n  group_by(intercn) %>% \n  select(CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n # rename(\"CO2 Emissions\" = CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)   %>% \n  summarise_all(\"mean\") \n  \ntable1"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:23:03"],"user":["default_user"],"umph":[1582323783.2021],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["ggplot(data,aes(x=gasprice2,y=CO2MASS,color=intercn))+\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +\n        theme_bw()+ \n        labs(y=\"CO2 Emissions\", \n        x=\"Gas Price\", \n        title=\"CO2 Emissions vs. Gasprice\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-21 23:30:48"],"user":["default_user"],"umph":[1582324248.2867],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-21 23:31:24"],"user":["default_user"],"umph":[1582324284.6694],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:31:30"],"user":["default_user"],"umph":[1582324290.4299],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["data <- suppressMessages(read_csv(\"Data/main_data.csv\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:31:31"],"user":["default_user"],"umph":[1582324291.8939],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["table <- data %>% \n  group_by(intercn) %>% \n  select(intercn, CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  summarise_all(\"mean\") %>% \n  rename(\"CO2 Emissions\"=CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)\n\ntable"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:31:33"],"user":["default_user"],"umph":[1582324293.5078],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["ggplot(data,aes(x=gasprice2,y=CO2MASS,color=intercn))+\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +\n        theme_bw()+ \n        labs(y=\"CO2 Emissions\", \n        x=\"Gas Price\", \n        title=\"CO2 Emissions vs. Gasprice\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-21 23:32:11"],"user":["default_user"],"umph":[1582324331.3514],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:32:16"],"user":["default_user"],"umph":[1582324336.3233],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["data <- suppressMessages(read_csv(\"Data/main_data.csv\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:32:17"],"user":["default_user"],"umph":[1582324337.7624],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["table <- data %>% \n  group_by(intercn) %>% \n  select(intercn, CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  summarise_all(\"mean\") %>% \n  rename(\"CO2 Emissions\"=CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)\n\ntable"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-21 23:32:19"],"user":["default_user"],"umph":[1582324339.0876],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["ggplot(data,aes(x=gasprice2,y=CO2MASS,color=intercn))+\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +\n        theme_bw()+ \n        labs(y=\"CO2 Emissions\", \n        x=\"Gas Price\", \n        title=\"CO2 Emissions vs. Gasprice\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-22 14:53:03"],"user":["default_user"],"umph":[1582379583.5826],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-22 19:45:29"],"user":["default_user"],"umph":[1582397129.038],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-22 19:45:48"],"user":["default_user"],"umph":[1582397148.7817],"ok":[true],"chunk":[11],"ex":[5],"e.ind":[0],"code":["data <- suppressMessages(read_csv(\"Data/main_data.csv\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-22 19:45:50"],"user":["default_user"],"umph":[1582397150.514],"ok":[true],"chunk":[12],"ex":[5],"e.ind":[0],"code":["# ... <- data %>% \n#  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n#  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n#  filter(intercn==\"...\")\neast <- data %>% \n  select(date, intercn, CO2MASS, coal_price, gasprice2, meant, load, nonFossil) %>% \n  mutate(CR = coal_price/gasprice2, CO2MASS=CO2MASS/1000000) %>% \n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-22 20:08:38"],"user":["default_user"],"umph":[1582398518.5471],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-02-22 20:08:57"],"user":["default_user"],"umph":[1582398537.2802],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["data <- suppressMessages(read_csv(\"Data/main_data.csv\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-22 20:08:59"],"user":["default_user"],"umph":[1582398539.3571],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["table <- data %>% \n  group_by(intercn) %>% \n  select(intercn, CO2MASS, load, gasprice2, coal_price) %>% \n  mutate(CO2MASS = CO2MASS/1000, load=load/1000, \"Emission Rate\"=CO2MASS/load, \"Cost Ratio\"=coal_price/gasprice2) %>% \n  summarise_all(\"mean\") %>% \n  rename(\"CO2 Emissions\"=CO2MASS, Load=load, \"Gas Price\"=gasprice2, \"Coal Price\"=coal_price)\n\ntable"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-02-22 20:09:01"],"user":["default_user"],"umph":[1582398541.1823],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["ggplot(data,aes(x=gasprice2,y=CO2MASS,color=intercn))+\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +\n        theme_bw()+ \n        labs(y=\"CO2 Emissions\", \n        x=\"Gas Price\", \n        title=\"CO2 Emissions vs. Gasprice\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-02-22 20:14:37"],"user":["default_user"],"umph":[1582398877.8717],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-22 20:37:35"],"user":["default_user"],"umph":[1582400255.0023],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 00:11:38"],"user":["default_user"],"umph":[1582413098.7942],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 00:33:37"],"user":["default_user"],"umph":[1582414417.0756],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 00:34:24"],"user":["default_user"],"umph":[1582414464.4277],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 00:39:14"],"user":["default_user"],"umph":[1582414754.4304],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 00:50:58"],"user":["default_user"],"umph":[1582415458.2012],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 15:02:57"],"user":["default_user"],"umph":[1582466577.1964],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 16:10:37"],"user":["default_user"],"umph":[1582470637.9695],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 16:11:52"],"user":["default_user"],"umph":[1582470712.8825],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-02-23 18:18:53"],"user":["default_user"],"umph":[1582478333.1842],"ok":[true]}
+,
