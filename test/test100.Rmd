@@ -1,130 +1,56 @@
-
-
-
 ```{r}
+library(haven)
 library(tidyverse)
-library(splines)  
-  
-# Generate a model for each Species
-models = iris %>% 
-  split(iris$Species) %>% 
-  map(~lm(Petal.Width ~ bs(Sepal.Width), data=.x))
+library(ggplot2)
+
+
+library(ggiraphExtra)
+```
+
+
+
+```{r}
+# Daten einlesen
+# in chunk fehler ausblenden
+setwd("X:/libraries/RTutor_BA")
+data <- read_csv(".Data/main_data.csv")
+
 ```
 
 ```{r}
-# Get Sepal.Width values at which we want predictions
-newdat = data.frame(Sepal.Width=seq(min(iris$Sepal.Width), max(iris$Sepal.Width), length=20)) 
+# Exemplarisch fuer "EAST Interconnection"
 
-model.predictions = map_df(models, ~cbind(newdat, Petal.Width=predict(.x, newdat)),
-       .id="Species") 
-
-ggplot(iris, aes(Sepal.Width, Petal.Width, colour=Species)) +
-  # Show raw data
-  geom_point() +
-  # Compare internal geom_smooth calculations with our models
-  geom_smooth(size=1.5, linetype="11", se=FALSE, formula=y ~ bs(x), method="lm") +
-  # Plot model predictions
-  geom_line(data=model.predictions) +
-  theme_classic()
+data_1 <- data %>% 
+  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
+  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>% 
+  filter(intercn=="EAST")
 ```
 
+
+
 ```{r}
+fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, data_1)
+
+p4 <- predict(fit4, data_1)
 
 
-
-fit4 <- lm(CO2MASS ~ CR + load + meant, data_1)
-
-
-
-
-
-
-predicted_df <- data.frame(CO2MASS = predict(fit4, data_1), gasprice=data_1$gasprice)
-
-# this is the predicted line of multiple linear regression
-ggplot(data = data_1, aes(x = gasprice, y = CO2MASS)) + 
-  geom_point(color='blue') +
-  stat_smooth(color='red',data = predicted_df, aes(x=gasprice, y=CO2MASS))
-
-
-
-
+regression.result(fit4)
 
 effectplot(fit4, show.ci = TRUE)
 
 
-#ggPredict(fit4,se=TRUE,interactive=TRUE)
+pispl <- periodicSpline(data_1$gasprice, p4)
 
 
-model <-splines::bs(CO2MASS ~ CR + load + meant, data_1)
-
-
-x <- data_1$gasprice
-y <- data_1$CO2MASS
-
-plot(x,y)
-
-library(splines)
-b <- bs(x)
-str(b)
-
-lm2= lm(y~b)
-
-pr = predict(lm2, newdata = data.frame(x))
-plot(x, y)
-points(x, pr, col = "red", pch = 19, cex = 0.5)
-
-
-
-
-#CO2_season_time <- gam(co2 ~ s(month, bs = 'cc', k = 12) + s(time), data = CO2, method = "REML")
-
-
-ggplot(data_1, aes(x, y)) + geom_point() + stat_smooth(method = "gam", formula = y ~s(x))
 
 ```
-
-
-
-
 
 
 
 ```{r}
-##  Example: Average temperatures at different latitudes
-x <- data_1$gasprice
-y <- data_1$CO2MASS
-xs <- seq(-60, 70, by = 1)
-
-# Generate a function for this
-pp <- cubicspline(x, y)
-ppfun <- function(xs) ppval(pp, xs)
-
-## Not run: 
-# # Plot with and without endpoint correction
- plot(x, y, col = "darkblue",
-            xlim = c(-60, 70), ylim = c(-3.5, -2.8),
-           xlab = "Latitude", ylab = "Temp. Difference",
-          main = "Earth Temperatures per Latitude")
-lines(spline(x, y), col = "darkgray")
-grid()
-# 
- ys <- cubicspline(x, y, xs, endp2nd = TRUE)     # der = 0 at endpoints
- lines(xs, ys, col = "red")
- ys <- cubicspline(x, y, xs)                     # no endpoint condition
- lines(xs, ys, col = "darkred")
-# ## End(Not run)
+# NOT RUN {
+# }
 ```
-
-
-
-
-
-
-
-
-
-
 
 
 

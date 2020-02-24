@@ -12,7 +12,7 @@ library(yaml)
 #library(restorepoint)
 setwd("X:/libraries/RTutor_BA")
 ps.name = "CarbonReductionCosts"; sol.file = paste0(ps.name,"_sol.Rmd")
-libs = c("dplyr", "ggplot2", "gridExtra", "htmlTable", "stargazer", "reshape2", "pracma", "haven", "tidyverse", "ggalt") # character vector of all packages you load in the problem set
+libs = c("dplyr", "ggplot2", "gridExtra", "htmlTable", "stargazer", "pracma", "haven", "tidyverse", "ggalt") # character vector of all packages you load in the problem set
 name.rmd.chunks(sol.file) # set auto chunk names in this file
 create.ps(sol.file=sol.file, ps.name=ps.name, user.name=NULL,libs=libs, stop.when.finished=FALSE, addons="quiz") # extra.code.file="dp.R", var.txt.file ="variables.txt")
 show.shiny.ps(ps.name, load.sav=FALSE,  sample.solution=TRUE, is.solved=TRUE, catch.errors=TRUE, launch.browser=TRUE)
@@ -30,7 +30,7 @@ rtutor.package.skel(sol.file=sol.file, ps.name=ps.name,libs=libs,
 #>
 
 
-Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Sorely questioning the moral of the population though, won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
+Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Purely questioning the moral of the population though, won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
 In this problem set we will approach one possible countermeasure by analysing how carbon pricing would reduce emissions in the electricty sector. The analysis is based on **"Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach using the Shale Revolution"** by Joseph A. Cullen, Erin T. Mansur (2016) - further simply referred as Cullen. The paper and further ressources can be downloaded from <a href="https://www.aeaweb.org/articles?id=10.1257/pol.20150388   target = "_blank"> https://www.aeaweb.org/articles?id=10.1257/pol.20150388</a>
 
 You will use the `Statstical Programming Language R` to replicate the analysis. Basic knowledge of `R` is required, but information on important function will be provided. 
@@ -275,6 +275,12 @@ ggplot(data=PaGP, aes(x=date)) +
 
 ////Text zu oben.
 
+
+#< award "Starter Kit"
+Good Start! You will earn awards at the end of every chapter. At the end you will see how many you have earned.
+#>
+
+
 ## Exercise 2 -- Interconnections
 
 ![Interconnections](./Material/interconnections.png) (SOURCE)
@@ -337,6 +343,9 @@ The data frame is a combination of data frames used in previous exercises and ad
 `coal_price` = Price of Coal ($ per million BTU)  
 `load` = daily electricity consumption per interconnection in MWH  
 `meant` = average daily temperature per interconnection  
+`nonFossil`
+`so2price`
+`netNSflow`
 #>
 
 
@@ -393,7 +402,7 @@ As we have seen in the previous exercise, the data heavily differ in the differe
 As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on on each intersection.
 Since we observe substantial variation in coal and gas prices, we additionally add a new variable for relative costs `CR` (`Cost Ratio`), which is defined as below:
 
-$CR=\frac{C_{coal}}{C_{gas}}$
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$
 
 //////////////CR ? CO2MASS/1000 EAJJAPODJAWPDJP
 
@@ -418,7 +427,7 @@ display("Replace the variable name with the one given in the exercise descriptio
 ### Stage 1: Linear Regression
 
 
-$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}P_{co2}}{P_{gas}+CO_{2,gas}P_{co2}}$
+
 
 
 ```{r "3_1__3"}
@@ -426,7 +435,7 @@ fit <- lm(CO2MASS ~ CR, data=east)
 ```
 
 #< info "Predict"
-INFOBOX PREDICT
+`predict()`
 #>
 
 INTERPRETATION LINEAR REGRESSION
@@ -513,11 +522,13 @@ QQ PLOT RESIDUALS?
 
 #< info "R-squared"
 `R-Squared` is a statistical measurement that represents the correlation between the fitted values of y (predited values) and the observed values (data you put into the regression formula). R-squared is always positive and ranges from 0 to 1. An `R-squared` value closer to 1 indicates that the suggested model explains a major portion of variance in the outcome variable.  
+$R^{2}=1-\frac{Explained Variation}{Total Variation}$
 The problem with `R-squared` measurement is, that it always increases with higher numbers of variables in the model, even if these variables are only weakly responsible for the predicted values. An solution is to take the number of variables into account, this is called `Adjusted R-Squared` and also shown in the summary output.
 #>
 
-### Stage 2: Polonymal Regression
+### Stage 2: Multivariate Regression
 
+**Task:** Just press *check*.
 ```{r "3_1__9"}
 CR.squared <- east$CR^2
 fit2 <- lm(CO2MASS ~ CR + CR.squared, east)
@@ -526,12 +537,13 @@ CR.cubed <- east$CR^3
 fit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)
 ```
 
+**Task:** Just press *check*.
 ```{r "3_1__10"}
 p2 <- predict(fit2, east)
 p3 <- predict(fit3, east)
 ```
 
-
+**Task:** Just press *check*.
 ```{r "3_1__11"}
 plot(CO2MASS ~ CR, east)    # plot points
 lines(smooth.spline(east$CR, p1), col = "blue")
@@ -546,12 +558,12 @@ lines(east$CR, p2, col="blue")
 lines(east$CR, p3, col="green")
 ```
 
-
+**Task:** Just press *check*.
 ```{r "3_1__12"}
 regression.result(fit, fit2, fit3)
 ```
 
-
+**Task:** Just press *check*.
 ```{r "3_1__13"}
 anova(fit, fit2, fit3)
 ```
@@ -559,52 +571,194 @@ anova(fit, fit2, fit3)
 
 ### Stage 3: Linear Regression
 
+We came to the conclusion that it not enough to build a model purely arounnd `$CO_{2}$ emissions` and the `cost ratio` of gas and coal. In this section we will build a advanced model that includes several `addtitional variables`. The model is a `reduced-form regression` as follow:  
+  
+$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$
 
-In the following section we will estimate the following model:
 
-$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+D\gamma+\epsilon_t$
+#< info "Meaning of Variables" 
+`$CO_{2t}$` = CO2 emissions in tons  
+`$CR_{t}$` = Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
+`$load_{t}$` = daily electricity consumption per interconnection in MWH  
+`meant` = average daily temperature per interconnection  
+
+$X_{t}$ = We include traditional factors like non-fossil electricity production (regenerative energies like solar, hydro or wind), 
+`nonFossil`
+`so2price`
+`netNSflow`
+#>
+
 
 First we will use ...
 
-
-```{r}
-fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil, data_1)
+**Task:** Just press *check*.
+```{r "3_1__14"}
+fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, east) 
 ```
 
+**Task:** Just press *check*.
+```{r "3_1__15"}
+effectplot(fit4, show.ci = TRUE)
+```
 
-Alle Kontrollvariablen
+**Task:** Just press *check*.
+```{r "3_1__16"}
+regression.result(fit4)
+```
 
-PLOT? NOPLOT
 
 
 https://datasciencebeginners.com/2018/12/20/multinomial-logistic-regression-using-r/
 
 
-### Stage 4: Linear Regression
+#< award "Linear Regression Expert"
+TEXT
+#>
 
 
-spline regression,
+## Exercise 4.1 -- Estimated CO2 Response to Fuel Prices
 
 
-komplette eskalation
+In this exercise we will use the findings we got in the last chapter and visualize our results. We will use the multivariate model we defined in the last exercise.
 
-https://stackoverflow.com/questions/37040552/cubic-spline-method-for-longitudinal-series-data
+Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
 
+We will use cubic splines on our model 
 
-
-
-
-## Exercise 3.2 -- Plotting Results
+What are Cubic Splines?
 
 
-Figure 6 plotten
-
-und Figure 7?
 
 
-## Exercise 4 -- Conclusion
+
+Datensatz aendern, sodass 3.2.2 rausfliegt?
+
+**Task:** Just press *check*.
+```{r "4_1"}
+data <- read_csv("Data/main_data.csv")
+```
+
+**Task:** Just press *check*.
+```{r "4_1__2"}
+# Exemplarisch fuer "EAST Interconnection"
+
+dat <- data %>% 
+  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
+  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000)
+```
+
+**Task:** Just press *check*.
+```{r "4_1__3"}
+dat_east <- dat %>% filter(intercn=="EAST")
+
+dat_wecc <- dat %>% filter(intercn=="WECC")
+
+dat_ercot <- dat %>%  filter(intercn=="ERCOT")
+```
 
 
+**Task:** Just press *check*.
+```{r "4_1__4"}
+model <- CO2MASS ~ gasprice + load + meant + nonFossil + so2price + netNSflow
+model2 <- CO2MASS ~ s(gasprice, bs = 'cr', k=6) + s(meant, bs= 're') + s(load, bs= 're') + s(load, bs= 're') + s(load, bs= 're') 
+```
+
+**Task:** Just press *check*.
+```{r "4_1__5"}
+fit_east <- lm(model, data = dat_east)
+fit_wecc <- lm(model, data = dat_wecc)
+fit_ercot <- lm(model, data = dat_ercot)
+```
+
+**Task:** Just press *check*.
+```{r "4_1__6"}
+####### Plot result for Interconnection "EAST"
+CO2_pred_east2 <- data.frame(CO2MASS = dat_east$CO2MASS,
+                       gasprice = dat_east$gasprice,
+                       predicted_values = predict(fit_east, newdata = dat_east))
+
+#find predicted CO2MASS at gas base price = 5.75?
+
+#calculate percentage change to base 
+CO2_pred_east <- CO2_pred_east2 %>% 
+  mutate(predicted_values_perc = predicted_values/5.305963-1)
+
+#save plot to variable
+plot_east <- ggplot(CO2_pred_east, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  #stat_smooth(aes(y=predicted_values_perc))+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
+
+####### Plot result for Interconnection "ERCOT"
+CO2_pred_ercot2 <- data.frame(CO2MASS = dat_ercot$CO2MASS,
+                       gasprice = dat_ercot$gasprice,
+                       predicted_values = predict(fit_ercot, newdata = dat_ercot))
+
+#find predicted CO2MASS at gas base price = 5.75?
+
+#calculate percentage change to base 
+CO2_pred_ercot <- CO2_pred_ercot2 %>% 
+  mutate(predicted_values_perc = predicted_values/0.5676612-1)
+
+#save plot to variable
+plot_ercot <- ggplot(CO2_pred_ercot, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
+
+
+####### Plot result for Interconnection "WECC"
+CO2_pred_wecc2 <- data.frame(CO2MASS = dat_wecc$CO2MASS,
+                       gasprice = dat_wecc$gasprice,
+                       predicted_values = predict(fit_wecc, newdata = dat_wecc))
+
+#find predicted CO2MASS at gas base price = 5.75?
+
+#calculate percentage change to base 
+CO2_pred_wecc <- CO2_pred_wecc2 %>% 
+  mutate(predicted_values_perc = predicted_values/0.9217305-1)
+
+#save plot to variable
+plot_wecc <- ggplot(CO2_pred_wecc, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
+```
+
+**Task:** Just press *check*.
+```{r "4_1__7"}
+plot_east
+plot_ercot
+plot_wecc
+```
+
+
+#< award "Spine Surgeon"
+This was a critical operation, but you mastered it! Keep going, the hardest part is over.
+#>
+
+## Exercise 4.2 --  Imputed CO2 Response to Carbon Prices
+
+${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
+
+Figure 7
+
+
+## Exercise 5 -- Conclusion
+
+
+```{r "5"}
+#< task
+awards()
+#>
+```
 
 
 ## Exercise References

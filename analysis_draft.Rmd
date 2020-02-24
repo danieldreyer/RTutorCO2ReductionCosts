@@ -202,44 +202,42 @@ ggplot(data = preds2)+
 
 ```{r}
 ################# CUBIC SPLINE DRAFT ######################
-x
-
-model <- bs(data_1$CR, df = 3)
+#modell mit allen variablen???????????
+library(splines)
+model <- bs(data_1$CR, df = 3, knots=6)
 fm1 <- lm(CO2MASS~bs(gasprice), data=data_1)
 
-fit <-predict(fm1)
-
-
-
-CO2_pred <- data.frame(CO2MASS = data_1$CO2MASS,
-                       gasprice = data_1$gasprice,
-                       predicted_values = predict(fm1))
-
-
-
-ggplot(CO2_pred, aes(x = gasprice)) +
-  geom_point(aes(y = CO2MASS), size = 1, alpha = 0.5) + geom_smooth(aes(y = predicted_values), colour = "red")
-
-
-
-ggplot(CO2_pred, aes(x=gasprice, y=CO2MASS) ) +
-  #geom_point() 
-  
-  stat_smooth(aes(y = temp), colour = "red") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_x_continuous(limits=c(2, 12)) +
-  geom_vline(xintercept = 5.75, linetype = "dashed")
- # scale_x_reverse()
-
-
-
+fit <-predict(fm1, interval = "confidence")
 
 ## predict CO2 bei 5.75 fuer % 
 
 5.395963
 
+#create new dataframe with fitted values and confidence band
+fit <- as.data.frame(fit)
+CO2_pred <- data.frame(CO2MASS = data_1$CO2MASS,
+                       gasprice = data_1$gasprice,
+                       predicted_values = fit$fit,
+                       predicted_lwr = fit$lwr,
+                       predicted_upr = fit$upr)
+
+#Transform into percentage changes regards to predicted co2-emission at base-gasprice
 CO2_pred <- CO2_pred %>% 
-  mutate(temp = predicted_values/5.395963-1)
+  mutate(predicted_values_perc = predicted_values/5.395963-1,
+         predicted_lwr_perc = predicted_lwr/5.357381-1,
+         predicted_upr_perc = predicted_upr/5.434546-1)
+
+#plot
+ggplot(CO2_pred, aes(x=gasprice, y=CO2MASS) ) +
+  geom_line(aes(y = predicted_values_perc), colour = "red") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed") +
+  geom_ribbon(data=CO2_pred, aes(ymin=predicted_lwr_perc, ymax=predicted_upr_perc), alpha=0.3)
+
+
+
+summary(fm1)
 
 ```
 
@@ -282,33 +280,55 @@ ggplot(data_1, aes(gasprice, CO2MASS) ) +
 ```{r}
 
 library("mgcv")
-
-model <- CO2MASS ~ s(gasprice, bs = 'cr', k=10) + s(meant, bs= 're') + s(load, bs= 're')
+model <- CO2MASS ~ gasprice + load + meant + nonFossil + so2price + netNSflow
+#model <- CO2MASS ~ s(gasprice, bs = 'cr', k=3) + s(meant, bs= 're') + s(load, bs= 're')
 
 fit <- gam(model, data = data_1, family = "gaussian", discrete = TRUE, nthreads = 2)
 
 
-summary(fit)
+#summary(fit)
 
-invisible(gam.check(fit))
+#invisible(gam.check(fit))
 
-plot.gam(fit, page = 1)
+#plot.gam(fit, page = 1)
 
+co2_pred <- data.frame(CO2MASS = data_1$CO2MASS,
+                       gasprice = data_1$gasprice,
+                       fitted = fit$fitted.values)
 
+plot(fitted~gasprice, data=co2_pred)
 
 
 CO2_pred <- data.frame(CO2MASS = data_1$CO2MASS,
                        gasprice = data_1$gasprice,
                        predicted_values = predict.gam(fit, newdata = data_1))
 
+CO2_pred <- CO2_pred %>% 
+  mutate(temp = predicted_values/5.395963-1)
+
+#ggplot(CO2_pred, aes(x = gasprice)) +
+#  geom_point(aes(y = CO2MASS), size = 1, alpha = 0.5) + stat_smooth(aes(y = predicted_values), colour = "red")
+
+#ggplot(CO2_pred, aes(x = gasprice)) +
+#  geom_point(aes(y = CO2MASS), size = 1, alpha = 0.5) + stat_smooth(aes(y = predicted_values), colour = "red")
 
 
-ggplot(CO2_pred, aes(x = gasprice)) +
-  geom_point(aes(y = CO2MASS), size = 1, alpha = 0.5) + geom_smooth(aes(y = predicted_values), colour = "red")
 
-ggplot(CO2_pred, aes(x = gasprice)) +
-  geom_point(aes(y = CO2MASS), size = 1, alpha = 0.5) + stat_smooth(aes(y = predicted_values), colour = "red")
+ggplot(CO2_pred, aes(x=gasprice, y=CO2MASS) ) +
+  #geom_point() 
+  
+  geom_smooth(aes(y = temp), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
 
+summary(fit)
+
+
+
+ggplot(co2_pred, aes(x=gasprice, y=fitted)) +
+  geom_line()
 
 ```
 

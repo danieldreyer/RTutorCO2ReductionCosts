@@ -1,0 +1,29 @@
+```{r}
+#117 is lbs carbon/MMBTU for gas or 0.0585 tons/MMBTU
+#210.8 is lbs carbon/MMBTU for coal or .1054 tons/MMBTUgen
+			
+			
+#carbontax = (priceratio*`basegas' - `basecoal')/(0.1054-priceratio*0.0585)
+
+basegas <- 5.75
+basecoal <- 2.25
+
+
+
+
+dat <- dat %>% 
+  mutate(carbontax = (CR*5.75-2.25)/(0.1054-CR*0.0585))
+
+tax_east <- dat %>% 
+  filter(carbontax >= 0 & carbontax <= 70 & intercn == "EAST")
+
+tax_wecc <- dat %>% 
+  filter(carbontax >= 0 & carbontax <= 70 & intercn == "WECC")
+
+tax_ercot <- dat %>% 
+  filter(carbontax >= 0 & carbontax <= 70 & intercn == "ERCOT")
+
+
+
+```
+

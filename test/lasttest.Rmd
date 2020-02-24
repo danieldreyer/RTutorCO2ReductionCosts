@@ -1,0 +1,131 @@
+```{r}
+library("mgcv")
+```
+
+
+
+Datensatz aendern, sodass 3.2.2 rausfliegt?
+```{r "3_2"}
+data <- read_csv("Data/main_data.csv")
+```
+
+```{r "3_2__2"}
+# Exemplarisch fuer "EAST Interconnection"
+
+dat <- data %>% 
+  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
+  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000)
+```
+
+```{r}
+dat_east <- dat %>% filter(intercn=="EAST")
+
+dat_wecc <- dat %>% filter(intercn=="WECC")
+
+dat_ercot <- dat %>%  filter(intercn=="ERCOT")
+```
+
+
+
+```{r}
+model <- CO2MASS ~ gasprice + load + meant + nonFossil + so2price + netNSflow
+#model <- CO2MASS ~ s(gasprice, bs = 'cr', k=5) + s(meant, bs= 're') + s(load, bs= 're') + s(nonFossil, bs= 're')+ s(so2price, bs= 're')+ s(netNSflow, bs= 're')
+```
+
+
+```{r}
+#fit_east <- gam(model, data = dat_east, family = "gaussian", discrete = TRUE, nthreads = 2)
+#fit_wecc <- gam(model, data = dat_wecc, family = "gaussian", discrete = TRUE, nthreads = 2)
+#fit_ercot <- gam(model, data = dat_ercot, family = "gaussian", discrete = TRUE, nthreads = 2)
+fit_east <- lm(model, data = dat_east)
+fit_wecc <- lm(model, data = dat_wecc)
+fit_ercot <- lm(model, data = dat_ercot)
+```
+
+```{r}
+####### Plot result for Interconnection "EAST"
+CO2_pred_east <- data.frame(CO2MASS = dat_east$CO2MASS,
+                       gasprice = dat_east$gasprice,
+                       predicted_values = predict(fit_east, newdata = dat_east))
+
+#find predicted CO2MASS at gas base price = 5.75?
+
+#calculate percentage change to base 
+CO2_pred_east <- CO2_pred_east %>% 
+  mutate(predicted_values_perc = predicted_values/5.305963-1)
+
+#save plot to variable
+plot_east <- ggplot(CO2_pred_east, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  #stat_smooth(aes(y=predicted_values_perc))+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
+
+####### Plot result for Interconnection "ERCOT"
+CO2_pred_ercot <- data.frame(CO2MASS = dat_ercot$CO2MASS,
+                       gasprice = dat_ercot$gasprice,
+                       predicted_values = predict(fit_ercot, newdata = dat_ercot))
+
+#find predicted CO2MASS at gas base price = 5.75?
+
+#calculate percentage change to base 
+CO2_pred_ercot <- CO2_pred_ercot %>% 
+  mutate(predicted_values_perc = predicted_values/0.5676612-1)
+
+#save plot to variable
+plot_ercot <- ggplot(CO2_pred_ercot, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
+
+
+####### Plot result for Interconnection "WECC"
+CO2_pred_wecc <- data.frame(CO2MASS = dat_wecc$CO2MASS,
+                       gasprice = dat_wecc$gasprice,
+                       predicted_values = predict(fit_wecc, newdata = dat_wecc))
+
+#find predicted CO2MASS at gas base price = 5.75?
+
+#calculate percentage change to base 
+CO2_pred_wecc <- CO2_pred_wecc %>% 
+  mutate(predicted_values_perc = predicted_values/0.9217305-1)
+
+#save plot to variable
+plot_wecc <- ggplot(CO2_pred_wecc, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+ # scale_x_reverse()
+
+predict(fit_ercot, dat_ercot$gasprice)
+```
+
+
+
+
+```{r}
+plot_east
+plot_ercot
+plot_wecc
+```
+
+
+```{r}
+regression.result(fit_east, fit_ercot, fit_wecc)
+#summary(fit)
+
+#invisible(gam.check(fit))
+
+plot(fit_east)
+
+summary.gam(fit_east)
+
+gam.check(fit_wecc)
+```
+
+

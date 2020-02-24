@@ -19,7 +19,7 @@ Author: Daniel Dreyer
 
 
 
-Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Sorely questioning the moral of the population though, won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
+Welcome to this interactive problem set. The awareness of climate change rose significantly over the past years. Purely questioning the moral of the population though, won't avoid its' highly uncertain effects. Therefore high efforts are made to find technical improvements as well as economical incentitives to avoid long term effects of climate change.   
 In this problem set we will approach one possible countermeasure by analysing how carbon pricing would reduce emissions in the electricty sector. The analysis is based on **"Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach using the Shale Revolution"** by Joseph A. Cullen, Erin T. Mansur (2016) - further simply referred as Cullen. The paper and further ressources can be downloaded from <a href="https://www.aeaweb.org/articles?id=10.1257/pol.20150388   target = "_blank"> https://www.aeaweb.org/articles?id=10.1257/pol.20150388</a>
 
 You will use the `Statstical Programming Language R` to replicate the analysis. Basic knowledge of `R` is required, but information on important function will be provided. 
@@ -181,20 +181,23 @@ ggplot(data=PaGP, aes(x=date)) +
 
 ////Text zu oben.
 
+
+
+
 ## Exercise 2 -- Interconnections
-
-
-FIGURE 4! -- In R?
 
 ![Interconnections](./Material/interconnections.png) (SOURCE)
 
 info("Interconnections") # Run this line (Strg-Enter) to show info
 
-
+**Task:** Just press *check*.
 ```{r "2"}
 Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 ```
 
+
+
+TODO!!
 
 
 ## Exercise 3 -- Road to a working model
@@ -288,7 +291,7 @@ $CR=\frac{C_{coal}}{C_{gas}}$
 ### Stage 1: Linear Regression
 
 
-$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}P_{co2}}{P_{gas}+CO_{2,gas}P_{co2}}$
+
 
 
 ```{r "3_1__3"}
@@ -314,7 +317,7 @@ We will use the `stargazer()` function from the `stargazer` package to show summ
 
 info("Stargazer") # Run this line (Strg-Enter) to show info
 
-info("Custon functions") # Run this line (Strg-Enter) to show info
+info("Custom functions") # Run this line (Strg-Enter) to show info
 
 **Task:** Run the Code Chunk. It defines the function to show our custom regression tables.
 ```{r "3_1__6"}
@@ -354,64 +357,136 @@ QQ PLOT RESIDUALS?
 
 info("R-squared") # Run this line (Strg-Enter) to show info
 
-### Stage 2: Polonymal Regression
+### Stage 2: Multivariate Regression
 
+**Task:** Just press *check*.
 ```{r "3_1__9"}
+
 ```
 
+**Task:** Just press *check*.
 ```{r "3_1__10"}
+
 ```
 
-
+**Task:** Just press *check*.
 ```{r "3_1__11"}
+
 ```
 
-
+**Task:** Just press *check*.
 ```{r "3_1__12"}
+
 ```
 
-
+**Task:** Just press *check*.
 ```{r "3_1__13"}
+
 ```
 
 
 ### Stage 3: Linear Regression
 
-$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+D\gamma+\epsilon_t$
+We came to the conclusion that it not enough to build a model purely arounnd `$CO_{2}$ emissions` and the `cost ratio` of gas and coal. In this section we will build a advanced model that includes several `addtitional variables`. The model is a `reduced-form regression` as follow:  
+  
+$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$
 
-Alle Kontrollvariablen
 
-PLOT?
+info("Meaning of Variables") # Run this line (Strg-Enter) to show info
+
+
+First we will use ...
+
+**Task:** Just press *check*.
+```{r "3_1__14"}
+
+```
+
+**Task:** Just press *check*.
+```{r "3_1__15"}
+
+```
+
+**Task:** Just press *check*.
+```{r "3_1__16"}
+
+```
+
 
 
 https://datasciencebeginners.com/2018/12/20/multinomial-logistic-regression-using-r/
 
 
-### Stage 4: Linear Regression
 
 
-spline regression,
+## Exercise 4.1 -- Estimated CO2 Response to Fuel Prices
 
 
-komplette eskalation
+In this exercise we will use the findings we got in the last chapter and visualize our results. We will use the multivariate model we defined in the last exercise.
 
-https://stackoverflow.com/questions/37040552/cubic-spline-method-for-longitudinal-series-data
+Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
 
+We will use cubic splines on our model 
 
-
-
-
-## Exercise 3.2 -- Plotting Results
+What are Cubic Splines?
 
 
-Figure 6 plotten
-
-und Figure 7?
 
 
-## Exercise 4 -- Conclusion
+
+Datensatz aendern, sodass 3.2.2 rausfliegt?
+
+**Task:** Just press *check*.
+```{r "4_1"}
+
+```
+
+**Task:** Just press *check*.
+```{r "4_1__2"}
+
+```
+
+**Task:** Just press *check*.
+```{r "4_1__3"}
+
+```
 
 
+**Task:** Just press *check*.
+```{r "4_1__4"}
+
+```
+
+**Task:** Just press *check*.
+```{r "4_1__5"}
+
+```
+
+**Task:** Just press *check*.
+```{r "4_1__6"}
+
+```
+
+**Task:** Just press *check*.
+```{r "4_1__7"}
+
+```
+
+
+
+## Exercise 4.2 --  Imputed CO2 Response to Carbon Prices
+
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}P_{co2}}{P_{gas}+CO_{2,gas}P_{co2}}$
+
+Figure 7
+
+
+## Exercise 5 -- Conclusion
+
+
+```{r "5"}
+awards()
+```
 
 
 ## Exercise References
