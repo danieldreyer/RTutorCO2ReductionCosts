@@ -275,7 +275,7 @@ TEXT
 
 
 
-## Exercise 3.1 -- E
+## Exercise 3.1 -- Finding the right model
 
 **Task:** To load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
@@ -285,30 +285,27 @@ data <- suppressMessages(read_csv("Data/main_data.csv"))
 
 As we have seen in the previous exercise, the data heavily differ in the different `intersections`. 
 
-As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on on each intersection.
+As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on each intersection.
 Since we observe substantial variation in coal and gas prices, we additionally add a new variable for relative costs `CR` (`Cost Ratio`), which is defined as below:
 
-$CR=\frac{C_{coal}}{C_{gas}}$
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$
 
-//////////////CR ? CO2MASS/1000 EAJJAPODJAWPDJP
+There are several ways to propose cost ratios, we will use the ratio between the price of coal and gas. 
 
-**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `??`. Filter only for data with `intercn=="EAST"` and store the new data frame in variable `east`. 
+**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with `interconnection "EAST"` and store the new data frame in variable `east`. Additionally, calculate the cost ratio between `coal_price` and `gasprice`.
 ```{r "3_1__2"}
 # ... <- data %>% 
 #  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
-#  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>% 
+#  mutate(CR = .../..., CO2MASS=CO2MASS/1000000) %>% 
 #  filter(intercn=="...")
 east <- data %>% 
-  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
-  mutate(CR = coal_price/gasprice) %>%  #, CO2MASS=CO2MASS/1000000
+  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
+  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>%
   filter(intercn=="EAST")
 ```
 
 
 ### Stage 1: Linear Regression
-
-
-
 
 
 ```{r "3_1__3"}
@@ -396,13 +393,6 @@ p3 <- predict(fit3, east)
 
 **Task:** Just press *check*.
 ```{r "3_1__11"}
-plot(CO2MASS ~ CR, east)    # plot points
-lines(smooth.spline(east$CR, p1), col = "blue")
-lines(smooth.spline(east$CR, p2), col = "red")
-lines(smooth.spline(east$CR, p3), col = "green")# add regression line, using `predict` to generate y-values
-
-
-
 plot(CO2MASS~CR, east)
 lines(east$CR, p1, col="red")
 lines(east$CR, p2, col="blue")
@@ -420,22 +410,23 @@ anova(fit, fit2, fit3)
 ```
 
 
-### Stage 3: Linear Regression
+### Stage 3: Multivariate Regression Model
 
-We came to the conclusion that it not enough to build a model purely arounnd `$CO_{2}$ emissions` and the `cost ratio` of gas and coal. In this section we will build a advanced model that includes several `addtitional variables`. The model is a `reduced-form regression` as follow:  
-  
+In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this `Stage` we will extend the model and add several `independent variables`.  
+The model is a `reduced-form regression` and is defined as followed:
+
 $CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$
 
+info("Model variables") # Run this line (Strg-Enter) to show info
 
-info("Meaning of Variables") # Run this line (Strg-Enter) to show info
-
-
-First we will use ...
+First, we have to define our model 
 
 **Task:** Just press *check*.
 ```{r "3_1__14"}
 fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, east) 
 ```
+
+
 
 **Task:** Just press *check*.
 ```{r "3_1__15"}
@@ -449,121 +440,107 @@ regression.result(fit4)
 
 
 
-https://datasciencebeginners.com/2018/12/20/multinomial-logistic-regression-using-r/
+
+## Exercise 3.2 -- Estimated CO2 Response to Fuel Prices
+
+In this exercise we will use the model we constructed in the last chapter and visualize our results. Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
+ 
+Explain Cubic Splines
+
+```{r "3_2",optional=TRUE}
+# show that all integers between 0 and 10
+1:10
+```
 
 
-
-
-## Exercise 4.1 -- Estimated CO2 Response to Fuel Prices
-
-
-In this exercise we will use the findings we got in the last chapter and visualize our results. We will use the multivariate model we defined in the last exercise.
-
-Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
-
-We will use cubic splines on our model 
-
-What are Cubic Splines?
-
-
-
-
-
-Datensatz aendern, sodass 3.2.2 rausfliegt?
 
 **Task:** Just press *check*.
-```{r "4_1"}
-data <- read_csv("Data/main_data.csv")
+```{r "3_2__2"}
+data <- suppressMessages(read_csv("Data/main_data.csv"))
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__2"}
-# Exemplarisch fuer "EAST Interconnection"
-
+```{r "3_2__3"}
 dat <- data %>% 
   select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
   mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000)
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__3"}
+```{r "3_2__4"}
 dat_east <- dat %>% filter(intercn=="EAST")
-
 dat_wecc <- dat %>% filter(intercn=="WECC")
-
 dat_ercot <- dat %>%  filter(intercn=="ERCOT")
 ```
 
 
 **Task:** Just press *check*.
-```{r "4_1__4"}
+```{r "3_2__5"}
 model <- CO2MASS ~ gasprice + load + meant + nonFossil + so2price + netNSflow
-model2 <- CO2MASS ~ s(gasprice, bs = 'cr', k=6) + s(meant, bs= 're') + s(load, bs= 're') + s(load, bs= 're') + s(load, bs= 're') 
+#model2 <- CO2MASS ~ s(gasprice, bs = 'cr', k=6) + s(meant, bs= 're') + s(load, bs= 're') + s(load, bs= 're') + s(load, bs= 're') 
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__5"}
+```{r "3_2__6"}
 fit_east <- lm(model, data = dat_east)
 fit_wecc <- lm(model, data = dat_wecc)
 fit_ercot <- lm(model, data = dat_ercot)
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__6"}
+```{r "3_2__7"}
 ####### Plot result for Interconnection "EAST"
-CO2_pred_east2 <- data.frame(CO2MASS = dat_east$CO2MASS,
+temp1 <- data.frame(CO2MASS = dat_east$CO2MASS,
                        gasprice = dat_east$gasprice,
                        predicted_values = predict(fit_east, newdata = dat_east))
 
-#find predicted CO2MASS at gas base price = 5.75?
 
-#calculate percentage change to base 
-CO2_pred_east <- CO2_pred_east2 %>% 
+
+
+#calculate percentage change to gas base price of 5.75$ 
+CO2_pred_east <- temp1 %>% 
   mutate(predicted_values_perc = predicted_values/5.305963-1)
 
 #save plot to variable
-plot_east <- ggplot(CO2_pred_east, aes(x=gasprice, y=CO2MASS) ) +
-  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
-  #stat_smooth(aes(y=predicted_values_perc))+
+plot_c02_east <- ggplot(CO2_pred_east, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="lm", formula = y ~ splines::bs(x, 5)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(2, 12)) +
   geom_vline(xintercept = 5.75, linetype = "dashed")
  # scale_x_reverse()
 
 ####### Plot result for Interconnection "ERCOT"
-CO2_pred_ercot2 <- data.frame(CO2MASS = dat_ercot$CO2MASS,
+temp2 <- data.frame(CO2MASS = dat_ercot$CO2MASS,
                        gasprice = dat_ercot$gasprice,
                        predicted_values = predict(fit_ercot, newdata = dat_ercot))
 
-#find predicted CO2MASS at gas base price = 5.75?
-
-#calculate percentage change to base 
-CO2_pred_ercot <- CO2_pred_ercot2 %>% 
+#calculate percentage change to to gas base price of 5.75$ 
+CO2_pred_ercot <- temp2 %>% 
   mutate(predicted_values_perc = predicted_values/0.5676612-1)
 
 #save plot to variable
-plot_ercot <- ggplot(CO2_pred_ercot, aes(x=gasprice, y=CO2MASS) ) +
-  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+plot_c02_ercot <- ggplot(CO2_pred_ercot, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="lm", formula = y ~ splines::bs(x, 5)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(2, 12)) +
   geom_vline(xintercept = 5.75, linetype = "dashed")
  # scale_x_reverse()
 
 
+
+
 ####### Plot result for Interconnection "WECC"
-CO2_pred_wecc2 <- data.frame(CO2MASS = dat_wecc$CO2MASS,
+temp3 <- data.frame(CO2MASS = dat_wecc$CO2MASS,
                        gasprice = dat_wecc$gasprice,
                        predicted_values = predict(fit_wecc, newdata = dat_wecc))
 
-#find predicted CO2MASS at gas base price = 5.75?
-
-#calculate percentage change to base 
-CO2_pred_wecc <- CO2_pred_wecc2 %>% 
+#calculate percentage change to gas base price of 5.75$ 
+CO2_pred_wecc <- temp3 %>% 
   mutate(predicted_values_perc = predicted_values/0.9217305-1)
 
 #save plot to variable
-plot_wecc <- ggplot(CO2_pred_wecc, aes(x=gasprice, y=CO2MASS) ) +
-  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="gam", formula = y ~ splines::bs(x, 5)) +
+plot_c02_wecc <- ggplot(CO2_pred_wecc, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="lm", formula = y ~ splines::bs(x, 5)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(2, 12)) +
   geom_vline(xintercept = 5.75, linetype = "dashed")
@@ -571,25 +548,108 @@ plot_wecc <- ggplot(CO2_pred_wecc, aes(x=gasprice, y=CO2MASS) ) +
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__7"}
-plot_east
-plot_ercot
-plot_wecc
+```{r "3_2__8"}
+plot_c02_east
+plot_c02_ercot
+plot_c02_wecc
 ```
 
 
 
-## Exercise 4.2 --  Imputed CO2 Response to Carbon Prices
-
-$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}P_{co2}}{P_{gas}+CO_{2,gas}P_{co2}}$
-
-Figure 7
 
 
-## Exercise 5 -- Conclusion
+
+## Exercise 3.3 --  Imputed CO2 Response to Carbon Prices
+
+${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
+
+**Task:** Just press *check*.
+```{r "3_3"}
+dat <- suppressMessages(read_csv("Data/chapter4.csv"))
+```
+
+**Task:** Just press *check*.
+```{r "3_3__2"}
+basegas <- 5.75
+basecoal <- 2.25
+```
+
+**Task:** Just press *check*.
+```{r "3_3__3"}
+#117 is lbs carbon/MMBTU for gas or 0.0585 tons/MMBTU
+#210.8 is lbs carbon/MMBTU for coal or .1054 tons/MMBTUgen
+dat <- dat %>% 
+  mutate(carbontax = (CR*basegas-basecoal)/(0.1054-CR*0.0585))
+
+```
+
+**Task:** Just press *check*.
+```{r "3_3__4"}
+tax_east <- dat %>% 
+  filter(carbontax >= 0 & carbontax <= 70 & intercn == "EAST")
+
+tax_wecc <- dat %>% 
+  filter(carbontax >= 0 & carbontax <= 70 & intercn == "WECC")
+
+tax_ercot <- dat %>% 
+  filter(carbontax >= 0 & carbontax <= 70 & intercn == "ERCOT")
+```
+
+**Task:** Just press *check*.
+```{r "3_3__5"}
+tax_east_perc <- tax_east %>% 
+  mutate(predicted_values_perc = (predicted_values/5.583435-1)*(-1))
+
+tax_wecc_perc <- tax_wecc %>% 
+  mutate(predicted_values_perc = (predicted_values/0.888435-1)*(-1))
+
+tax_ercot_perc <- tax_ercot %>% 
+  mutate(predicted_values_perc = (predicted_values/0.507435-1)*(-1))
+```
 
 
-```{r "5"}
+**Task:** Just press *check*.
+```{r "3_3__6"}
+plot_tax_east <- ggplot(tax_east_perc, aes(x=carbontax, y=predicted_values_perc) ) +
+  geom_smooth(colour = "black", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(title="Easter Interconnection",
+       y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
+  coord_flip()
+
+plot_tax_ercot <- ggplot(tax_ercot_perc, aes(x=carbontax, y=predicted_values_perc) ) +
+  geom_smooth(colour = "black", method="gam", formula = y ~ splines::bs(x, 5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(title="ERCOT Interconnection",
+       y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
+  coord_flip()
+
+plot_tax_wecc <- ggplot(tax_wecc_perc, aes(x=carbontax, y=predicted_values_perc) ) +
+  geom_smooth(colour = "black", method="gam", formula = y ~ splines::bs(x, 5))+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(title="Western Interconnection",
+       y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
+  coord_flip()
+
+```
+
+**Task:** Just press *check*.
+```{r "3_3__7"}
+plot_tax_east
+plot_tax_ercot
+plot_tax_wecc
+```
+
+
+
+
+
+
+
+## Exercise 4 -- Conclusion
+
+
+```{r "4"}
 awards()
 ```
 
