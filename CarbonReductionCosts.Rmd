@@ -155,7 +155,7 @@ ggplot(data=PaGP, aes(x=date)) +
   scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
 ```
 
-////Text zu oben.
+TEXT
 
 
 In the next Step we will look at the generated Power for Coal / Gas in the U.S. 
@@ -179,8 +179,7 @@ ggplot(data=PaGP, aes(x=date)) +
   scale_y_continuous(breaks=seq(0,200,25))
 ```
 
-////Text zu oben.
-
+TEXT
 
 
 
@@ -195,30 +194,35 @@ info("Interconnections") # Run this line (Strg-Enter) to show info
 Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 ```
 
+wip
 
 
-TODO!!
+
+### theory behind mapping carbon prices
+
+
+$$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
+
+
 
 
 ## Exercise 3 -- Road to a working model
 
-In this chapter we will develop a model, which tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
+In this and the following exercies we will develop a statistical model, that tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
 &nbsp;
- - You can find a rough timeline of what we do in each chapter of this exercise below:
+ - You can find a rough guideline of content in each exercise below:
                 
-  + `Stage 1` - Exercise 3.1: Linear Regression
-  + `Stage 2` - Exercise 3.2: Polonymal Regression
-  + `Stage 3` - Exercise 3.3: Cubic Spline Regression
-  + `Stage 4` - Exercise 3.4: More advanced Models??? Regression
+  + `Exercise 3.1` - Linear Regression
+  + `Exercise 3.2` - Polonymal Regression
+  + `Exercise 3.3` - Cubic Spline Regression
 &nbsp;
 
-If you want to go faster through the problem set, you can skip to exercise `3.4`, which contains the final model and a brief overview of our results.  
+If you want to go faster through the problem set, you can skip to exercise `3.3` onwards, which presents the final model and visualizes our results.  
 In this exercise you will get a feeling for the data set you are working with and with some 
 
+The goal of this exercise is to give you an overview of the data we use to perform our analysis. 
 
-Erklaeren was wir machen usw.
-
-Why are we splitting our analysis in different interconnections?
+TEXT
 
 **Task:** Read in table.
 
@@ -242,13 +246,8 @@ table <- data %>%
 table
 ```
 
-
-
-
-
-
 **Task:** Just press *check*.
-```{r "3__4"}
+```{r "3__3"}
 ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
         geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
         theme_bw()+ 
@@ -259,30 +258,34 @@ ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
 
 TEXT
 
+## Exercise 3.1 -- Priceratio Regressions
 
+In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs and answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
 
-## Exercise 3.1 -- Finding the right model
-
-**Task:** To load the data set `main_data.csv`, press `edit` and `check` afterwards.
+**Task:** To get started, load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
 ```{r "3_1"}
-data <- suppressMessages(read_csv("Data/main_data.csv"))
+dat <- suppressMessages(read_csv("Data/main_data.csv"))
 ```
 
-As we have seen in the previous exercise, the data heavily differ in the different `intersections`. 
+We have seen in the previous exercise that it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that `intersection`. Afterwards we will use the model on each intersection. Since we observe substantial variation in coal and gas prices, we construct a new variable for relative costs `priceratio`. There are several ways to propose price ratios, we use the ratio between the price of coal and gas, which is defined as followed:  
 
-As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on each intersection.
-Since we observe substantial variation in coal and gas prices, we additionally add a new variable for relative costs `CR` (`Cost Ratio`), which is defined as below:
+As we have seen in the last chapter it makes sense to apply our analysis for each intersection `separately`. For this reason the data are divided into interconnections. We `develop` our model based on the `EAST` interconnection and map the model to all at a later point in time.  
 
-$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$
 
-There are several ways to propose cost ratios, we will use the ratio between the price of coal and gas. 
 
-**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with `interconnection "EAST"` and store the new data frame in variable `east`. Additionally, calculate the cost ratio between `coal_price` and `gasprice`.
+
+
+
+
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}(2)$
+
+
+
+**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with interconnection `EAST` and store the new data frame in variable `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice`.
 ```{r "3_1__2"}
 # ... <- data %>% 
-#  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
-#  mutate(CR = .../..., CO2MASS=CO2MASS/1000000) %>% 
+#  mutate(CR = .../...) %>% 
 #  filter(intercn=="...")
 
 ```
@@ -290,22 +293,46 @@ There are several ways to propose cost ratios, we will use the ratio between the
 
 ### Stage 1: Linear Regression
 
+Highly unlikely here, but to get you rolling in the topic, lets start with a simple linear regression and analyse the results on fitting. I will introduce methods to interpret regression results ...
 
-```{r "3_1__3"}
+
+info("Linear Regression with lm()") # Run this line (Strg-Enter) to show info
+
+**Task:** Run a regression with `co2mass` as the dependent variable and `pricerati` as independent variable. Store it in the variable `fit1`. 
+```{r "3_1__4"}
+# ... <- lm(...~... , data=east)
+
 ```
 
-info("Predict") # Run this line (Strg-Enter) to show info
 
-INTERPRETATION LINEAR REGRESSION
+
+Before we look at our results, answer this quiz. 
+
+#! addon__quiz__Reg1
+
+
+TEXT
+
 **Task:** To
-```{r "3_1__4"}
+```{r "3_1__5"}
+summary(fit)
+```
+
+
+
+
+
+**Task:** To
+```{r "3_1__6"}
 
 ```
 
 QUIZ: erwartung fallend oder steigend
 
+info("Predict") # Run this line (Strg-Enter) to show info
+
 **Task:** To
-```{r "3_1__5"}
+```{r "3_1__7"}
 
 ```
 
@@ -317,8 +344,8 @@ info("Stargazer") # Run this line (Strg-Enter) to show info
 info("Custom functions") # Run this line (Strg-Enter) to show info
 
 **Task:** Run the Code Chunk. It defines the function to show our custom regression tables.
-```{r "3_1__6"}
-regression.result= function(...){
+```{r "3_1__10"}
+show.regression= function(...){
   library(stargazer)
     stargazer(..., 
             type = "text", 
@@ -327,9 +354,9 @@ regression.result= function(...){
             df = FALSE,
             report = "vct*",
             star.cutoffs = c(0.05, 0.01, 0.001),
-            #model.names = FALSE,
-            #object.names = TRUE,
-            #model.numbers = FALSE, 
+            model.names = FALSE,
+            object.names = TRUE,
+            model.numbers = FALSE, 
             omit.stat=c("f", "ser")
     )
 } 
@@ -338,7 +365,7 @@ regression.result= function(...){
 
 
 **Task:** Let's see what we just defined. Run the regression table for the linear model. Insert 
-```{r "3_1__7"}
+```{r "3_1__11"}
 # regression.result(...)
 
 ```
@@ -346,7 +373,7 @@ regression.result= function(...){
 TEXT
 
 **Task:** To
-```{r "3_1__8"}
+```{r "3_1__12"}
 
 ```
 
@@ -354,51 +381,17 @@ QQ PLOT RESIDUALS?
 
 info("R-squared") # Run this line (Strg-Enter) to show info
 
-### Stage 2: Multivariate Regression
-
-**Task:** Just press *check*.
-```{r "3_1__9"}
-
-```
-
-**Task:** Just press *check*.
-```{r "3_1__10"}
-
-```
-
-**Task:** Just press *check*.
-```{r "3_1__11"}
-
-```
-
-**Task:** Just press *check*.
-```{r "3_1__12"}
-
-```
+### Stage 2: Polonymal Regression
 
 **Task:** Just press *check*.
 ```{r "3_1__13"}
 
 ```
 
-
-### Stage 3: Multivariate Regression Model
-
-In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this `Stage` we will extend the model and add several `independent variables`.  
-The model is a `reduced-form regression` and is defined as followed:
-
-$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$
-
-info("Model variables") # Run this line (Strg-Enter) to show info
-
-First, we have to define our model 
-
 **Task:** Just press *check*.
 ```{r "3_1__14"}
 
 ```
-
-
 
 **Task:** Just press *check*.
 ```{r "3_1__15"}
@@ -410,13 +403,27 @@ First, we have to define our model
 
 ```
 
+**Task:** Just press *check*.
+```{r "3_1__17"}
+
+```
 
 
 
-## Exercise 3.2 -- Estimated CO2 Response to Fuel Prices
 
-In this exercise we will use the model we constructed in the last chapter and visualize our results. Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
- 
+
+
+
+
+
+
+## Exercise 3.2 -- Restricted Spline Regressions
+
+### Stage 3: Cubic Spline
+
+In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this `Stage` we will extend the model and add several `independent variables`.  
+The model is a `reduced-form regression` and is defined as followed:
+
 #! start_note "Cubic Splines?"
 Explain Cubic Splines
 
@@ -426,11 +433,16 @@ Explain Cubic Splines
 
 #! end_note
 
+info("Model variables") # Run this line (Strg-Enter) to show info
+
+First, we have to define our model 
 
 **Task:** Just press *check*.
 ```{r "3_2__2"}
 
 ```
+
+
 
 **Task:** Just press *check*.
 ```{r "3_2__3"}
@@ -443,24 +455,69 @@ Explain Cubic Splines
 ```
 
 
+
+
+## Exercise 3.3 -- Estimated CO2 Response to Fuel Prices
+
+In this exercise we will use the model we constructed in the last chapter and visualize our results. Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
+ 
+In this exercise we will extend our results from the previous exercise and estimate the $CO_{2}$ respone to changing fuel prices. 
+
+
+To summarise the results from last exercises and to understand why we do certain methods this way, lets summarise. In exercise ?.? we showed that it makes sense to split our analysis in different connection. 
+
+ 
+ 
+$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$ 
+ 
+ 
+
+
+
+
+```{r "3_3"}
+```
+
+
+```{r "3_3__2"}
+```
+
+```{r "3_3__3"}
+```
+
+```{r "3_3__4"}
+```
+
+```{r "3_3__5"}
+```
+
+```{r "3_3__6"}
+```
+
+```{r "3_3__7"}
+```
+
+```{r "3_3__8"}
+```
+
+
+EVtl loop ueber "WECC" und "ERCOT"
+
 **Task:** Just press *check*.
-```{r "3_2__5"}
+```{r "3_3__9"}
 
 ```
 
+
+
 **Task:** Just press *check*.
-```{r "3_2__6"}
+```{r "3_3__10"}
 
 ```
 
-**Task:** Just press *check*.
-```{r "3_2__7"}
 
-```
 
-**Task:** Just press *check*.
-```{r "3_2__8"}
-
+```{r "3_3__11"}
 ```
 
 
@@ -468,45 +525,49 @@ Explain Cubic Splines
 
 
 
-## Exercise 3.3 --  Imputed CO2 Response to Carbon Prices
+
+
+
+
+
+
+
+
+
+## Exercise 3.4 --  Imputed CO2 Response to Carbon Prices
+
+
+The first step is the same as in the last exercise, but we need it for this part too. You can just run the code below. If you have skipped to this exercise and dont understand what it does you should go back to the previous exercise.
 
 ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 
 **Task:** Just press *check*.
-```{r "3_3"}
+```{r "3_4"}
 
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__2"}
+```{r "3_4__2"}
 
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__3"}
+```{r "3_4__3"}
 
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__4"}
-
-```
-
-**Task:** Just press *check*.
-```{r "3_3__5"}
+```{r "3_4__4"}
 
 ```
 
 
 **Task:** Just press *check*.
-```{r "3_3__6"}
+```{r "3_4__5"}
 
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__7"}
-
-```
 
 
 

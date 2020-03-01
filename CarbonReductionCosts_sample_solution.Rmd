@@ -163,7 +163,7 @@ ggplot(data=PaGP, aes(x=date)) +
   scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
 ```
 
-////Text zu oben.
+TEXT
 
 
 In the next Step we will look at the generated Power for Coal / Gas in the U.S. 
@@ -193,8 +193,7 @@ ggplot(data=PaGP, aes(x=date)) +
   scale_y_continuous(breaks=seq(0,200,25))
 ```
 
-////Text zu oben.
-
+TEXT
 
 
 
@@ -209,30 +208,35 @@ info("Interconnections") # Run this line (Strg-Enter) to show info
 Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 ```
 
+wip
 
 
-TODO!!
+
+### theory behind mapping carbon prices
+
+
+$$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
+
+
 
 
 ## Exercise 3 -- Road to a working model
 
-In this chapter we will develop a model, which tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
+In this and the following exercies we will develop a statistical model, that tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
 &nbsp;
- - You can find a rough timeline of what we do in each chapter of this exercise below:
+ - You can find a rough guideline of content in each exercise below:
                 
-  + `Stage 1` - Exercise 3.1: Linear Regression
-  + `Stage 2` - Exercise 3.2: Polonymal Regression
-  + `Stage 3` - Exercise 3.3: Cubic Spline Regression
-  + `Stage 4` - Exercise 3.4: More advanced Models??? Regression
+  + `Exercise 3.1` - Linear Regression
+  + `Exercise 3.2` - Polonymal Regression
+  + `Exercise 3.3` - Cubic Spline Regression
 &nbsp;
 
-If you want to go faster through the problem set, you can skip to exercise `3.4`, which contains the final model and a brief overview of our results.  
+If you want to go faster through the problem set, you can skip to exercise `3.3` onwards, which presents the final model and visualizes our results.  
 In this exercise you will get a feeling for the data set you are working with and with some 
 
+The goal of this exercise is to give you an overview of the data we use to perform our analysis. 
 
-Erklaeren was wir machen usw.
-
-Why are we splitting our analysis in different interconnections?
+TEXT
 
 **Task:** Read in table.
 
@@ -256,13 +260,8 @@ table <- data %>%
 table
 ```
 
-
-
-
-
-
 **Task:** Just press *check*.
-```{r "3__4"}
+```{r "3__3"}
 ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
         geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
         theme_bw()+ 
@@ -273,59 +272,91 @@ ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
 
 TEXT
 
+## Exercise 3.1 -- Priceratio Regressions
 
+In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs and answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
 
-## Exercise 3.1 -- Finding the right model
-
-**Task:** To load the data set `main_data.csv`, press `edit` and `check` afterwards.
+**Task:** To get started, load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
 ```{r "3_1"}
-data <- suppressMessages(read_csv("Data/main_data.csv"))
+dat <- suppressMessages(read_csv("Data/main_data.csv"))
 ```
 
-As we have seen in the previous exercise, the data heavily differ in the different `intersections`. 
+We have seen in the previous exercise that it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that `intersection`. Afterwards we will use the model on each intersection. Since we observe substantial variation in coal and gas prices, we construct a new variable for relative costs `priceratio`. There are several ways to propose price ratios, we use the ratio between the price of coal and gas, which is defined as followed:  
 
-As we have seen in the previous exercise it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that. Afterwards we will use the model on each intersection.
-Since we observe substantial variation in coal and gas prices, we additionally add a new variable for relative costs `CR` (`Cost Ratio`), which is defined as below:
+As we have seen in the last chapter it makes sense to apply our analysis for each intersection `separately`. For this reason the data are divided into interconnections. We `develop` our model based on the `EAST` interconnection and map the model to all at a later point in time.  
 
-$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$
 
-There are several ways to propose cost ratios, we will use the ratio between the price of coal and gas. 
 
-**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with `interconnection "EAST"` and store the new data frame in variable `east`. Additionally, calculate the cost ratio between `coal_price` and `gasprice`.
+
+
+
+
+$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}(2)$
+
+
+
+**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with interconnection `EAST` and store the new data frame in variable `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice`.
 ```{r "3_1__2"}
 # ... <- data %>% 
-#  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil) %>% 
-#  mutate(CR = .../..., CO2MASS=CO2MASS/1000000) %>% 
+#  mutate(CR = .../...) %>% 
 #  filter(intercn=="...")
-east <- data %>% 
-  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
-  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>%
+dat_east <- dat %>% 
+  mutate(priceratio = coalprice/gasprice) %>%
   filter(intercn=="EAST")
 ```
 
 
 ### Stage 1: Linear Regression
 
+Highly unlikely here, but to get you rolling in the topic, lets start with a simple linear regression and analyse the results on fitting. I will introduce methods to interpret regression results ...
 
-```{r "3_1__3"}
-fit <- lm(CO2MASS ~ CR, data=east)
+
+info("Linear Regression with lm()") # Run this line (Strg-Enter) to show info
+
+**Task:** Run a regression with `co2mass` as the dependent variable and `pricerati` as independent variable. Store it in the variable `fit1`. 
+```{r "3_1__4"}
+# ... <- lm(...~... , data=east)
+fit <- lm(co2mass ~ priceratio, data=dat_east)
 ```
 
-info("Predict") # Run this line (Strg-Enter) to show info
 
-INTERPRETATION LINEAR REGRESSION
+
+Before we look at our results, answer this quiz. 
+
+
+Quiz: What impact do changing price ratios have on emissions? Remember, priceratio is defined as above.
+
+- With increasing price ratios emissions will increase. [ ]
+
+- With increasing price ratios emissions will fall. [x]
+
+
+
+TEXT
+
 **Task:** To
-```{r "3_1__4"}
-p1 <- predict(fit, newdata = east)
+```{r "3_1__5"}
+summary(fit)
+```
+
+
+
+
+
+**Task:** To
+```{r "3_1__6"}
+p1 <- predict(fit, newdata = dat_east)
 ```
 
 QUIZ: erwartung fallend oder steigend
 
+info("Predict") # Run this line (Strg-Enter) to show info
+
 **Task:** To
-```{r "3_1__5"}
-plot(CO2MASS~CR, east)
-lines(east$CR, p1, col="red")
+```{r "3_1__7"}
+plot(co2mass~priceratio, dat_east)
+lines(dat_east$priceratio, p1, col="red")
 ```
 
 
@@ -336,8 +367,8 @@ info("Stargazer") # Run this line (Strg-Enter) to show info
 info("Custom functions") # Run this line (Strg-Enter) to show info
 
 **Task:** Run the Code Chunk. It defines the function to show our custom regression tables.
-```{r "3_1__6"}
-regression.result= function(...){
+```{r "3_1__10"}
+show.regression= function(...){
   library(stargazer)
     stargazer(..., 
             type = "text", 
@@ -346,9 +377,9 @@ regression.result= function(...){
             df = FALSE,
             report = "vct*",
             star.cutoffs = c(0.05, 0.01, 0.001),
-            #model.names = FALSE,
-            #object.names = TRUE,
-            #model.numbers = FALSE, 
+            model.names = FALSE,
+            object.names = TRUE,
+            model.numbers = FALSE, 
             omit.stat=c("f", "ser")
     )
 } 
@@ -357,7 +388,7 @@ regression.result= function(...){
 
 
 **Task:** Let's see what we just defined. Run the regression table for the linear model. Insert 
-```{r "3_1__7"}
+```{r "3_1__11"}
 # regression.result(...)
 regression.result(fit)
 ```
@@ -365,7 +396,7 @@ regression.result(fit)
 TEXT
 
 **Task:** To
-```{r "3_1__8"}
+```{r "3_1__12"}
 plot(fit, 1)
 plot(fit, 2)
 ```
@@ -374,10 +405,10 @@ QQ PLOT RESIDUALS?
 
 info("R-squared") # Run this line (Strg-Enter) to show info
 
-### Stage 2: Multivariate Regression
+### Stage 2: Polonymal Regression
 
 **Task:** Just press *check*.
-```{r "3_1__9"}
+```{r "3_1__13"}
 CR.squared <- east$CR^2
 fit2 <- lm(CO2MASS ~ CR + CR.squared, east)
 
@@ -386,13 +417,13 @@ fit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__10"}
+```{r "3_1__14"}
 p2 <- predict(fit2, east)
 p3 <- predict(fit3, east)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__11"}
+```{r "3_1__15"}
 plot(CO2MASS~CR, east)
 lines(east$CR, p1, col="red")
 lines(east$CR, p2, col="blue")
@@ -400,51 +431,31 @@ lines(east$CR, p3, col="green")
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__12"}
+```{r "3_1__16"}
 regression.result(fit, fit2, fit3)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__13"}
+```{r "3_1__17"}
 anova(fit, fit2, fit3)
 ```
 
 
-### Stage 3: Multivariate Regression Model
+
+
+
+
+
+
+
+
+## Exercise 3.2 -- Restricted Spline Regressions
+
+### Stage 3: Cubic Spline
 
 In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this `Stage` we will extend the model and add several `independent variables`.  
 The model is a `reduced-form regression` and is defined as followed:
 
-$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$
-
-info("Model variables") # Run this line (Strg-Enter) to show info
-
-First, we have to define our model 
-
-**Task:** Just press *check*.
-```{r "3_1__14"}
-fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, east) 
-```
-
-
-
-**Task:** Just press *check*.
-```{r "3_1__15"}
-effectplot(fit4, show.ci = TRUE)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__16"}
-regression.result(fit4)
-```
-
-
-
-
-## Exercise 3.2 -- Estimated CO2 Response to Fuel Prices
-
-In this exercise we will use the model we constructed in the last chapter and visualize our results. Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
- 
 Explain Cubic Splines
 
 ```{r "3_2",optional=TRUE}
@@ -453,105 +464,168 @@ Explain Cubic Splines
 ```
 
 
+info("Model variables") # Run this line (Strg-Enter) to show info
+
+First, we have to define our model 
 
 **Task:** Just press *check*.
 ```{r "3_2__2"}
-data <- suppressMessages(read_csv("Data/main_data.csv"))
+fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, east) 
 ```
+
+
 
 **Task:** Just press *check*.
 ```{r "3_2__3"}
-dat <- data %>% 
-  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
-  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000)
+effectplot(fit4, show.ci = TRUE)
 ```
 
 **Task:** Just press *check*.
 ```{r "3_2__4"}
-dat_east <- dat %>% filter(intercn=="EAST")
-dat_wecc <- dat %>% filter(intercn=="WECC")
-dat_ercot <- dat %>%  filter(intercn=="ERCOT")
+regression.result(fit4)
 ```
 
 
-**Task:** Just press *check*.
-```{r "3_2__5"}
-model <- CO2MASS ~ gasprice + load + meant + nonFossil + so2price + netNSflow
-#model2 <- CO2MASS ~ s(gasprice, bs = 'cr', k=6) + s(meant, bs= 're') + s(load, bs= 're') + s(load, bs= 're') + s(load, bs= 're') 
+
+
+## Exercise 3.3 -- Estimated CO2 Response to Fuel Prices
+
+In this exercise we will use the model we constructed in the last chapter and visualize our results. Before going into plotting our results, we have to introduce some new ideas on how to plot our model.
+ 
+In this exercise we will extend our results from the previous exercise and estimate the $CO_{2}$ respone to changing fuel prices. 
+
+
+To summarise the results from last exercises and to understand why we do certain methods this way, lets summarise. In exercise ?.? we showed that it makes sense to split our analysis in different connection. 
+
+ 
+ 
+$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$ 
+ 
+ 
+
+
+
+
+```{r "3_3"}
+dat <- read_csv("Data/main_data.csv")
 ```
 
-**Task:** Just press *check*.
-```{r "3_2__6"}
-fit_east <- lm(model, data = dat_east)
-fit_wecc <- lm(model, data = dat_wecc)
-fit_ercot <- lm(model, data = dat_ercot)
+
+```{r "3_3__2"}
+east <- dat %>% 
+  mutate(priceratio = coalprice/gasprice) %>%
+  filter(intercn=="EAST")
 ```
 
-**Task:** Just press *check*.
-```{r "3_2__7"}
-####### Plot result for Interconnection "EAST"
-temp1 <- data.frame(CO2MASS = dat_east$CO2MASS,
-                       gasprice = dat_east$gasprice,
-                       predicted_values = predict(fit_east, newdata = dat_east))
+```{r "3_3__3"}
+mean_dat_east <- east %>% 
+  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
+  summarise_all(mean)
+```
 
+```{r "3_3__4"}
+temp_east <- tibble(gasprice = east$gasprice, priceratio = east$priceratio) %>% cbind(mean_dat_east)
+```
 
+```{r "3_3__5"}
+reg_east <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=east)
+```
 
+```{r "3_3__6"}
+co2.east = predict(reg_east, temp_east)
+```
 
-#calculate percentage change to gas base price of 5.75$ 
-CO2_pred_east <- temp1 %>% 
-  mutate(predicted_values_perc = predicted_values/5.305963-1)
+```{r "3_3__7"}
+basecoal=2.25
+basegas=5.75
 
-#save plot to variable
-plot_c02_east <- ggplot(CO2_pred_east, aes(x=gasprice, y=CO2MASS) ) +
-  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="lm", formula = y ~ splines::bs(x, 5)) +
+diff_base <- abs(east$priceratio - (basecoal/basegas))
+min_dif <- min(diff_base)
+closest <- min_dif==diff_base
+base_emit <- mean(co2.east[which(closest)])
+
+transformed.east <- co2.east/base_emit-1
+
+pred_east <- temp_east %>% cbind(transformed.east = transformed.east)
+
+```
+
+```{r "3_3__8"}
+plot_east <- ggplot(pred_east, aes(x=basecoal/priceratio, y=transformed.east)) +
+  geom_line(aes(y=transformed.east)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_x_continuous(limits=c(2, 12)) +
-  geom_vline(xintercept = 5.75, linetype = "dashed")
- # scale_x_reverse()
-
-####### Plot result for Interconnection "ERCOT"
-temp2 <- data.frame(CO2MASS = dat_ercot$CO2MASS,
-                       gasprice = dat_ercot$gasprice,
-                       predicted_values = predict(fit_ercot, newdata = dat_ercot))
-
-#calculate percentage change to to gas base price of 5.75$ 
-CO2_pred_ercot <- temp2 %>% 
-  mutate(predicted_values_perc = predicted_values/0.5676612-1)
-
-#save plot to variable
-plot_c02_ercot <- ggplot(CO2_pred_ercot, aes(x=gasprice, y=CO2MASS) ) +
-  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="lm", formula = y ~ splines::bs(x, 5)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_x_continuous(limits=c(2, 12)) +
-  geom_vline(xintercept = 5.75, linetype = "dashed")
- # scale_x_reverse()
-
-
-
-
-####### Plot result for Interconnection "WECC"
-temp3 <- data.frame(CO2MASS = dat_wecc$CO2MASS,
-                       gasprice = dat_wecc$gasprice,
-                       predicted_values = predict(fit_wecc, newdata = dat_wecc))
-
-#calculate percentage change to gas base price of 5.75$ 
-CO2_pred_wecc <- temp3 %>% 
-  mutate(predicted_values_perc = predicted_values/0.9217305-1)
-
-#save plot to variable
-plot_c02_wecc <- ggplot(CO2_pred_wecc, aes(x=gasprice, y=CO2MASS) ) +
-  geom_smooth(aes(y = predicted_values_perc), colour = "red", method="lm", formula = y ~ splines::bs(x, 5)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_x_continuous(limits=c(2, 12)) +
-  geom_vline(xintercept = 5.75, linetype = "dashed")
- # scale_x_reverse()
+  geom_vline(xintercept = 5.75, linetype = "dashed") + 
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
+  labs(title="EAST Interconnection", subtitle = "Percentage Change in CO2 emissions",
+       y="", x="Gas Price $/MMBTU")
+plot_east
 ```
+
+
+EVtl loop ueber "WECC" und "ERCOT"
 
 **Task:** Just press *check*.
-```{r "3_2__8"}
-plot_c02_east
-plot_c02_ercot
-plot_c02_wecc
+```{r "3_3__9"}
+ercot <- dat %>% 
+  mutate(priceratio = coalprice/gasprice) %>%
+  filter(intercn=="ERCOT")
+
+mean_dat_ercot <- ercot %>% 
+  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
+  summarise_all(mean)
+
+pred_temp2 <- tibble(gasprice = ercot$gasprice, priceratio = ercot$priceratio) %>% cbind(mean_dat_ercot)
+
+reg_ercot <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=ercot)
+#ERCOT has no net imports of electricity, predict throws warning, therefore we suppress it
+co2.ercot = suppressWarnings(predict(reg_ercot, pred_temp2))
+
+pred_dat_ercot <- pred_temp2 %>% cbind(transformed.ercot = co2.ercot/(mean(co2.ercot[which(min(abs(ercot$priceratio - (basecoal/basegas)))==abs(ercot$priceratio - (basecoal/basegas)))]))-1)
+
+plot_ercot <- ggplot(pred_dat_ercot, aes(x=basecoal/priceratio, y=transformed.ercot)) +
+  geom_line(aes(y=transformed.ercot)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed") + 
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
+  labs(title="ERCOT Interconnection", subtitle = "Percentage Change in CO2 emissions",
+       y="", x="Gas Price $/MMBTU")
+plot_ercot
+```
+
+
+
+**Task:** Just press *check*.
+```{r "3_3__10"}
+wecc <- dat %>% 
+  mutate(priceratio = coalprice/gasprice) %>%
+  filter(intercn=="WECC")
+
+mean_dat_wecc <- wecc %>% 
+  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
+  summarise_all(mean)
+
+pred_temp3 <- tibble(gasprice = wecc$gasprice, priceratio = wecc$priceratio) %>% cbind(mean_dat_wecc)
+
+reg_wecc <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=wecc)
+
+co2.wecc = predict(reg_wecc, pred_temp3)
+
+pred_dat_wecc <- pred_temp3 %>% cbind(transformed.wecc = co2.wecc/(mean(co2.wecc[which(min(abs(wecc$priceratio - (basecoal/basegas)))==abs(wecc$priceratio - (basecoal/basegas)))]))-1)
+
+plot_wecc <- ggplot(pred_dat_wecc, aes(x=basecoal/priceratio, y=transformed.wecc)) +
+  geom_line(aes(y=transformed.wecc)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed") + 
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
+  labs(title="WECC Interconnection", subtitle = "Percentage Change in CO2 emissions",
+       y="", x="Gas Price $/MMBTU")
+plot_wecc
+```
+
+
+
+```{r "3_3__11"}
+grid.arrange(plot_east, plot_wecc, plot_ercot, nrow=1)
 ```
 
 
@@ -559,23 +633,40 @@ plot_c02_wecc
 
 
 
-## Exercise 3.3 --  Imputed CO2 Response to Carbon Prices
+
+
+
+
+
+
+
+
+
+## Exercise 3.4 --  Imputed CO2 Response to Carbon Prices
+
+
+The first step is the same as in the last exercise, but we need it for this part too. You can just run the code below. If you have skipped to this exercise and dont understand what it does you should go back to the previous exercise.
 
 ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 
 **Task:** Just press *check*.
-```{r "3_3"}
-dat <- suppressMessages(read_csv("Data/chapter4.csv"))
+```{r "3_4"}
+#datensatz aus 3.3 mit allen werten
+
+# date intercn co2.hat cr predicted emissions %)
+
+#calc carbon tax
+temp <- tibble(east$date, co2.hat5, east$CR, base_emit, carbontax=(east$CR*basegas-basecoal)/(0.1054-east$CR*0.0585), emission=pred_dat$transformed.reg5)
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__2"}
+```{r "3_4__2"}
 basegas <- 5.75
 basecoal <- 2.25
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__3"}
+```{r "3_4__3"}
 #117 is lbs carbon/MMBTU for gas or 0.0585 tons/MMBTU
 #210.8 is lbs carbon/MMBTU for coal or .1054 tons/MMBTUgen
 dat <- dat %>% 
@@ -584,61 +675,25 @@ dat <- dat %>%
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__4"}
+```{r "3_4__4"}
 tax_east <- dat %>% 
-  filter(carbontax >= 0 & carbontax <= 70 & intercn == "EAST")
-
-tax_wecc <- dat %>% 
-  filter(carbontax >= 0 & carbontax <= 70 & intercn == "WECC")
-
-tax_ercot <- dat %>% 
-  filter(carbontax >= 0 & carbontax <= 70 & intercn == "ERCOT")
-```
-
-**Task:** Just press *check*.
-```{r "3_3__5"}
-tax_east_perc <- tax_east %>% 
-  mutate(predicted_values_perc = (predicted_values/5.583435-1)*(-1))
-
-tax_wecc_perc <- tax_wecc %>% 
-  mutate(predicted_values_perc = (predicted_values/0.888435-1)*(-1))
-
-tax_ercot_perc <- tax_ercot %>% 
-  mutate(predicted_values_perc = (predicted_values/0.507435-1)*(-1))
+  filter(carbontax >= 0 & carbontax <= 80)
 ```
 
 
 **Task:** Just press *check*.
-```{r "3_3__6"}
-plot_tax_east <- ggplot(tax_east_perc, aes(x=carbontax, y=predicted_values_perc) ) +
-  geom_smooth(colour = "black", method="gam", formula = y ~ splines::bs(x, 5)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+```{r "3_4__5"}
+ggplot(temp, aes(x=carbontax, y=emission*-1) ) +
+  geom_line() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.05,0.2)) +
+  scale_x_continuous(limits=c(0, 80)) +
   labs(title="Easter Interconnection",
        y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
   coord_flip()
 
-plot_tax_ercot <- ggplot(tax_ercot_perc, aes(x=carbontax, y=predicted_values_perc) ) +
-  geom_smooth(colour = "black", method="gam", formula = y ~ splines::bs(x, 5)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  labs(title="ERCOT Interconnection",
-       y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
-  coord_flip()
-
-plot_tax_wecc <- ggplot(tax_wecc_perc, aes(x=carbontax, y=predicted_values_perc) ) +
-  geom_smooth(colour = "black", method="gam", formula = y ~ splines::bs(x, 5))+
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  labs(title="Western Interconnection",
-       y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
-  coord_flip()
-
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__7"}
-plot_tax_east
-plot_tax_ercot
-plot_tax_wecc
-```
 
 
 

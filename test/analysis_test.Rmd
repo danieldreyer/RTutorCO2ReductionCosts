@@ -1,0 +1,50 @@
+```{r}
+east <- data %>% 
+  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
+  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>%
+  filter(intercn=="ERCOT")
+
+
+f = function(CR){
+  east$coal_price/CR
+}
+
+
+pred_dat <- tibble(CR=seq(0.155, 1.4, length.out=200), gas_price = seq(1.880, 13.29, length.out=200)) %>%
+  cbind(mean_dat)
+
+
+pred_dat <- east %>% 
+  select(gasprice, CR) %>% 
+  cbind(mean_dat)
+
+
+reg5 <- lm(CO2MASS ~ bs(CR, df=5) + bs(load, df=5) + bs(meant, df=5) + nonFossil + so2price + netNSflow, data=east)
+
+#summary(reg5)
+
+
+co2.hat5 = predict(reg5, pred_dat)
+
+temp1 <- data.frame(CO2MASS = east$CO2MASS,
+                       gasprice = east$gasprice,
+                       predicted_values = co2.hat5,
+                       predicted_values_perc = co2.hat5/0.105963-1)
+
+ggplot(temp1, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y=predicted_values_perc)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  #scale_x_date(labels = lbls, breaks = brks) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+
+
+
+
+
+
+
+
+
+```
+

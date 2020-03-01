@@ -1,0 +1,61 @@
+```{r}
+library(splines)
+```
+
+```{r}
+data <- read_csv("Data/main_data.csv")
+```
+
+
+```{r}
+east <- data %>% 
+  mutate(CR = coal_price/gasprice) %>%
+  filter(intercn=="EAST")
+```
+
+```{r}
+mean_dat <- east %>% 
+  select(CO2MASS, load, tlsd, tlmin, tlmax, meant, nonFossil, so2price, netNSflow) %>% 
+  summarise_all(mean)
+```
+
+```{r}
+pred_dat <- tibble(gasprice = east$gasprice, CR = east$CR) %>% cbind(mean_dat)
+```
+
+```{r}
+reg5 <- lm(CO2MASS ~ ns(CR, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonFossil + so2price + netNSflow, data=east)
+```
+
+```{r}
+co2.hat5 = predict(reg5, pred_dat)
+```
+
+```{r}
+basecoal=2.25
+basegas=5.75
+
+diff_base <- abs(east$CR - (basecoal/basegas))
+min_dif <- min(diff_base)
+closest <- min_dif==diff_base
+base_emit <- co2.hat5[which(closest)]
+
+transformed.hat5 <- co2.hat5/base_emit-1
+
+pred_dat <- pred_dat %>% cbind(transformed.reg5 = transformed.hat5)
+#pred_dat <- pred_dat %>% cbind(transformed.hat5 =co2.hat5/base_emit-1)
+
+```
+
+```{r}
+#test <- tibble(price=basecoal/pred_dat$CR, reg=transformed.hat5)
+#head(test)
+
+ggplot(pred_dat, aes(x=basecoal/CR, y=transformed.reg5)) +
+  geom_line(aes(y=transformed.reg5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed") + 
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
+  labs(title="EAST Interconnection", subtitle = "Percentage Change in CO2 emissions",
+       y="", x="Gas Price $/MMBTU")
+```

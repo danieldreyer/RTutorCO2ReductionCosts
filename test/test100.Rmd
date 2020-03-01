@@ -1,55 +1,108 @@
 ```{r}
-library(haven)
-library(tidyverse)
-library(ggplot2)
 
-
-library(ggiraphExtra)
-```
-
-
-
-```{r}
-# Daten einlesen
-# in chunk fehler ausblenden
-setwd("X:/libraries/RTutor_BA")
-data <- read_csv(".Data/main_data.csv")
-
-```
-
-```{r}
-# Exemplarisch fuer "EAST Interconnection"
-
-data_1 <- data %>% 
-  select(date, intercn, CO2MASS, coal_price, gasprice, meant, load, nonFossil, so2price, netNSflow) %>% 
-  mutate(CR = coal_price/gasprice, CO2MASS=CO2MASS/1000000) %>% 
+east <- data %>% 
+  mutate(CR = coal_price/gasprice) %>%  #CO2MASS=CO2MASS/1000000) %>%
   filter(intercn=="EAST")
-```
+
+
+mean_dat <- east %>% 
+  select(CO2MASS, load, tlsd, tlmin, tlmax, meant, nonFossil, so2price, netNSflow) %>% 
+  summarise_all(mean)
+
+
+f = function(CR){
+  east$coal_price/CR
+}
+
+
+pred_dat <- tibble(CR=seq(0.155, 1.4, length.out=3558), gas_price = seq(1.880, 13.29, length.out=3558)) %>%
+  cbind(mean_dat)
+
+
+pred_dat <- east %>% 
+  select(gasprice, CR) %>% 
+  cbind(mean_dat)
 
 
 
-```{r}
-fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, data_1)
 
-p4 <- predict(fit4, data_1)
+reg1 <- lm(CO2MASS ~ CR, data=east)
 
+co2.hat1 = predict(reg1, pred_dat)
 
-regression.result(fit4)
-
-effectplot(fit4, show.ci = TRUE)
+plot(pred_dat$CR, co2.hat1)
 
 
-pispl <- periodicSpline(data_1$gasprice, p4)
+reg2 <- lm(CO2MASS ~ CR + load, data=east)
+summary(reg1)
+
+co2.hat2 <- predict(reg2, pred_dat)
+
+reg3 <- lm(CO2MASS ~ poly(CR,3) + load, data=east)
+co2.hat3 <- predict(reg3, pred_dat)
+
+library(splines)
+
+reg4 <- lm(CO2MASS ~ bs(CR, df=5) + bs(load, df=5), data=east)
+
+co2.hat4 = predict(reg4, pred_dat)
+
+temp2 <- pred_dat %>% cbind(co2.hat5) 
+temp4 <- arrange(temp2, CR)
+vec <- temp2$gasprice
+vec <- sort(vec)
+
+temp5 <- temp4 %>% cbind(vec)
+
+
+reg5 <- lm(CO2MASS ~ bs(CR, df=5) + bs(load, df=5) + tlsd + tlmin + tlmax + bs(meant, df=5) + nonFossil + so2price + netNSflow, data=east)
+
+summary(reg5)
+
+
+co2.hat5 = predict(reg5, pred_dat)
+
+temp1 <- data.frame(CO2MASS = east$CO2MASS,
+                       gasprice = east$gasprice,
+                       predicted_values = co2.hat5,
+                       predicted_values_perc = co2.hat5/5.105963/1000000-1)
+
+ggplot(temp1, aes(x=CR, y=CO2MASS) ) +
+  geom_line(aes(y=co2.hat5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  #scale_x_date(labels = lbls, breaks = brks) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
 
 
 
-```
 
 
 
-```{r}
-# NOT RUN {
-# }
+ggplot(temp1, aes(x=gasprice, y=CO2MASS) ) +
+  geom_smooth(aes(y=co2.hat5)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  #scale_x_date(labels = lbls, breaks = brks) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+
+
+
+summary(reg5)
+
+
+colnames(east)
+
+ggplot(temp5, aes(x=CR, y=CO2MASS)) +
+  geom_line(aes(y=co2.hat5), col="red")
+
+
+plot(x=pred_dat$gasprice, y=pred_dat$co2.hat1, ylim=range(co2.hat1, co2.hat3))
+  lines(pred_dat$gasprice, co2.hat2, col="blue")
+  lines(pred_dat$gasprice, co2.hat3, col="red")
+  lines(pred_dat$gasprice, co2.hat4, col="green")
+#  lines(pred_dat$gas_price, co2.hat5, col="green")
+
 ```
 
 

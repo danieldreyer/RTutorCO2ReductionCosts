@@ -1,29 +1,151 @@
 ```{r}
+east <- data %>% 
+  mutate(CR = coal_price/gasprice, gx=2.25/CR) %>%  #CO2MASS=CO2MASS/1000000) %>%
+  filter(intercn=="EAST")
+
+
+mean_dat <- east %>% 
+  select(CO2MASS, load, tlsd, tlmin, tlmax, meant, nonFossil, so2price, netNSflow) %>% 
+  summarise_all(mean)
+
+
+f = function(CR){
+  east$coal_price/CR
+}
+
+
+pred_dat <- tibble(gasprice=seq(1.562225, 14.659103, length.out=2557), gx=seq(1.562225, 14.659103, length.out=2557), CR=seq(0.155, 1.4, length.out=2557)) %>%
+  cbind(mean_dat)
+
+#pred_dat <- 
+
+
+#pred_dat <- east %>% 
+#  select(gasprice, CR) %>% 
+#  cbind(mean_dat)
+
+
+
+
+#reg1 <- lm(CO2MASS ~ CR, data=east)
+
+#co2.hat1 = predict(reg1, pred_dat)
+
+#plot(pred_dat$gasprice, co2.hat1)
+
+#gen gx =  `avgcp'/priceratio
+library(splines)
+
+reg5 <- lm(CO2MASS ~ ns(CR, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonFossil + so2price + netNSflow, data=east)
+
+
+#predict(reg5, newdata=data.frame(x=5.75),type="response")
+#summary(reg5)
+
+co2.hat5 = predict(reg5, pred_dat)
+#east <- east %>% cbind(co2.hat5=predict(reg5, pred_dat))
+#plot(pred_dat$gx, co2.hat5)
+
+basecoal=2.25
+basegas=5.75
+
+
+#gen diff_base = abs(priceratio -(`basecoal'/`basegas')) 
+diff_base <- abs(east$CR - (basecoal/basegas))
+min_dif <- min(diff_base)
+#gen closest = mindiff==diff_base
+closest <- min_dif==diff_base
+#unique(closest)
+
+#closest
+#
+
+base_emit <- co2.hat5[which(closest)]
+
+
+#gen d_pct = 100*(emithat-base_emit)/base_emit			
+hallo <- 100*(co2.hat5-base_emit)/base_emit
+
+
+#hallo <- co2.hat5/base_emit-1
+#hallo
+
+  
+ggplot(pred_dat, aes(x=basecoal/CR, y=hallo)) +
+  geom_line(aes(y=hallo)) +
+  #scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(2, 12)) +
+  geom_vline(xintercept = 5.75, linetype = "dashed")
+  
+
+```
+
+
+
+**Task:** Just press *check*.
+```{r "3_4__3"}
 #117 is lbs carbon/MMBTU for gas or 0.0585 tons/MMBTU
 #210.8 is lbs carbon/MMBTU for coal or .1054 tons/MMBTUgen
-			
-			
-#carbontax = (priceratio*`basegas' - `basecoal')/(0.1054-priceratio*0.0585)
 
 basegas <- 5.75
 basecoal <- 2.25
+temp <- tibble(east$date, co2.hat5, east$CR, base_emit, carbontax=(east$CR*basegas-basecoal)/(0.1054-east$CR*0.0585), emission=pred_dat$transformed.reg5)
 
-
-
-
-dat <- dat %>% 
-  mutate(carbontax = (CR*5.75-2.25)/(0.1054-CR*0.0585))
-
-tax_east <- dat %>% 
-  filter(carbontax >= 0 & carbontax <= 70 & intercn == "EAST")
-
-tax_wecc <- dat %>% 
-  filter(carbontax >= 0 & carbontax <= 70 & intercn == "WECC")
-
-tax_ercot <- dat %>% 
-  filter(carbontax >= 0 & carbontax <= 70 & intercn == "ERCOT")
-
-
+#east <- east %>% cbind(co2.hat5)
 
 ```
+
+**Task:** Just press *check*.
+```{r "3_4__4"}
+temp <- temp %>% 
+  filter(carbontax >= 0 & carbontax <= 80)
+
+#tax_wecc <- dat %>% 
+#  filter(carbontax >= 0 & carbontax <= 70 & intercn == "WECC")
+
+#tax_ercot <- dat %>% 
+#  filter(carbontax >= 0 & carbontax <= 70 & intercn == "ERCOT")
+```
+
+**Task:** Just press *check*.
+```{r "3_4__5"}
+temp <- temp %>% 
+  mutate(emission_perc = (co2.hat5/base_emit-1)*(-1))
+
+diff_base <- abs(east$CR - (basecoal/basegas))
+min_dif <- min(diff_base)
+closest <- min_dif==diff_base
+base_emit <- co2.hat5[which(closest)]
+
+transformed.hat5 <- carbontax/base_emit-1
+
+
+#tax_wecc_perc <- tax_wecc %>% 
+#  mutate(predicted_values_perc = (predicted_values/0.888435-1)*(-1))
+
+#tax_ercot_perc <- tax_ercot %>% 
+#  mutate(predicted_values_perc = (predicted_values/0.507435-1)*(-1))
+```
+
+
+**Task:** Just press *check*.
+```{r "3_4__6"}
+ggplot(temp, aes(x=carbontax, y=emission*-1) ) +
+  geom_line() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.05,0.2)) +
+  scale_x_continuous(limits=c(0, 80)) +
+  labs(title="Easter Interconnection",
+       y="CO2 Emissions abated as a Percentage of Baseline Emissions", x="Carbon Price $/ton") + 
+  coord_flip()
+
+```
+
+
+
+
+
+
+
+
+
 
