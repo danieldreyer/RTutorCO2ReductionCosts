@@ -19,6 +19,7 @@ library(haven)
 library(tidyverse)
 library(ggalt)
 library(regtools)
+library(splines)
 library(RTutor)
 
 
@@ -193,7 +194,7 @@ PaGP <- read_csv("./Data/PaGP.csv")
 
 ```{r "1__6"}
 # head(PaGP, ...)
-head(PaGP, 8)
+head(PaGP, 5)
 
 ```
 
@@ -210,8 +211,10 @@ PaGP$date <- as.Date(PaGP$date)
 
   
 The data frame contains monthly numbers of generated MwH with coal and gas as well as prices of Energy commodities. 
-Keep in mind that different commodities are traded in different units. Oil is traded in barrels (\$/bbl), coal in metric tons (\$/mt) and gas in British thermal units($/mmbtu). The natural gas index is set to 100 in the year 2010 and changes accordingly.
-Prior to visualizing the data and to get clearer results, lets modifiy the data set. As mentioned before, commodities are traded in different units. Therefore we will add new entries for normalized prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
+Keep in mind that different commodities are traded in different units. Oil is traded in barrels (\$/bbl), coal in metric tons (\$/mt) and gas in British thermal units($/mmbtu). The natural gas index is
+set to 100 in the year 2010 and changes accordingly.
+Prior to visualizing the data and to get clearer results, lets modifiy the data set. As mentioned before, commodities are traded in different units. Therefore we will add new entries for normalized
+prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
 
 **Task:** Perform the above calculations. Just press *check*.
   
@@ -220,11 +223,15 @@ Prior to visualizing the data and to get clearer results, lets modifiy the data 
 
 ### Info: Pipe, mutate, select
 The pipe operator `%>%` is a feature provided by the `dplyr` Package. Essentially it allows to exectute multiple operation on a dataframe at once.
-This works because every pipe operator returns a dataframe. If you add pipes, all you do is creating new data frames.  
+This works the way that every pipe operator returns a dataframe and passes it to the next connected function. `Select` allows you to filter out certain columns of data, whereas `mutate` allows you to
+alter data. The counterpart for selecting specific rows is `filter`. There are several more functions to alter your data, below i linked a handy cheatsheet.
   
-example %>%  
-&nbsp; mutate(new_column = old_column+1) %>% `mutate: create or alter columns`    
-&nbsp; select(1:5)  `select: keep certain columns, here column 1 to 5`   
+```{r "1__8",eval=FALSE}
+example %>% 
+  select(1:5)  `select: keep certain columns, here column 1 to 5`  %>% 
+  mutate(new_column = old_column+1)`mutate: create or alter columns`    
+
+```
 
 You can find a more detailed cheatsheet [here](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) or use the `help()` function.
 
@@ -235,7 +242,8 @@ You can find a more detailed cheatsheet [here](https://rstudio.com/wp-content/up
 ***
 
 ### Info: ggplot2
-The package `ggplot2` is a powerful data visualization package for `R`, which is part of the `tidyverse` environment. Besides basic functions that are also provided by native `R`, it allows the user to highly modify graphs by **altering**, **adding** or **removing** components.
+The package `ggplot2` is a powerful data visualization package for `R`, which is part of the `tidyverse` environment. Besides basic functions that are also provided by native `R`, it allows the user to
+highly modify graphs by **altering**, **adding** or **removing** components.
 
 The problem set doesn't require you to have deeper knowledge about function of `ggplot2`. However, you can find further documentation [here](https://ggplot2.tidyverse.org/) or type `help(ggplot2)`.
 
@@ -243,7 +251,7 @@ The problem set doesn't require you to have deeper knowledge about function of `
 
 
 
-```{r "1__8"}
+```{r "1__9"}
 PaGP <- PaGP %>% 
   mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412,
          price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412,
@@ -252,7 +260,7 @@ PaGP <- PaGP %>%
 ```
 
 **Task:** Output a graphic. Just press *check*.
-```{r "1__9"}
+```{r "1__10"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$price_coal_australia_normalized, color="Coal Autralia"), size=1) +
   geom_line(aes(y=PaGP$price_coal_africa_normalized, color="Coal Africa"), size=1) +
@@ -283,7 +291,7 @@ Quiz: Do you think that the proportion of gas generated electicity compared to c
 
 **Task:** Just press *check*.
 
-```{r "1__10"}
+```{r "1__11"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
   geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
@@ -304,7 +312,7 @@ Good Start! You will earn awards at the end of every chapter. At the end you wil
 
 
 
-## Exercise 2 -- Interconnections
+## Exercise 2 -- Interconnections // mapping carbon prices???
 
 ![Interconnections](./Material/interconnections.png) (SOURCE)
 
@@ -323,7 +331,7 @@ The 3 regions, as seen in the graph above, are as followed:
 
 
 **Task:** Just press *check*.
-```{r "2__11"}
+```{r "2__12"}
 Emissions <- read.csv("./Data/Emissions_Unit_Type.csv")
 ```
 
@@ -336,39 +344,35 @@ wip
 
 $$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
 
-
+einfuehren priceratio auf basis von tabelle oben - hohe varianz
 
 
 ## Exercise 3 -- Road to a working model
 
-In this and the following exercies we will develop a statistical model, that tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
+In this exercise we briefly go over the data we use for our main analysis and give an overview what we will be doing in the following exercises. The main question of this problem set is to find out how
+carbon prices would effect emissions in the energy sector. To answer this we will construct a statistical model to understand the emission behaviour for changing input costs while controlling for
+variables that effect the energy market. However we won't simply propose a final model but will work our way from simple linear regressions to more complex but also more accurate models.  
 &nbsp;
  - You can find a rough guideline of content in each exercise below:
                 
-  + `Exercise 3.1` - Linear Regression
-  + `Exercise 3.2` - Polonymal Regression
-  + `Exercise 3.3` - Cubic Spline Regression
+  + `Exercise 3.1` - Linear Regression and Polynomial Regression
+  + `Exercise 3.2` - Introduction of Cubic Splines
+  + `Exercise 3.3` - Estimated CO2 Response to Fuel Prices
+  + `Exercise 3.4` - Imputed CO2 Response to Carbon Prices
 &nbsp;
 
-If you want to go faster through the problem set, you can skip to exercise `3.3` onwards, which presents the final model and visualizes our results.  
-In this exercise you will get a feeling for the data set you are working with and with some 
+If you want to go faster through the problem set, you can skip to exercise `3.3` onwards, which presents the final model and visualize our results.  
+Before we take a look at the data, import our dataset.
 
-The goal of this exercise is to give you an overview of the data we use to perform our analysis. 
+**Task:** Load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
-TEXT
-
-**Task:** Read in table.
-
-```{r "3__12"}
-data <- suppressMessages(read_csv("Data/main_data.csv"))
+```{r "3__13",message=FALSE}
+dat <- read_csv("Data/main_data.csv")
+head(dat,3)
 ```
+&nbsp;
 
-
-
-***
-
-### Info: main_data
-The data frame is a combination of data frames used in previous exercises and adds additional information. It contains `daily` information for each interconnection. Relevant columns are explained below:
+The data frame is a combination of data we used previous exercises and additional factors. It consists of `daily` information for `each interconnection`. Relevant columns are explained below:
 
 `co2mass` = CO2 emissions in tons  
 `gasprice` = Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
@@ -377,31 +381,84 @@ The data frame is a combination of data frames used in previous exercises and ad
 `meant` = average daily temperature per interconnection  
 `nonFossil` 
 `so2price`
-`netNSflow`
+`netNSflow` = MwH flowing from Canada to US by interconnection and month
+
+
+++++++++ sources of data
+
+When choosing control variables we have to be sure that they directly effect the emissions 
+
+To give us an overview of the data, lets create a table with average values for relevant factors for each interconnection. R provides several packages that , but for now we work with packages we
+introduced before and solve this with `dyplr`.  
+
+**Task:** Use `group_by()` to group the dataset `dat` by `intercn`. Afterwards use `summarise_all()` to calculate the means of every variable. You don't have to deal with the additional lines of code, which is used to create a more understandable output.
+
+
+***
+
+### Info: Group_by() and summarise()
+`Group_by()` allows you to group a data frame by specific variables. Operations that are run on the output data frame of grouped data are then performed on each group.
+
+The function `Summarise()` can be used on your **grouped data** and can perform operations on your grouped data e.g. calculating means (`mean()`) or finding minimums (`min()`). There are several
+pre-implemented version of `summarise` function in `R`. The one we use here is `summarise_all()`, which performs these operations on multiple variables.
+
+To give you an example in code form, lets pretend we have a dataframe `data` with several car manufacturer and their respective car models with prices and we want to calculate the average car price per
+manufacturer.
+
+```{r "3__14",eval=FALSE}
+example <- data %>% 
+  group_by(manufacturer) %>%
+  summarise(mean_price = mean(price))
+```
+
+Call `help(group_by)` or `help(summarize)` for futher information.
 
 ***
 
 
-
-**Task:** Just press *check*.
-```{r "3__13"}
-table <- data %>% 
+```{r "3__15"}
+#... %>% 
+#  select(intercn, co2mass, load, gasprice, coalprice) %>% 
+#  group_by(...) %>% 
+#  ...("mean") %>% 
+#  mutate(co2mass = co2mass/1000, load=load/1000, "Emission Rate"=co2mass/load, "Cost Ratio"=coalprice/gasprice) %>% 
+#  rename("CO2 Emissions"=co2mass, Load=load, "Gas Price"=gasprice, "Coal Price"=coalprice)
+dat %>% 
+  select(intercn, co2mass, load, gasprice, coalprice, meant, nonfossil, so2price) %>% 
   group_by(intercn) %>% 
-  select(intercn, CO2MASS, load, gasprice, coal_price) %>% 
-  mutate(CO2MASS = CO2MASS/1000, load=load/1000, "Emission Rate"=CO2MASS/load, "Cost Ratio"=coal_price/gasprice) %>% 
+  mutate(co2mass = co2mass/1000, load=load/1000, "Cost Ratio"=coalprice/gasprice, "Emission Rate"=co2mass/load) %>% 
   summarise_all("mean") %>% 
-  rename("CO2 Emissions"=CO2MASS, Load=load, "Gas Price"=gasprice, "Coal Price"=coal_price)
-
-table
+  rename("Interconnection"=intercn, "CO2 Emissions"=co2mass, Load=load, "Gas Price"=gasprice, "Coal Price"=coalprice)
 ```
 
+
+
+
+/// graph einheiten y achse
+
+
 **Task:** Just press *check*.
-```{r "3__14"}
-ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
-        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
+
+
+***
+
+### Info: geom_encircle
+Besides standard functionality for plotting points or lines, `ggplot2` provides a advanced framework for visualising your data. `geom_encircle()` encloses groups of data point in a polycan and can be
+used to circle specified groups of data and can be used to visualise differences in groups of data.
+
+Call `help(geom_encircle)` to get further information.
+
+***
+
+
+```{r "3__16"}
+ggplot(dat,aes(x=gasprice,y=co2mass/1000,color=intercn))+
+        geom_point(alpha=0.2) +
+        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3, s_shape=1) +
         theme_bw()+ 
-        labs(y="CO2 Emissions", 
+        labs(y="", 
         x="Gas Price", 
+        subtitle="CO2 Emissions",
         title="CO2 Emissions vs. Gasprice")
 ```
 
@@ -409,11 +466,11 @@ TEXT
 
 ## Exercise 3.1 -- Priceratio Regressions
 
-In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs and answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
+In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs tor answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
 
 **Task:** To get started, load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
-```{r "3_1__15"}
+```{r "3_1__17"}
 dat <- suppressMessages(read_csv("Data/main_data.csv"))
 ```
 
@@ -432,7 +489,7 @@ $CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO
 
 
 **Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with interconnection `EAST` and store the new data frame in variable `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice`.
-```{r "3_1__16"}
+```{r "3_1__18"}
 # ... <- data %>% 
 #  mutate(CR = .../...) %>% 
 #  filter(intercn=="...")
@@ -446,6 +503,8 @@ dat_east <- dat %>%
 
 Highly unlikely here, but to get you rolling in the topic, lets start with a simple linear regression and analyse the results on fitting. I will introduce methods to interpret regression results ...
 
+///////// why priceratio - paper 18 absatz 2
+
 
 
 ***
@@ -454,7 +513,7 @@ Highly unlikely here, but to get you rolling in the topic, lets start with a sim
 
 `lm()` is part of the `stats` package and loaded on default. As shown in the syntax example below, it enables you to regress `y` on the indepedent variables `x1` and `x2`. The model can be `stored` in a variable or directly `used` in other functions. Another popular function to solve linear regressions in `R` is `felm()`, that provides further functionality to include `fixed effects`. In this problem set we will strictly use `lm()`.
 
-```{r "3_1__17",eval=FALSE}
+```{r "3_1__19",eval=FALSE}
 example <- lm(y~x1+x2, data=dat_east)
 ```
 
@@ -464,7 +523,7 @@ You can find more information on the `lm()` function [here](https://www.rdocumen
 
 
 **Task:** Run a regression with `co2mass` as the dependent variable and `pricerati` as independent variable. Store it in the variable `fit1`. 
-```{r "3_1__18"}
+```{r "3_1__20"}
 # ... <- lm(...~... , data=east)
 fit <- lm(co2mass ~ priceratio, data=dat_east)
 ```
@@ -485,7 +544,7 @@ Quiz: What impact do changing price ratios have on emissions? Remember, pricerat
 TEXT
 
 **Task:** To
-```{r "3_1__19"}
+```{r "3_1__21"}
 summary(fit)
 ```
 
@@ -494,7 +553,7 @@ summary(fit)
 
 
 **Task:** To
-```{r "3_1__20"}
+```{r "3_1__22"}
 p1 <- predict(fit, newdata = dat_east)
 ```
 
@@ -510,7 +569,7 @@ QUIZ: erwartung fallend oder steigend
 
 
 **Task:** To
-```{r "3_1__21"}
+```{r "3_1__23"}
 plot(co2mass~priceratio, dat_east)
 lines(dat_east$priceratio, p1, col="red")
 ```
@@ -533,13 +592,13 @@ We will use the `stargazer()` function from the `stargazer` package to show summ
 ### Info: Custom functions
 `R` provides an easy framework to add your own functions. The syntax is quite similar to other `Programming Languages` you could be familiar with. Once you have defined a function, you can use it as long as you are in the same session. Below you can find the basic structure of a function:
 
-```{r "3_1__22",eval=FALSE}
+```{r "3_1__24",eval=FALSE}
 `myfunction <- function(arg1, arg2, ... ){`  
 `statements`  
 `return(object)`  
 ```  
 Here's an simple functions that adds `5` to the input and returns it.
-```{r "3_1__23",eval=FALSE}
+```{r "3_1__25",eval=FALSE}
 `example <- function(x) {`  
   `x + 5`  
 `}`  
@@ -552,7 +611,7 @@ You can find more detailed information [here](https://www.rdocumentation.org/pac
 
 
 **Task:** Run the Code Chunk. It defines the function to show our custom regression tables.
-```{r "3_1__24"}
+```{r "3_1__26"}
 show.regression= function(...){
   library(stargazer)
     stargazer(..., 
@@ -573,7 +632,7 @@ show.regression= function(...){
 
 
 **Task:** Let's see what we just defined. Run the regression table for the linear model. Insert 
-```{r "3_1__25"}
+```{r "3_1__27"}
 # regression.result(...)
 regression.result(fit)
 ```
@@ -581,7 +640,7 @@ regression.result(fit)
 TEXT
 
 **Task:** To
-```{r "3_1__26"}
+```{r "3_1__28"}
 plot(fit, 1)
 plot(fit, 2)
 ```
@@ -599,10 +658,10 @@ A problem with the `R-squared` measurement is, that it always increases with hig
 ***
 
 
-### Stage 2: Polonymal Regression
+### Stage 2: Polynomial Regression
 
 **Task:** Just press *check*.
-```{r "3_1__27"}
+```{r "3_1__29"}
 CR.squared <- east$CR^2
 fit2 <- lm(CO2MASS ~ CR + CR.squared, east)
 
@@ -611,13 +670,13 @@ fit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__28"}
+```{r "3_1__30"}
 p2 <- predict(fit2, east)
 p3 <- predict(fit3, east)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__29"}
+```{r "3_1__31"}
 plot(CO2MASS~CR, east)
 lines(east$CR, p1, col="red")
 lines(east$CR, p2, col="blue")
@@ -625,12 +684,12 @@ lines(east$CR, p3, col="green")
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__30"}
+```{r "3_1__32"}
 regression.result(fit, fit2, fit3)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__31"}
+```{r "3_1__33"}
 anova(fit, fit2, fit3)
 ```
 
@@ -647,15 +706,25 @@ anova(fit, fit2, fit3)
 
 ### Stage 3: Cubic Spline
 
-In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this `Stage` we will extend the model and add several `independent variables`.  
+In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this exercise we will introduce the concept of `spline regression` and extend our model with several `control variables`.  
 The model is a `reduced-form regression` and is defined as followed:
 
 Explain Cubic Splines
 
-```{r "3_2__32",optional=TRUE}
+
+
+
+
+
+
+```{r "3_2__34",optional=TRUE}
 # show that all integers between 0 and 10
 1:10
 ```
+
+
+
+simple cubic splines
 
 
 
@@ -673,22 +742,7 @@ $X_{t}$ = We include traditional factors like non-fossil electricity production 
 
 First, we have to define our model 
 
-**Task:** Just press *check*.
-```{r "3_2__33"}
-fit4 <- lm(CO2MASS ~ CR + load + meant + nonFossil + so2price + netNSflow, east) 
-```
 
-
-
-**Task:** Just press *check*.
-```{r "3_2__34"}
-effectplot(fit4, show.ci = TRUE)
-```
-
-**Task:** Just press *check*.
-```{r "3_2__35"}
-regression.result(fit4)
-```
 
 
 
@@ -719,36 +773,36 @@ $CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_
 
 
 
-```{r "3_3__36"}
+```{r "3_3__35"}
 dat <- read_csv("Data/main_data.csv")
 ```
 
 
-```{r "3_3__37"}
+```{r "3_3__36"}
 east <- dat %>% 
   mutate(priceratio = coalprice/gasprice) %>%
   filter(intercn=="EAST")
 ```
 
-```{r "3_3__38"}
+```{r "3_3__37"}
 mean_dat_east <- east %>% 
   select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
   summarise_all(mean)
 ```
 
-```{r "3_3__39"}
+```{r "3_3__38"}
 temp_east <- tibble(gasprice = east$gasprice, priceratio = east$priceratio) %>% cbind(mean_dat_east)
 ```
 
-```{r "3_3__40"}
+```{r "3_3__39"}
 reg_east <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=east)
 ```
 
-```{r "3_3__41"}
+```{r "3_3__40"}
 co2.east = predict(reg_east, temp_east)
 ```
 
-```{r "3_3__42"}
+```{r "3_3__41"}
 basecoal=2.25
 basegas=5.75
 
@@ -763,7 +817,7 @@ pred_east <- temp_east %>% cbind(transformed.east = transformed.east)
 
 ```
 
-```{r "3_3__43"}
+```{r "3_3__42"}
 plot_east <- ggplot(pred_east, aes(x=basecoal/priceratio, y=transformed.east)) +
   geom_line(aes(y=transformed.east)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -775,10 +829,10 @@ plot_east
 ```
 
 
-EVtl loop ueber "WECC" und "ERCOT"
+EVtl loop ueber "WECC" und "ERCOT" ///////comments
 
 **Task:** Just press *check*.
-```{r "3_3__44"}
+```{r "3_3__43"}
 ercot <- dat %>% 
   mutate(priceratio = coalprice/gasprice) %>%
   filter(intercn=="ERCOT")
@@ -808,7 +862,7 @@ plot_ercot
 
 
 **Task:** Just press *check*.
-```{r "3_3__45"}
+```{r "3_3__44"}
 wecc <- dat %>% 
   mutate(priceratio = coalprice/gasprice) %>%
   filter(intercn=="WECC")
@@ -837,7 +891,7 @@ plot_wecc
 
 
 
-```{r "3_3__46"}
+```{r "3_3__45"}
 grid.arrange(plot_east, plot_wecc, plot_ercot, nrow=1)
 ```
 
@@ -871,40 +925,45 @@ The first step is the same as in the last exercise, but we need it for this part
 ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 
 **Task:** Just press *check*.
-```{r "3_4__47"}
+
+
+**Task:** Just press *check*.
+```{r "3_4__46"}
 #datensatz aus 3.3 mit allen werten
 
 # date intercn co2.hat cr predicted emissions %)
 
 #calc carbon tax
-temp <- tibble(east$date, co2.hat5, east$CR, base_emit, carbontax=(east$CR*basegas-basecoal)/(0.1054-east$CR*0.0585), emission=pred_dat$transformed.reg5)
+tax_east0 <- tibble(date=east$date, co2 = co2.east, priceratio = east$priceratio, base_emit, carbontax=(east$priceratio*basegas-basecoal)/(0.1054-east$priceratio*0.0585), emission=pred_east$transformed.east)
+
+head(tax_east0)
 ```
 
 **Task:** Just press *check*.
-```{r "3_4__48"}
+```{r "3_4__47"}
 basegas <- 5.75
 basecoal <- 2.25
 ```
 
 **Task:** Just press *check*.
-```{r "3_4__49"}
+```{r "3_4__48"}
 #117 is lbs carbon/MMBTU for gas or 0.0585 tons/MMBTU
 #210.8 is lbs carbon/MMBTU for coal or .1054 tons/MMBTUgen
-dat <- dat %>% 
-  mutate(carbontax = (CR*basegas-basecoal)/(0.1054-CR*0.0585))
+east1 <- tax_east0 %>% 
+  mutate(carbontax = (priceratio*basegas-basecoal)/(0.1054-priceratio*0.0585))
 
 ```
 
 **Task:** Just press *check*.
-```{r "3_4__50"}
-tax_east <- dat %>% 
+```{r "3_4__49"}
+tax_east <- east1 %>% 
   filter(carbontax >= 0 & carbontax <= 80)
 ```
 
 
 **Task:** Just press *check*.
-```{r "3_4__51"}
-ggplot(temp, aes(x=carbontax, y=emission*-1) ) +
+```{r "3_4__50"}
+ggplot(tax_east, aes(x=carbontax, y=emission*-1) ) +
   geom_line() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.05,0.2)) +
   scale_x_continuous(limits=c(0, 80)) +
@@ -922,12 +981,47 @@ ggplot(temp, aes(x=carbontax, y=emission*-1) ) +
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//// einschub robustness test mit anderen definition von priceratios , appendix a2< number of knots
+
+
+
+
+
 ## Exercise 4 -- Conclusion
 
 
-```{r "4__52"}
+```{r "4__51"}
 awards()
 ```
+
+
+The methods used here can be further used to generate additoinal results. This could be a point where you can go on.
 
 
 ## Exercise References

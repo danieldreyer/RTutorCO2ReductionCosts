@@ -131,8 +131,10 @@ PaGP$date <- as.Date(PaGP$date)
 
   
 The data frame contains monthly numbers of generated MwH with coal and gas as well as prices of Energy commodities. 
-Keep in mind that different commodities are traded in different units. Oil is traded in barrels (\$/bbl), coal in metric tons (\$/mt) and gas in British thermal units($/mmbtu). The natural gas index is set to 100 in the year 2010 and changes accordingly.
-Prior to visualizing the data and to get clearer results, lets modifiy the data set. As mentioned before, commodities are traded in different units. Therefore we will add new entries for normalized prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
+Keep in mind that different commodities are traded in different units. Oil is traded in barrels (\$/bbl), coal in metric tons (\$/mt) and gas in British thermal units($/mmbtu). The natural gas index is
+set to 100 in the year 2010 and changes accordingly.
+Prior to visualizing the data and to get clearer results, lets modifiy the data set. As mentioned before, commodities are traded in different units. Therefore we will add new entries for normalized
+prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
 
 **Task:** Perform the above calculations. Just press *check*.
   
@@ -141,11 +143,11 @@ info("Pipe, mutate, select") # Run this line (Strg-Enter) to show info
 info("ggplot2") # Run this line (Strg-Enter) to show info
 
 
-```{r "1__8"}
+```{r "1__9"}
 ```
 
 **Task:** Output a graphic. Just press *check*.
-```{r "1__9"}
+```{r "1__10"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$price_coal_australia_normalized, color="Coal Autralia"), size=1) +
   geom_line(aes(y=PaGP$price_coal_africa_normalized, color="Coal Africa"), size=1) +
@@ -170,7 +172,7 @@ In the next Step we will look at the generated Power for Coal / Gas in the U.S.
 
 **Task:** Just press *check*.
 
-```{r "1__10"}
+```{r "1__11"}
 ggplot(data=PaGP, aes(x=date)) +
   geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
   geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
@@ -183,7 +185,7 @@ TEXT
 
 
 
-## Exercise 2 -- Interconnections
+## Exercise 2 -- Interconnections // mapping carbon prices???
 
 ![Interconnections](./Material/interconnections.png) (SOURCE)
 
@@ -203,56 +205,84 @@ wip
 
 $$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
 
-
+einfuehren priceratio auf basis von tabelle oben - hohe varianz
 
 
 ## Exercise 3 -- Road to a working model
 
-In this and the following exercies we will develop a statistical model, that tries to find a connection between our given variables and CO2 emission. We will start from a simple linear approach and find our ways to a more complex but also more accurate model. We do not just stick to the 
+In this exercise we briefly go over the data we use for our main analysis and give an overview what we will be doing in the following exercises. The main question of this problem set is to find out how
+carbon prices would effect emissions in the energy sector. To answer this we will construct a statistical model to understand the emission behaviour for changing input costs while controlling for
+variables that effect the energy market. However we won't simply propose a final model but will work our way from simple linear regressions to more complex but also more accurate models.  
 &nbsp;
  - You can find a rough guideline of content in each exercise below:
                 
-  + `Exercise 3.1` - Linear Regression
-  + `Exercise 3.2` - Polonymal Regression
-  + `Exercise 3.3` - Cubic Spline Regression
+  + `Exercise 3.1` - Linear Regression and Polynomial Regression
+  + `Exercise 3.2` - Introduction of Cubic Splines
+  + `Exercise 3.3` - Estimated CO2 Response to Fuel Prices
+  + `Exercise 3.4` - Imputed CO2 Response to Carbon Prices
 &nbsp;
 
-If you want to go faster through the problem set, you can skip to exercise `3.3` onwards, which presents the final model and visualizes our results.  
-In this exercise you will get a feeling for the data set you are working with and with some 
+If you want to go faster through the problem set, you can skip to exercise `3.3` onwards, which presents the final model and visualize our results.  
+Before we take a look at the data, import our dataset.
 
-The goal of this exercise is to give you an overview of the data we use to perform our analysis. 
+**Task:** Load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
-TEXT
-
-**Task:** Read in table.
-
-```{r "3"}
-data <- suppressMessages(read_csv("Data/main_data.csv"))
+```{r "3",message=FALSE}
+dat <- read_csv("Data/main_data.csv")
+head(dat,3)
 ```
+&nbsp;
+
+The data frame is a combination of data we used previous exercises and additional factors. It consists of `daily` information for `each interconnection`. Relevant columns are explained below:
+
+`co2mass` = CO2 emissions in tons  
+`gasprice` = Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
+`coalprice` = Price of Coal ($ per million BTU)  
+`load` = daily electricity consumption per interconnection in MWH  
+`meant` = average daily temperature per interconnection  
+`nonFossil` 
+`so2price`
+`netNSflow` = MwH flowing from Canada to US by interconnection and month
 
 
-info("main_data") # Run this line (Strg-Enter) to show info
+++++++++ sources of data
 
+When choosing control variables we have to be sure that they directly effect the emissions 
 
-**Task:** Just press *check*.
-```{r "3__2"}
-table <- data %>% 
-  group_by(intercn) %>% 
-  select(intercn, CO2MASS, load, gasprice, coal_price) %>% 
-  mutate(CO2MASS = CO2MASS/1000, load=load/1000, "Emission Rate"=CO2MASS/load, "Cost Ratio"=coal_price/gasprice) %>% 
-  summarise_all("mean") %>% 
-  rename("CO2 Emissions"=CO2MASS, Load=load, "Gas Price"=gasprice, "Coal Price"=coal_price)
+To give us an overview of the data, lets create a table with average values for relevant factors for each interconnection. R provides several packages that , but for now we work with packages we
+introduced before and solve this with `dyplr`.  
 
-table
-```
+**Task:** Use `group_by()` to group the dataset `dat` by `intercn`. Afterwards use `summarise_all()` to calculate the means of every variable. You don't have to deal with the additional lines of code, which is used to create a more understandable output.
 
-**Task:** Just press *check*.
+info("Group_by() and summarise()") # Run this line (Strg-Enter) to show info
+
 ```{r "3__3"}
-ggplot(data,aes(x=gasprice,y=CO2MASS,color=intercn))+
-        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3) +
+#... %>% 
+#  select(intercn, co2mass, load, gasprice, coalprice) %>% 
+#  group_by(...) %>% 
+#  ...("mean") %>% 
+#  mutate(co2mass = co2mass/1000, load=load/1000, "Emission Rate"=co2mass/load, "Cost Ratio"=coalprice/gasprice) %>% 
+#  rename("CO2 Emissions"=co2mass, Load=load, "Gas Price"=gasprice, "Coal Price"=coalprice)
+```
+
+
+
+
+/// graph einheiten y achse
+
+
+**Task:** Just press *check*.
+
+info("geom_encircle") # Run this line (Strg-Enter) to show info
+
+```{r "3__4"}
+ggplot(dat,aes(x=gasprice,y=co2mass/1000,color=intercn))+
+        geom_point(alpha=0.2) +
+        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3, s_shape=1) +
         theme_bw()+ 
-        labs(y="CO2 Emissions", 
+        labs(y="", 
         x="Gas Price", 
+        subtitle="CO2 Emissions",
         title="CO2 Emissions vs. Gasprice")
 ```
 
@@ -260,7 +290,7 @@ TEXT
 
 ## Exercise 3.1 -- Priceratio Regressions
 
-In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs and answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
+In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs tor answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
 
 **Task:** To get started, load the data set `main_data.csv`, press `edit` and `check` afterwards.
 
@@ -294,6 +324,8 @@ $CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO
 ### Stage 1: Linear Regression
 
 Highly unlikely here, but to get you rolling in the topic, lets start with a simple linear regression and analyse the results on fitting. I will introduce methods to interpret regression results ...
+
+///////// why priceratio - paper 18 absatz 2
 
 
 info("Linear Regression with lm()") # Run this line (Strg-Enter) to show info
@@ -381,7 +413,7 @@ QQ PLOT RESIDUALS?
 
 info("R-squared") # Run this line (Strg-Enter) to show info
 
-### Stage 2: Polonymal Regression
+### Stage 2: Polynomial Regression
 
 **Task:** Just press *check*.
 ```{r "3_1__13"}
@@ -421,11 +453,17 @@ info("R-squared") # Run this line (Strg-Enter) to show info
 
 ### Stage 3: Cubic Spline
 
-In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this `Stage` we will extend the model and add several `independent variables`.  
+In previous stages we came to the conclusion that a model that relies purely on `$CO_{2}$ emissions` and the `Cost Ratio` of gas and coal isn't sufficient to explain the real-life situation. In this exercise we will introduce the concept of `spline regression` and extend our model with several `control variables`.  
 The model is a `reduced-form regression` and is defined as followed:
 
 #! start_note "Cubic Splines?"
 Explain Cubic Splines
+
+
+
+
+
+
 
 ```{r "3_2",optional=TRUE}
 # show that all integers between 0 and 10
@@ -433,26 +471,15 @@ Explain Cubic Splines
 
 #! end_note
 
+
+simple cubic splines
+
+
 info("Model variables") # Run this line (Strg-Enter) to show info
 
 First, we have to define our model 
 
-**Task:** Just press *check*.
-```{r "3_2__2"}
 
-```
-
-
-
-**Task:** Just press *check*.
-```{r "3_2__3"}
-
-```
-
-**Task:** Just press *check*.
-```{r "3_2__4"}
-
-```
 
 
 
@@ -501,7 +528,7 @@ $CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_
 ```
 
 
-EVtl loop ueber "WECC" und "ERCOT"
+EVtl loop ueber "WECC" und "ERCOT" ///////comments
 
 **Task:** Just press *check*.
 ```{r "3_3__9"}
@@ -542,9 +569,7 @@ The first step is the same as in the last exercise, but we need it for this part
 ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 
 **Task:** Just press *check*.
-```{r "3_4"}
 
-```
 
 **Task:** Just press *check*.
 ```{r "3_4__2"}
@@ -561,15 +586,52 @@ ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 
 ```
 
-
 **Task:** Just press *check*.
 ```{r "3_4__5"}
+
+```
+
+
+**Task:** Just press *check*.
+```{r "3_4__6"}
 
 ```
 
 **Task:** Just press *check*.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//// einschub robustness test mit anderen definition von priceratios , appendix a2< number of knots
 
 
 
@@ -581,6 +643,9 @@ ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 ```{r "4"}
 awards()
 ```
+
+
+The methods used here can be further used to generate additoinal results. This could be a point where you can go on.
 
 
 ## Exercise References
