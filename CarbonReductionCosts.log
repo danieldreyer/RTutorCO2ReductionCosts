@@ -822,3 +822,13 @@
 ,
 {"type":["check_chunk"],"time":["2020-03-03 19:58:53"],"user":["default_user"],"umph":[1583261933.6897],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["ggplot(dat,aes(x=gasprice,y=co2mass/1000,color=intercn))+\n        geom_point(alpha=0.2) +\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3, s_shape=1) +\n        theme_bw()+ \n        labs(y=\"\", \n        x=\"Gas Price\", \n        subtitle=\"CO2 Emissions\",\n        title=\"CO2 Emissions vs. Gasprice\")"],"message":[""]}
 ,
+{"type":["init_ps"],"time":["2020-03-05 22:58:21"],"user":["default_user"],"umph":[1583445501.7498],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-06 16:07:29"],"user":["default_user"],"umph":[1583507249.8861],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-06 22:17:47"],"user":["default_user"],"umph":[1583529467.4847],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-06 22:17:55"],"user":["default_user"],"umph":[1583529475.7269],"ok":[false],"chunk":[26],"ex":[7],"e.ind":[1],"code":["dat <- read_csv(\"Data/main_data.csv\")\n\ndat <- dat %>% \n  mutate(priceratio = coalprice/gasprice,\n         season=(month>3) + (month>6) + (month>9),\n         yearseason=year*10+season)"],"message":["\nYou have assigned 2 times a value to the variable dat in your chunk. While you might get the correct result in RStudio, RTutor can only check your result if you assign a value to dat only once in your chunk."]}
+,
+{"type":["init_ps"],"time":["2020-03-06 22:48:27"],"user":["default_user"],"umph":[1583531307.0388],"ok":[true]}
+,

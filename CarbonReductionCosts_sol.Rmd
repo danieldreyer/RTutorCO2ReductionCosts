@@ -454,7 +454,7 @@ As we have seen in the last chapter it makes sense to apply our analysis for eac
 
 
 
-$CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}(2)$
+$$\tag{2}CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}(2)$$
 
 
 
@@ -552,7 +552,7 @@ lines(dat_east$priceratio, p1, col="red")
 We will use the `stargazer()` function from the `stargazer` package to show summary statistics from our regressions. We don't need everything to know everything the basic functions displays, therefore we define a own custom function with statistics we need. Read below to find out more about `stargazer` and `custom functions` and continue with the next `task`.
 
 #< info "Stargazer"
-`stargazer` provides specialised `HTML` formatting for regression tables and summary statistics tables. It is easy to use, supports a large number of different model types and formats data in a pleasing way. The basic function is called by `stargazer()`, but can be customized heavily. For more information run `help(stargazer)` or read on [here](https://cran.r-project.org/web/packages/stargazer/).
+`stargazer` provides specialised `HTML` formatting for regression tables and summary statistics tables. It is easy to use, supports a large number of model types and formats data in a more pleasing way. The basic function is called by `stargazer()`, but can be customized heavily. For more information run `help(stargazer)` or read further [here](https://cran.r-project.org/web/packages/stargazer/).
 #>
 
 #< info "Custom functions"
@@ -602,7 +602,7 @@ show.regression= function(...){
 #< task
 # regression.result(...)
 #>
-regression.result(fit)
+show.regression(fit)
 #< hint
 display("Insert the name of the model you defined at the beginning of this exercise.")
 #>
@@ -678,12 +678,6 @@ The model is a `reduced-form regression` and is defined as followed:
 #! start_note "Cubic Splines?"
 Explain Cubic Splines
 
-
-
-
-
-
-
 ```{r "3_2",optional=TRUE}
 #< task
 # show that all integers between 0 and 10
@@ -696,14 +690,9 @@ Explain Cubic Splines
 
 simple cubic splines
 
+$$\tag{4}CO_{2t}=s(CR_{t}|\beta)$$
 
-#< info "Model variables" 
-$CO_{2t}$ = CO2 emissions in tons  
-$CR_{t}$ = Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
-$load_{t}$ = daily electricity consumption per interconnection in MWH  
-meant = average daily temperature per interconnection  
-$X_{t}$ = We include traditional factors like non-fossil electricity production (e.g. solar, hydro or wind), nonFossil, $SO_{2}$ price and net imports of electricity from Canada
-#>
+
 
 First, we have to define our model 
 
@@ -717,45 +706,84 @@ TEXT
 
 ## Exercise 3.3 -- Estimated CO2 Response to Fuel Prices
 
-In this exercise we will extend our results from the previous exercise and estimate the $CO_{2}$ respone to changing fuel prices. 
+In this exercise we will expand our results from the previous exercise and estimate the $CO_{2}$ respone to changing fuel prices. 
 To summarise the results from last exercises and to understand why we do certain methods this way, lets summarise. In exercise ?.? we showed that it makes sense to split our analysis in different connection. 
 
-$CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+\epsilon_t$ 
+Getting the results we want isn't so easy, but we will take it step by step. First we will 
+
+$$\tag{5}CO_{2t}=s(CR_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X_t\psi+D_\gamma+\epsilon_t$$
+#< info "Model variables" 
+$CO_{2t}$ = CO2 emissions in tons  
+$CR_{t}$ = Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
+$load_{t}$ = daily electricity consumption per interconnection in MWH  
+meant = average daily temperature per interconnection  
+$X_{t}$ = We include traditional factors like non-fossil electricity production (e.g. solar, hydro or wind), nonFossil, $SO_{2}$ price and net imports of electricity from Canada
+#>
 
 
-**Task:** Just press *check*.
-```{r "3_3", message=FALSE}
+**Task:** Load the data and store them in `dat`. Create a new variable called `priceratio` and calculate the ratio between `coalprice` and `gasprice`.
+```{r "3_3",message=FALSE}
 dat <- read_csv("Data/main_data.csv")
+
+dat <- dat %>% 
+  mutate(priceratio = coalprice/gasprice,
+         season=(month>3) + (month>6) + (month>9),
+         yearseason=year*10+season)
 ```
 
-**Task:** Just press *check*.
+**Task:** Filter the data set for interconnection `EAST`.
 ```{r "3_3__2"}
-east <- dat %>% 
-  mutate(priceratio = coalprice/gasprice) %>%
-  filter(intercn=="EAST")
+east <- filter(dat, intercn=="EAST")
 ```
 
-**Task:** Just press *check*.
+**Task:** Calculate the `mean` of every variable we use in our regression. First, select the necessary columns and then use `summarise_all` to get the `mean`. Store the result in `mean_dat_east`.
 ```{r "3_3__3"}
 mean_dat_east <- east %>% 
-  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
+  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
   summarise_all(mean)
 ```
 
-**Task:** Just press *check*.
+
+
+
+
+
+**Task:** To make our life a bit easier we will create a new data set with `gasprice`, `priceratio` and the results of the `last` task. Use `tibble()` to create the described output.
+
+#< info "tibble()" 
+
+
+#>
+#< info "cbind()" 
+
+
+#>
 ```{r "3_3__4"}
 temp_east <- tibble(gasprice = east$gasprice, priceratio = east$priceratio) %>% cbind(mean_dat_east)
 ```
 
-**Task:** Just press *check*.
+Our data are now ready to be used on our model. We have the necessary data for our regression model in the data set `east` and afterwards we can predict `emissions` with the help of data in `mean_dat_east`.
+
+#< info "ns()" 
+
+
+#>
+
+**Task:** Perform the regression model we described in the beginning of this exercise. Use `ns()` for variable we want to regress per spline regression. We want to use `5` degrees of freedom. Store the resulting model in `reg_east`.
 ```{r "3_3__5"}
-reg_east <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=east)
+reg_east <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=east)
 ```
 
-**Task:** Just press *check*.
+**Task:** Predict $CO_2$ emissions based on the regression model `reg_east` and `temp_east`.
 ```{r "3_3__6"}
-co2.east = predict(reg_east, temp_east)
+co2.east = as.data.frame(predict(reg_east, newdata = temp_east, interval = 'confidence'))
+
+#co2.east$fit
+#temp_east = temp_east %>% cbind(as.data.frame(predict(reg_east, newdata = temp_east, interval = 'confidence')))
 ```
+
+
+
 
 **Task:** Just press *check*.
 ```{r "3_3__7"}
@@ -765,42 +793,46 @@ basegas=5.75
 diff_base <- abs(east$priceratio - (basecoal/basegas))
 min_dif <- min(diff_base)
 closest <- min_dif==diff_base
-base_emit <- mean(co2.east[which(closest)])
+base_emit <- mean(co2.east$fit[which(closest)])
 
-transformed.east <- co2.east/base_emit-1
+transformed.east.fit <- co2.east$fit/base_emit-1
+transformed.east.lwr <- co2.east$lwr/base_emit-1
+transformed.east.upr <- co2.east$upr/base_emit-1
 
-pred_east <- temp_east %>% cbind(transformed.east = transformed.east)
+#pred_east <- temp_east %>% cbind(transformed.east = transformed.east)
 
 ```
 
 **Task:** Just press *check*.
-```{r "3_3__8", warning=FALSE}
+```{r "3_3__8",warning=FALSE}
 #< task_notest
-plot_east <- ggplot(pred_east, aes(x=basecoal/priceratio, y=transformed.east)) +
-  geom_line(aes(y=transformed.east)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+plot_east <- ggplot(temp_east, aes(x=basecoal/priceratio, y=transformed.east.fit)) +
+  geom_ribbon(aes_string(ymin = transformed.east.lwr, ymax = transformed.east.upr),
+                   colour="lightgrey", fill="lightgrey", alpha=0.5) +
+  geom_line(aes(y=transformed.east.fit)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +
   geom_vline(xintercept = 5.75, linetype = "dashed") + 
-  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(1.8, 12)) +
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
   labs(title="EAST Interconnection", subtitle = "Percentage Change in CO2 emissions",
-       y="", x="Gas Price $/MMBTU")
+       y="", x="Gas Price $/MMBTU") +
+  theme_minimal()
+
 plot_east
 #>
 ```
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r "3_3__9", warning=FALSE}
+```{r "3_3__9",warning=FALSE}
 #< task_notest
-ercot <- dat %>% 
-  mutate(priceratio = coalprice/gasprice) %>%
-  filter(intercn=="ERCOT")
+ercot <- filter(dat, intercn=="ERCOT")
 
 mean_dat_ercot <- ercot %>% 
-  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
+  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
   summarise_all(mean)
 
 pred_temp2 <- tibble(gasprice = ercot$gasprice, priceratio = ercot$priceratio) %>% cbind(mean_dat_ercot)
 
-reg_ercot <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=ercot)
+reg_ercot <- lm(co2mass ~ ns(priceratio, df=6) + ns(load, df=6) + tlsd + tlmin + tlmax + ns(meant, df=6) + nonfossil + so2price + netNSflow + yearseason, data=ercot)
 #ERCOT has no net imports of electricity, predict throws warning
 co2.ercot = suppressWarnings(predict(reg_ercot, pred_temp2))
 
@@ -808,9 +840,9 @@ pred_ercot <- pred_temp2 %>% cbind(transformed.ercot = co2.ercot/(mean(co2.ercot
 
 plot_ercot <- ggplot(pred_ercot, aes(x=basecoal/priceratio, y=transformed.ercot)) +
   geom_line(aes(y=transformed.ercot)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +
   geom_vline(xintercept = 5.75, linetype = "dashed") + 
-  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(1.8, 12)) +
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
   labs(title="ERCOT Interconnection", subtitle = "Percentage Change in CO2 emissions",
        y="", x="Gas Price $/MMBTU")
 plot_ercot
@@ -818,19 +850,17 @@ plot_ercot
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r "3_3__10", warning=FALSE}
+```{r "3_3__10",warning=FALSE}
 #< task_notest
-wecc <- dat %>% 
-  mutate(priceratio = coalprice/gasprice) %>%
-  filter(intercn=="WECC")
+wecc <- filter(dat,intercn=="WECC")
 
 mean_dat_wecc <- wecc %>% 
-  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow) %>% 
+  select(co2mass, load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
   summarise_all(mean)
 
 pred_temp3 <- tibble(gasprice = wecc$gasprice, priceratio = wecc$priceratio) %>% cbind(mean_dat_wecc)
 
-reg_wecc <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow, data=wecc)
+reg_wecc <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=wecc)
 
 co2.wecc = predict(reg_wecc, pred_temp3)
 
@@ -838,21 +868,21 @@ pred_wecc <- pred_temp3 %>% cbind(transformed.wecc = co2.wecc/(mean(co2.wecc[whi
 
 plot_wecc <- ggplot(pred_wecc, aes(x=basecoal/priceratio, y=transformed.wecc)) +
   geom_line(aes(y=transformed.wecc)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +
   geom_vline(xintercept = 5.75, linetype = "dashed") + 
-  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(1.8, 12)) +
+  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2, 12)) +
   labs(title="WECC Interconnection", subtitle = "Percentage Change in CO2 emissions",
        y="", x="Gas Price $/MMBTU")
 plot_wecc
 #>
 ```
 
-```{r "3_3__11", warning=FALSE}
+```{r "3_3__11",warning=FALSE}
 grid.arrange(plot_east, plot_wecc, plot_ercot, nrow=1)
 ```
 
-///////// checken
-```{r}
+///////// CHEEEEEEEECKEN WERTE HABE SICH GEAENTER!!!!!!!!!!!!!!!!!
+```{r "3_3__12"}
 e <- tibble(date=east$date, intercn=east$intercn, gasprice=east$gasprice, coalprice=east$coalprice, priceratio=east$priceratio, emission=co2.east, transformed.emission=pred_east$transformed.east)
 er <- tibble(date=ercot$date, intercn=ercot$intercn, gasprice=ercot$gasprice, coalprice=ercot$coalprice, priceratio=ercot$priceratio, emission=co2.ercot, transformed.emission=pred_ercot$transformed.ercot)
 wec <-tibble(date=wecc$date, intercn=wecc$intercn, gasprice=wecc$gasprice, coalprice=wecc$coalprice, priceratio=wecc$priceratio, emission=co2.wecc, transformed.emission=pred_wecc$transformed.wecc)
@@ -888,34 +918,39 @@ ${P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$
 To safe us a bit of work i already created a dataframe that contains the results of last exercise.
 
 **Task:** Just press *check*.
-```{r "3_4", message=FALSE}
+```{r "3_4",message=FALSE}
 dat <- read_csv("Data/main_data2.csv")
-head(dat,3)
+```
 
+```{r "3_4",message=FALSE}
 basegas <- 5.75
 basecoal <- 2.25
+tax <- dat %>% 
+  mutate(carbontax = (priceratio*basegas-basecoal)/(0.1054-priceratio*0.0585)) %>% 
+  filter(carbontax >= 0 & carbontax <= 80)
+
+head(tax,3)
+
 ```
 
 
 **Task:** Just press *check*.
-```{r "3_4__4"}
+```{r "3_4__2"}
 #117 is lbs carbon/MMBTU for gas or 0.0585 tons/MMBTU
 #210.8 is lbs carbon/MMBTU for coal or .1054 tons/MMBTUgen
-temp_east <- dat %>% 
-  filter(intercn=="EAST") %>% 
-  mutate(carbontax = (priceratio*basegas-basecoal)/(0.1054-priceratio*0.0585))
-
+temp_east <- tax %>% 
+  filter(intercn=="EAST")
 ```
 
 **Task:** Just press *check*.
-```{r "3_4__5"}
+```{r "3_4__3"}
 tax_east <- temp_east %>% 
   filter(carbontax >= 0 & carbontax <= 80)
 ```
 
 
 **Task:** Just press *check*.
-```{r "3_4__6"}
+```{r "3_4__4"}
 ggplot(tax_east, aes(x=carbontax, y=transformed.emission*(-1))) +
   geom_line() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.05,0.2)) +
@@ -928,7 +963,7 @@ ggplot(tax_east, aes(x=carbontax, y=transformed.emission*(-1))) +
 ///////COMMENT
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r}
+```{r "3_4__5"}
 #< task_notest
 temp_ercot <- dat %>% 
   filter(intercn=="ERCOT") %>% 
@@ -949,7 +984,7 @@ ggplot(tax_ercot, aes(x=carbontax, y=transformed.emission*(-1))) +
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r}
+```{r "3_4__6"}
 #< task_notest
 temp_wecc <- dat %>% 
   filter(intercn=="WECC") %>% 
@@ -977,11 +1012,74 @@ ggplot(tax_wecc, aes(x=carbontax, y=transformed.emission*(-1))) +
 
 
 
-//// einschub robustness test mit anderen definition von priceratios , appendix a2< number of knots
 
 
 
 
+
+
+///////// TABELLE 
+
+```{r "3_4__8"}
+function_name <- function(a) {
+  vector <- 1:9
+  for(i in 0:8){
+   vector[i+1] = mean(a$emission[which.min(abs(a$carbontax - i*10))])
+  }
+  return(vector)
+}
+newrow = data.frame(tax=seq(0,80,10), east_emission=round(function_name(tax_east)/100000,1), ercot_emission=round(function_name(tax_ercot)/100000,1), wecc_emission=round(function_name(tax_wecc)/100000,1))
+
+test <- newrow %>% 
+  mutate(perc_east=round((1-newrow$east_emission/newrow$east_emission[1])*100,1),
+         perc_ercot=round((1-newrow$ercot_emission/newrow$ercot_emission[1])*100,1),
+         perc_wecc=round((1-newrow$wecc_emission/newrow$wecc_emission[1])*100,1),
+          emission_all=east_emission+ercot_emission+wecc_emission,
+         perc_all=round((1-test$emission_all/test$emission[1])*100,1))  
+
+test2 <- test[,c(1,2,5,3,6,4,7,8,9)]
+test2
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//// einschub robustness test mit anderen definition von priceratios , appendix a2< number of knots NUR FUER EAST, danach kurz interpretieren
+
+#! start_note "Robustness Test - andere priceratio"
+
+```{r "3_4__9",optional=TRUE}
+#< task
+# show that all integers between 0 and 10
+#>
+1:10
+```
+
+#! end_note 
+
+#! start_note "Robustness Test - weniger knots"
+
+```{r "3_4__10",optional=TRUE}
+#< task
+# show that all integers between 0 and 10
+#>
+1:10
+```
+
+#! end_note 
 
 ## Exercise 4 -- Conclusion
 
@@ -1006,6 +1104,8 @@ The methods used here can be further used to generate additoinal results. This c
 - Lafrancois, B. A. (2012), ‘A lot left over: Reducing CO2 emissions in the United States’ electric power sector through the use of natural gas’, Energy Policy 50, 428–435.
 
 
+/add literature
+
 ### R Packages
 
 - Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.
@@ -1017,7 +1117,7 @@ The methods used here can be further used to generate additoinal results. This c
 
 - Wickham, H., Francois, R., Henry, L., Muller, K., (2018): dplyr. "A Grammar of Data Manipulation", R package version 0.8.3, http://CRAN.R-project.org/package=dplyr
 
-
+/// add packages, "splines", "regtools", "ggalt?" ,"htmltable"
  
 ### Data Sources
 
@@ -1027,6 +1127,9 @@ and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.
 - The World Bank , "Commodity Markets Monthly Prices",  https://www.worldbank.org/en/research/commodity-markets
 
 - U.S. Energy Information Administration, "Form EIA-923", https://www.eia.gov/electricity/data.php#generation
+
+
+/// add data sources
 
 
 *All of the above links were accessable as of March 31, 2020.*
