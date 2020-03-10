@@ -109,29 +109,27 @@ The problem set offers different ways to interact with it. Coding exercises are 
 After you finish a chapter, click `Go to next exercise` on the bottom or navigate around with the help of the bar on top.
 
 
-## Exercise 1 -- Motivation
+## Exercise 1 -- Insights into Energy Markets
 
-`Coal` is the **world's biggest source of energy and carbon emissions**, mostly because it is easy to store, transport, doesn't alter and can be mined in huge quantities around the world. This makes it desirable and cheap to use as a energy source. Given that the coal supply will last for decades, it is a major goal to find incentitives to reduce emissions from coal consumption.  
-One alternative to coal is `natural gas`. Even though still being a fossil fuel, its' emissions and heat density are way superior to coal. Nevertheless, natural gas wasn't considered to be an real alternative to coal because to its higher prices more difficult handling up until the early 2000s.  
-This changed due to the `Shale Revolution`, whereby natural gas was not only a by-product of the oil industry, but could now be extracted in a targeted manner and in large quantities. Lanfrancois (2012) estimates, that based on the Clean Power Plan introduced by the Obama administration in 2015, carbon dioxide emissions from the electricity industry could be reduced by 23 to 42 percent by switching existing coal powered generators to gas powered ones.  
+The energy consumption of the world keeps rising daily. New technologies are being developed to satisfy our needs, but we are still heavily dependant on `fossil fuels`. Coal is hereby one of the biggest and most important source of energy, but at the same time the biggest cause of carbon emissions. It is easy to store, to transport, doesn't alter and can be mined in huge quantities all around the world. This makes it desirable and cheap to use as a relying energy source. Given that coal supplies will last for centuries, it is a major goal to find incentitives to reduce the use of coal and therefore emissions.
+Another major energy ressource is `natural gas`. Even though still being a fossil fuel, its' emissions and heat density are way superior to coal. Nevertheless, natural gas wasn't considered to be an real alternative to coal because of more difficult extracting methods and handling.  
+This changed due to the `Shale Revolution` in the early 2000s, where natural gas began to not only be a by-product of the oil industry, but could now be extracted large quantities and in a targeted manner. Lanfrancois (2012) estimates, that based on the `Clean Power Plan` introduced by the Obama Administration in 2015, carbon dioxide emissions from the electricity industry could be reduced by roughly 23 to 42 percent by replacing existing coal to gas fired generators.    
   
 #< info "Shale-Revolution"
-Shale gas is a form of natural gas and is extracted from shale formation, known as fracking. Since the start of the century, shale gas became a increasingly more important source of natural gas in the United States. Whereas in 2000 shale gas only provided 1% of the natural gas, nowadays in 2020 it makes up roughly 50%.
-However at the same time, the environmental concerns of fracking are heavily debated.  
+Shale gas is a form of natural gas and is extracted from shale formation, a technology known as fracking. Since the start of this century, shale gas became a increasingly more popular source of natural gas in the United States. Whereas in the year 2000 shale gas only provided 1% of the extracted natural gas in the U.S., whereas nowadays it makes up roughly 50%. However, the long term effects of fracking on the environment are still fairly unknown and are heavily debated.
 
-You can find further information on the topic here:  
+You can find further information on this topic below:  
 <a href="https://en.wikipedia.org/wiki/Shale_ga   target = "_blank"> https://en.wikipedia.org/wiki/Shale_gas</a>s  
 <a href="https://en.wikipedia.org/wiki/Hydraulic_fracturing   target = "_blank"> https://en.wikipedia.org/wiki/Hydraulic_fracturing</a>
 #>
   
-With this in mind, in `Exercise 1` you will explore data to get insights in the current situation of the U.S. energy sector. You will look at the distribution of energy sources in the American market, its prices and the generated load over time.  
+Enough background for now, let's start with some interactive tasks. In `Exercise 1` we will get a feeling for the energy sector and explore time-series data of historic prices and generated power.
 
 **Task:**
-Use the `read_csv` command to *load the data set* and store it in a variable called `PaGP`.
-The basic structure of the command is already given in the code chunk as a comment.
+Use the `read_csv` command to *load the data set* and store it in a variable called `data`. `Read_csv` displays the parsed type of each column after you execute the command. This will come handy later on in this exercise. Since this case won't happen again in this problem set though, we will disable these messages in future exercises.
 
 #< info "read.csv() and write.csv()"
-The command `read_csv()` reads in a **csv file** and stores it into a given name. Csv is a format for data, that uses commas as seperators and periods as decimals. Another version of are **csv2 files**, where semicolons are used for seperators and commas for decimals. We only use csv files here.
+The command `read_csv()` reads in a **csv file** and stores it into a given name. Csv is a format for data, that uses commas as seperators and periods as decimals. Another version of are **csv2 files**, where semicolons are used for seperators and commas for decimals. We only use csv files in this problem set.
 
 Given the file you want to read it is in the same working directory, you can use the command below:
 
@@ -139,91 +137,71 @@ Given the file you want to read it is in the same working directory, you can use
 example <- read_csv("example.csv")
 ```
 
-If the file is saved outside of your working directory there are two possibilities. For one you can insert the whole file path, if the file is you can navigate through the whole file path if your file is above 
-
-If the file is saved in an structure above your working directory you have to additionally insert the full file path:
+If the file is saved outside of your working directory you have to differentiate between two possibilities.  
+For files that are "above" your current working directory, you have to provide the full path to the file. You can view your working directory with `getwd()`:
 
 ```{r "1__2",eval=FALSE}
 example <- read_csv("C:/Data/example.csv")
 ```
 
-For files that are located below the working directory it is sufficient to specify the following file path:
+For files that are located "below" the working directory it is sufficient to specify the file path starting with your current working directory:
 
 ```{r "1__3",eval=FALSE}
 example <- read_csv("./Data/example.csv")
 ```
 
-
-Csv files can be saved using the `write.csv` command.
+Csv files can be saved using the `write_csv` command:
 
 ```{r "1__4",eval=FALSE}
 write_csv(example, file="example.csv")
 ```
 
-For further information, use `help(write.csv)`.
+For further information, use `help(write_csv)`.
 #>
 
 ```{r "1__5"}
 #< task
-# ... <- read_csv("./Data/PaGP.csv")
+# ... <- read_csv("./Data/exercise1.csv")
 #>
-PaGP <- read_csv("./Data/PaGP.csv")
+dat <- read_csv("./Data/exercise1.csv")
 #< hint
 display("Replace the variable name with the one given in the exercise description. No other changes are needed.")
 #>
 ```
 
+**Task:** The first thing you should do after loading a new data set is looking at the structure. Use the `head()` command to show the first **eight** rows of the data set named `dat`.  
 
-**Task:** Lets take a look at the data we just imported. Use the `head()` command to show the first **eight** rows of the data set. 
-
+When not given a second argument, `head()` displays the first 5 rows on default. Alternatively, the problem set provides a seperate data tab. If you want to take a closer look at the data, especially later on in the problem set, you can click `data` and get redirected to the `Data Explorer` Tab, where you can navigate along the data frame and see some basic statistics.  
 
 ```{r "1__6"}
 #< task
-# head(PaGP, ...)
+# head(dat, ...)
 #>
-head(PaGP, 5)
+head(dat, 8)
 #< hint
 display("The second input parameter defines the number of row that are shown. Replace ... with the number from the task description.")
 #>
-
 ```
 
+The data frame contains monthly numbers of generated MWh of coal and gas as well as prices of `natural gas` in Europe and the United States as well as the `natural gas index` from the year 2002 to the end of 2019. Keep in mind that different commodities are traded in different units. Coal in metric tons (`\$/mt`) and gas in British thermal units (`$/mmBTU`). The natural gas index is set to 100 in the year 2010 and changes accordingly. 
+While reading in our current data set I mentioned that it would come handy to know which data types your columns inherit. `R` requires `dates` to be stored as type `Date`, otherwise we will get weird outputs when trying to plot along a time line. The date column is currently stored as type `character`. Therefore  we have to convert the date variable into a `date format` by using `as.Date()`.
 
-Alternatively you can press the `data` button to get redirected to the `Data Explorer` Tab. 
-
-The date column is currently stored as a character. To be able visualize the date variable as a continuous variable, we have to convert is. Therefore, R has a build in date class.  
-**Task:** Just press *check*.
-
+**Task:**  Transform the data type with `as.Date()` and store the transformed variable to the same name.
 ```{r "1__7"}
-#< task_notest
-PaGP <- as.data.frame(PaGP)
-PaGP$date <- as.Date(PaGP$date)
+#< task
+# ... <- ...(dat$date, format="%m/%d/%Y")
+#>
+dat$date <- as.Date(dat$date, format="%m/%d/%Y")
+#< hint
+display("Convert the column dat$date into a date format using as.Date(). Store the result in the same column.")
 #>
 ```
 
-  
-The data frame contains monthly numbers of generated MwH with coal and gas as well as prices of Energy commodities. 
-Keep in mind that different commodities are traded in different units. Oil is traded in barrels (\$/bbl), coal in metric tons (\$/mt) and gas in British thermal units($/mmbtu). The natural gas index is
-set to 100 in the year 2010 and changes accordingly.
-Prior to visualizing the data and to get clearer results, lets modifiy the data set. As mentioned before, commodities are traded in different units. Therefore we will add new entries for normalized
-prices, which gives us a good cost basis to produce the same amount of energy with each commodity.  On this account, we assume that `1 MwH = 0.454 mT Coal = 3.412 mmBtu Natural Gas`.
+Now that we imported our data set, got a first look on its' structure and data, lets start creating our first plot. `R` provides several packages to create your own plots. Basic `R` is also capable of producing plots. This is the way to go if you want some quick visualisations. In this problem set we will, with a few exeptions, use the package `ggplot2`. It is widely considered one of the most powerful packages to create plots, but the downside is that you have to get used to the handling. In this problem set you won't need to create whole plots on your own but `fill in blanks`. This way you will learn how the logic within `ggplot2` works and at the same time won't be frustrated if the output doesn't meet the requirements.
 
-**Task:** Perform the above calculations. Just press *check*.
-  
-#< info "Pipe, mutate, select"
-The pipe operator `%>%` is a feature provided by the `dplyr` Package. Essentially it allows to exectute multiple operation on a dataframe at once.
-This works the way that every pipe operator returns a dataframe and passes it to the next connected function. `Select` allows you to filter out certain columns of data, whereas `mutate` allows you to
-alter data. The counterpart for selecting specific rows is `filter`. There are several more functions to alter your data, below i linked a handy cheatsheet.
-  
-```{r "1__8",eval=FALSE}
-example %>% 
-  select(1:5)  `select: keep certain columns, here column 1 to 5`  %>% 
-  mutate(new_column = old_column+1)`mutate: create or alter columns`    
+The first plot we want to create should tell us more about the development of gas prices along the timeframe. As we have mentioned at the beginning of this exercise, the `Shale-Revolution` started in the beginning of this century. Therefore we expect falling gas prices for the U.S. market. Since commodity prices are split for regions/markets, the European Gas price should differ. Let's see if these assumptions are true.
 
-```
-
-You can find a more detailed cheatsheet [here](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) or use the `help()` function.
-#>
+**Task:** Use the data frame `dat` to plot historic prices of gas in Europe and the United States. For reference, just press *check*.
 
 #< info "ggplot2"
 The package `ggplot2` is a powerful data visualization package for `R`, which is part of the `tidyverse` environment. Besides basic functions that are also provided by native `R`, it allows the user to
@@ -231,34 +209,24 @@ highly modify graphs by **altering**, **adding** or **removing** components.
 
 The problem set doesn't require you to have deeper knowledge about function of `ggplot2`. However, you can find further documentation [here](https://ggplot2.tidyverse.org/) or type `help(ggplot2)`.
 #>
-
-
-```{r "1__9"}
-PaGP <- PaGP %>% 
-  mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412,
-         price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412,
-         price_coal_australia_normalized = price_coal_australia * 0.453, 
-         price_coal_africa_normalized = price_coal_africa * 0.453)
-```
-
-**Task:** Output a graphic. Just press *check*.
-```{r "1__10"}
+```{r "1__8"}
 #< task_notest
-ggplot(data=PaGP, aes(x=date)) +
-  geom_line(aes(y=PaGP$price_coal_australia_normalized, color="Coal Autralia"), size=1) +
-  geom_line(aes(y=PaGP$price_coal_africa_normalized, color="Coal Africa"), size=1) +
-  geom_line(aes(y=PaGP$price_naturalgas_USA_normalized, color="Gas US"), size=1) +
-  geom_line(aes(y=PaGP$price_naturalgas_Europe_normalized, color="Gas Europe"), size=1) +
-  labs(x = "Year", y = "", title = "Normalized Ressource Prices", subtitle = "Y=$/MwH")+
-  scale_color_manual(name="Region",values = c("green", "yellow", "blue","red"))
+ggplot(data=dat, aes(x=date)) +
+  geom_line(aes(y=dat$price_naturalgas_USA, color="Gas US"), size=1) +
+  geom_line(aes(y=dat$price_naturalgas_Europe, color="Gas Europe"), size=1) +
+  labs(x = "Year", y = "", title = "Natural Gas Prices", subtitle = "Y=$/mmBTU")+
+  scale_color_manual(name="Region",values = c("blue","red"))
 #>
 ```
 
-TEXT
+Looking at the plot our assumptions are confirmed. We observe a strict fall in gas prices in the U.S. from just over $12 in 2008 to under \$2 in 2016. The prices remained at roughly the same low level. Natural gas prices in Europe are considerable higher. One reason being is that fracking isn't as popular in Europe, therefore a major part of gas in Europe gets imported from Russia which drives prices. Another reason is that Europe has a different energy mix. According to the European Environment Agency (EEA) the consumption of gas decreased in average by 1.4% per year since 2005, whereas in the U.S. natural gas reached new all-time highs nearly every year.
+
+Looking forward Because of the lack of data provided by state officials in Europe, this problem set will further on purely focus on the U.S. market. 
+Onwards this problem set will focus on the U.S. market. 
 
 
-In the next Step we will look at the generated Power for Coal / Gas in the U.S. 
 
+To visualise the the generation of power with coal and gas, lets make another plot
 
 
 #< quiz "Proportion of Sectors"
@@ -272,41 +240,113 @@ failure: Try again.
 #>  
 &nbsp;
 
+**Task:** Create a new `ggplot2`. Plot the `date` on the x-Axis, generated electricity on the y-Axis. We want `one line` for `gas generated power` as well as `one line` for `coal generated power`. Lines are drawn with `geom_line`. For reference you can look at the code from the previous graph or conduct the help() function.
 
-
-
-**Task:** Just press *check*.
-
-```{r "1__11"}
-#< task_notest
-ggplot(data=PaGP, aes(x=date)) +
-  geom_line(aes(y=PaGP$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
-  geom_line(aes(y=PaGP$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
+```{r "1__9"}
+#< task
+#ggplot(data=___, aes(x=___)) +
+#  ____(aes(_=dat$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
+#  ____(aes(_=dat$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
+#  labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
+#  scale_color_manual(name="",values = c("black","red"))+
+#  scale_y_continuous(breaks=seq(0,200,25))
+ggplot(data=dat, aes(x=date)) +
+  geom_line(aes(y=dat$generated_coal, color="Coal Generation (TWh)"), size=1, alpha=0.5) +
+  geom_line(aes(y=dat$generated_gas, color="Natural Gas Generation (TWh)"), size=1, alpha=0.5) +
   labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
   scale_color_manual(name="",values = c("black","red"))+
   scale_y_continuous(breaks=seq(0,200,25))
 #>
 ```
 
-TEXT
+
+These finding are cemented by reports from the EIA
+EIA 2020/3 https://www.eia.gov/todayinenergy/detail.php?id=43035
+
+Natural gas accounts for the largest share in electricity generation. 
+
+
+Due to the lack of data provided by state officals in Europe, from here onwards we will purely focus on the U.S. market.
+
+
 
 #< award "Starter Kit"
-Good Start! You will earn awards at the end of every chapter. At the end you will see how many you have earned.
+Good Start by finishing the first exercise! You will earn awards at the end of every exercise. After you completed all exercises you will see how many awards you got.
+#>
+
+In the next exercise we will go through the necessary theory 
+
+
+
+## Exercise 2 -- Theory
+
+
+### Relationship between Fuel and Carbon Prices
+
+#< info "Variable names in this exercise"
+$MC$: Marginal Costs  
+$HR$: Heat Rate, mmBTU/MWh  
+$C_{coal}$: Cost of burning Coal  
+$C_{gas}$: Cost of burning gas  
+$P_{coal}$: Coal Price, $/mmBTU  
+$P_{gas}$: Gas Price, $/mmBTU  
+$CO_{2,coal}$: Carbon content of coal, tons/mmBTU  
+$CO_{2,gas}$: Carbon content of gas, tons/mmBTU  
+$P_{co2}$: Carbon Price , $/ton
 #>
 
 
-## Exercise 2 -- Interconnections // mapping carbon prices???
+As a prerequisite we can define the `marginal costs` of fossil-powered plants as a Equation of `heat rate` and the `costs of burning fuel`:
 
-![Interconnections](./Material/interconnections.png) (SOURCE)
+$$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
 
-#< info "Interconnections"
-The American Electric system is made up of three major `Interconnections`, which in turn concist of different balancing authorities (responsible for maintaining the electricity balance within the region).
-Local electricity grids are hereby connected to form a network, which provides higher stablity and reliability of electricity. These `Interconnections` are operated independently of each other and, in contrast to the European electricity grid, there is little transfer of power.  
-The 3 regions, as seen in the graph above, are as followed:
-- Easter Interconnection: Consists of 36 balancing authorities and extends from the East Coast to the Rocky Mountains.
-- Western Interconnection: Involves 37 balancing authorities, which are located in the West of North America.
-- Electric Reliability Council of Texas (ERCOT): Consists of large parts of Texas
+In `Exercise 1` we already looked at fuel prices of `gas` and `coal` and their variance over time. Because of the fact that the cost efficiency of coal is generally better, we have to introduce a incentive to reduce the use of coal in relation to gas in electricity generation. One way to change the cost efficiency is to propose `carbon taxes`. This is especially viable because coal contains approximately `twice` as much $CO_2$ as natural gas and therefore lowers the cost efficiency. Another fact that drives this momentum is, that gas plants are generally more efficient than coal generators. Combining these two facts of cost and generation efficiency lead to `steeper marginal cost` for coal generators when carbon prices are introduced. Reflecting this to our upcoming analysis, we don't observe any carbon prices, but a time-series of fuel prices. To reflect the mechanism of `fuel change`, which we explained above, we introduce a`coal-gasratio`, which we define as followed:
+
+$$\tag{2}priceratio=\frac{C_{coal}}{C_{gas}}$$
+
+Quickly nterpreting this `Equation`, the `price ratio` will rise for higher `coal prices` or lower `gas prices`. Understanding the mechanism of changing fuel and carbon prices is essential for our main analysis.To get a clearer understanding, lets visualize the relationship with 2 graphics, which replicate Figure 4 of Cullen.
+
+<img src="./Material/relationship.png" alt="drawing" width="600"/>
+Source: Cullen (2016)  
+  
+Looking at the upper graph, as soon as `carbon prices` get introduced, the cost efficiency of coal generators will fall in relation to gas generators. Up until a point where gas generators will have a highercost efficiency. Transforming these prices in `price ratios` will lead to the graphic below. 
+
+#< quiz "carbon prices"
+question: Do you think we can create any given price ratio under the assumption that we introduce carbon prices under fixed fuel prices?
+sc:
+    - Yes*
+    - No
+success: Great, your answer is correct!
+failure: Try again.
+#>  
+&nbsp;
+
+Combining Equation `1` and `2` we can explain price ratios as a function of `fuel prices`, `carbon content` and `carbon prices`:
+
+$$\tag{2}priceratio=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$$
+
+Rearranging for carbon prices: 
+
+$$\tag{3}{P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$$
+
+#< award "Theorist"
+Gratulations! You can now map carbon prices. You are ready to start with the analysis.
 #>
+
+
+
+### Interconnections
+
+<img src="./Material/interconnections.png" alt="drawing" width="600"/>
+Source: Cullen (2012)
+
+The American Electric system is made up of three major `interconnections`, which in turn concist of different balancing authorities (responsible for maintaining the electricity balance within the region). Local electricity grids are hereby connected to form a network, which provides higher stablity and reliability. These `interconnections` operate mostly independent to each other and exchange little to no electricity, in contrast to the European electricity grid.  
+
+In the graph below you can see the `3` interconnection we include data of in this problem set. I listed a few details for each below:
+- `Eastern Interconnection`: Consists of 36 balancing authorities and extends from the East Coast to the Rocky Mountains.
+- `Western Interconnection`: Involves 37 balancing authorities, which are located in the West of North America.
+- Electric Reliability Council of Texas (`ERCOT`): Consists of large parts of Texas
+
 
 **Task:** Just press *check*.
 ```{r "2"}
@@ -343,22 +383,28 @@ TEXT
 
 
 
-### theory behind mapping carbon prices
 
-
-$$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
-
-einfuehren priceratio auf basis von tabelle oben - hohe varianz
-
-theory hier,
-
-warum carbon prices steht da!
-
+The degree to which production switches from coal to gas generation will depend on
+several factors. From a static dispatch framework, fuel switching depends on the relative
+fuel prices, the relative heat rates, the available capacity of gas plants, and the demand
+for electricity. In addition, intra-day fluctuations in electricity demand may be important as
+some generators are not well suited for starting and stopping production frequently. Start-up
+costs, ramping rates, minimum down times, and other intertemporal constraints limit firms’
+operation decisions (Mansur 2008, Cullen 2015). 
 
 
 
 
-## Exercise 3.1 -- Priceratio Regressions
+
+
+## Exercise 3.1 -- Emission Response Curves - A simple approach
+
+A short recapture: Until now we got an idea how the energy market in the U.S. is build, how commodity prices changed over that and introduced the concept of `interconnections` . Additionally we
+briefly went over the theory behind mapping carbon prices???. 
+In `Chapter 3` we will present the needed regression theory and develop a model that will hopefully help us answer our main question on how carbon prices would effect emissions in the energy sector.
+However we won't simpy propose a final model but will work our way from a simple linear regression model to more complex but also more accurate models. 
+
+
 
 In this exercise we briefly go over the data we use for our main analysis and give an overview what we will be doing in the following exercises. The main question of this problem set is to find out
 how carbon prices would effect emissions in the energy sector. To answer this we will construct a statistical model to understand the emission behaviour for changing input costs while controlling
@@ -368,10 +414,8 @@ for variables that effect the energy market. However we won't simply propose a f
 Until now we got an idea how the energy market is 
 In this and the following chapter we will take a look at regression theory and develop a model that satifies our statistical needs tor answer our initial question on how changing commodity prices will effect $CO_2$ emissions. We start with simple regressions and introduce new methods along the way to make our model more precise.
 
-
-If you want to go faster through the problem set without the theoretical background, you can skip to exercise `4.1` onwards, where we present the final model and visualize our results.
-
-//////////// neu data frame nur mit co2mass gas coalprice
+If you are purely interested in the final model and the economic impact, you can skip to `Exercise 4.1` onwards. This chapter will focus on regression theory which will allow us to construct a
+fitting model and introduces some requirement to 
 
 **Task:** To get started, load the data set `exercise3.csv`, press `edit` and `check` afterwards.
 
@@ -382,23 +426,40 @@ head(dat,3)
 #>
 ```
 
-We have seen in the previous exercise that it makes sense to calculate our model for each intersection separately. For this purpose we filter our data for intersection `EAST` and develop the model based on that `intersection`. Afterwards we will use the model on each intersection. Since we observe substantial variation in coal and gas prices, we construct a new variable for relative costs `priceratio`. There are several ways to propose price ratios, we use the ratio between the price of coal and gas, which is defined as followed:  
+In the last exercise we got a glimpse why it makes sense to calculate our model for each interconnection seperatly. We will get further indication on why that makes sense later on. For this purpose
+we will filter our data set for interconnection `EAST` and develop the model based on these data. Once we found a fitting model we will use the model on each interconnection.    
+To get started with our regression model, we will try to regress fuel prices against $CO_2$ emissions. As we have seen in the beginning of this problem set in `Exercise 1` we observe substantial
+variation in coal and gas prices. While some of its' variation is regional, most of it comes from price variations over time. Because of that reason we construct a new variable called `Price Ratio`.
+There are several ways to propose price ratios, we will use the ratio between the price of coal and gas and is defined as followed:  
 
-As we have seen in the last chapter it makes sense to apply our analysis for each intersection `separately`. For this reason the data are divided into interconnections. We `develop` our model based on the `EAST` interconnection and map the model to all at a later point in time.  
+$$\tag{2}priceratio=\frac{C_{coal}}{C_{gas}}$$
+
+You may ask, why we won't simply use both fuel prices seperately, but construct the ratio. There are several benefits of doing so. Firstly, 
 
 
-
-
-
-
-
-$$\tag{2}CR=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$$
 
 THe question here is, why use a priceratio and not just coal and gas prices seperatly.  ///////// why priceratio - paper 18 absatz 2
 
 
-**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter only for data with interconnection `EAST` and store the new data frame in variable `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice` according to formula 2.
-```{r "3_1__2"}
+**Task:** The data set contains a column `intercn` with values `EAST`, `WEST` and `ERCOT`. Filter the data set for interconnection `EAST` and store the new data frame in variable `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice` according to formula 2.
+
+#< info "Pipe, mutate, select"
+The pipe operator `%>%` is a feature provided by the `dplyr` Package. Essentially it allows to exectute multiple operation on a dataframe at once.
+This works the way that every pipe operator returns a dataframe and passes it to the next connected function. `Select` allows you to filter out certain columns of data, whereas `mutate` allows you to
+alter data. The counterpart for selecting specific rows is `filter`. There are several more functions to alter your data, below i linked a handy cheatsheet.
+  
+```{r "3_1__2",eval=FALSE}
+example %>% 
+  select(1:5)  `select: keep certain columns, here column 1 to 5`  %>% 
+  mutate(new_column = old_column+1)`mutate: create or alter columns`    
+
+```
+
+You can find a more detailed cheatsheet [here](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) or use the `help()` function.
+#>
+
+
+```{r "3_1__3"}
 #< task
 # ... <- data %>% 
 #  mutate(CR = .../...) %>% 
@@ -424,7 +485,7 @@ $$\tag{3}CO_{2t}=\beta_{0}+\beta_{1}\cdot priceratio_{t}$$
 
 `lm()` is part of the `stats` package and loaded on default. As shown in the syntax example below, it enables you to regress `y` on the indepedent variables `x1` and `x2`. The model can be `stored` in a variable or directly `used` in other functions. Another popular function to solve linear regressions in `R` is `felm()`, that provides further functionality to include `fixed effects`. In this problem set we will strictly use `lm()`.
 
-```{r "3_1__3",eval=FALSE}
+```{r "3_1__4",eval=FALSE}
 example <- lm(y~x1+x2, data=dat_east)
 ```
 
@@ -432,7 +493,7 @@ You can find more information on the `lm()` function [here](https://www.rdocumen
 #>
 
 **Task:** Run a regression with `co2mass` as the dependent variable and `priceratio` as independent variable. Store it in the variable `fit1`. 
-```{r "3_1__4"}
+```{r "3_1__5"}
 #< task
 # ... <- lm(...~... , data=east)
 #>
@@ -456,7 +517,7 @@ failure: Try again.
 TEXT
 
 **Task:** To
-```{r "3_1__5"}
+```{r "3_1__6"}
 #< task_notest
 summary(fit)
 #>
@@ -476,13 +537,13 @@ For upcoming regressions we will use the `stargazer()` function from the `starga
 #< info "Custom functions"
 `R` provides an easy framework to add your own functions. The syntax is quite similar to other `Programming Languages` you could be familiar with. Once you have defined a function, you can use it as long as you are in the same session. Below you can find the basic structure of a function:
 
-```{r "3_1__6",eval=FALSE}
+```{r "3_1__7",eval=FALSE}
 `myfunction <- function(arg1, arg2, ... ){`  
 `statements`  
 `return(object)`  
 ```  
 Here's an simple functions that adds `5` to the input and returns it.
-```{r "3_1__7",eval=FALSE}
+```{r "3_1__8",eval=FALSE}
 `example <- function(x) {`  
   `x + 5`  
 `}`  
@@ -493,7 +554,7 @@ You can find more detailed information [here](https://www.rdocumentation.org/pac
 #>
 
 **Task:** Click check to run the Code. It defines the function to show our custom regression tables.
-```{r "3_1__8"}
+```{r "3_1__9"}
 #< task_notest
 show.regression= function(...){
   library(stargazer)
@@ -516,20 +577,20 @@ show.regression(fit)
 
 Our eventual goal is to plot the rensponse curves of changing ??AWD prices 
 
-
-
-**Task:** To
-```{r "3_1__9"}
-p1 <- predict(fit, newdata = dat_east)
-```
-
-
 #< info "Predict"
 `predict()`
 #>
 
 **Task:** To
 ```{r "3_1__10"}
+p1 <- predict(fit, newdata = dat_east)
+```
+
+
+
+
+**Task:** To
+```{r "3_1__11"}
 plot(co2mass~priceratio, dat_east)
 lines(dat_east$priceratio, p1, col="red")
 ```
@@ -538,7 +599,7 @@ lines(dat_east$priceratio, p1, col="red")
 
 
 **Task:** Let's see what we just defined. Run the regression table for the linear model. Insert 
-```{r "3_1__11"}
+```{r "3_1__12"}
 #< task
 # regression.result(...)
 #>
@@ -551,7 +612,7 @@ display("Insert the name of the model you defined at the beginning of this exerc
 TEXT
 
 **Task:** To
-```{r "3_1__12"}
+```{r "3_1__13"}
 plot(fit, 1)
 plot(fit, 2)
 ```
@@ -564,10 +625,12 @@ $R^{2}=1-\frac{Explained Variation}{Total Variation}$
 A problem with the `R-squared` measurement is, that it always increases with higher numbers of variables in the model, even if these variables are only weakly responsible for the predicted values. An solution is to take the number of variables into account, this is called `Adjusted R-Squared` and also shown in the summary output.
 #>
 
+RMSE?
+
 ### Stage 2: Polynomial Regression
 
 **Task:** Just press *check*.
-```{r "3_1__13"}
+```{r "3_1__14"}
 CR.squared <- east$CR^2
 fit2 <- lm(CO2MASS ~ CR + CR.squared, east)
 
@@ -576,13 +639,13 @@ fit3 <- lm(CO2MASS ~ CR + + CR.squared + CR.cubed, east)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__14"}
+```{r "3_1__15"}
 p2 <- predict(fit2, east)
 p3 <- predict(fit3, east)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__15"}
+```{r "3_1__16"}
 plot(CO2MASS~CR, east)
 lines(east$CR, p1, col="red")
 lines(east$CR, p2, col="blue")
@@ -590,12 +653,12 @@ lines(east$CR, p3, col="green")
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__16"}
+```{r "3_1__17"}
 regression.result(fit, fit2, fit3)
 ```
 
 **Task:** Just press *check*.
-```{r "3_1__17"}
+```{r "3_1__18"}
 anova(fit, fit2, fit3)
 ```
 
@@ -651,10 +714,9 @@ TEXT
 
 ## Exercise 4 -- ???
 
-In this chapter we will carry out our main analysis. Before 
+Until now we got an idea about the energy market in the U.S. and the regression theory needed to develop a model that will answer our main question how carbon prices would reduce emissions. 
 
-
-In this exercise we present the data we use for our analysis and give an overview what we will be doing in the following exercises. The main question of this problem set is to find out
+Until now we worked with data sets that only include a portion of what we will use in our final model. Therefore we will use this exercise to present the data we use for our analysis and give an overview what we will be doing in the following exercises. The main question of this problem set is to find out
 how carbon prices would effect emissions in the energy sector. 
 
 
@@ -696,19 +758,19 @@ preparation in this problem set but rather provide the data sources. `Emission` 
 The U.S. Energy Information Administration (EIA) collects data of `Non-fossil` energy production as well as spot prices of `coal prices` in Form 923. Spot prices of `gas` can be found in
 `Intercontinental Exchange (ICE)`. Data of `electricity consumption` or `load` are provided in Form 714 of the `Federal Energy Regulatory Commission (FERC)`, permit prices of $SO_2$ from the `EPA Clean Air Markets` and finally, `net imports` of electricity from Canada are gathered from the `National Energy Board of Canada`. Links to the sources can be found in `references section`.
 
+To give us an overview of the data, lets create a table with average values for relevant factors of each interconnection. `Dyplr` provides 
 
-When choosing control variables we have to be sure that they directly effect the emissions 
 
-To give us an overview of the data, lets create a table with average values for relevant factors for each interconnection. R provides several packages that , but for now we work with packages we
+R provides several packages for that , but for now we work with packages we
 introduced before and solve this with `dyplr`.  
 
-**Task:** Use `group_by()` to group the dataset `dat` by `intercn`. Afterwards use `summarise_all()` to calculate the means of every variable. You don't have to deal with the additional lines of code, which is used to create a more understandable output.
+**Task:** Use `group_by()` to group the dataset `dat` by `intercn`. Afterwards use `summarise_all()` to calculate the means of every column. You don't have to deal with the additional lines of code, which is used to create a more understandable output.
 
 #< info "Group_by() and summarise()"
 `Group_by()` allows you to group a data frame by specific variables. Operations that are run on the grouped data frame are then performed on each group.
 
 The function `Summarise()` is run on **grouped data** and can perform operations e.g. calculating means (`mean()`) or finding minimums (`min()`). There are several
-pre-implemented version of `summarise` function in `R`. The one we use here is `summarise_all()`, which performs these operations on all columns.
+pre-implemented version of `summarise` functions in `R`. The one we use here is `summarise_all()`, which performs these operations on all columns.
 
 To give you an example in code form, lets pretend we have a dataframe `data` with several `car manufacturer` and their respective car models with `prices` and we want to calculate the average car price per manufacturer.
 
@@ -720,6 +782,11 @@ example <- data %>%
 
 Call `help(group_by)` or `help(summarize)` for further information.
 #>
+  
+#< info "kable()"
+#>
+
+///Tabelle mit einheiten
 
 ```{r "4__3"}
 #< task
@@ -733,45 +800,17 @@ Call `help(group_by)` or `help(summarize)` for further information.
 dat %>% 
   select(intercn, co2mass, load, gasprice, coalprice, nonfossil) %>% 
   group_by(intercn) %>% 
-  mutate(co2mass = co2mass/1000, load=load/1000, "Cost Ratio"=coalprice/gasprice, "Emission Rate"=co2mass/load, "Non fossil"=nonfossil) %>% 
+  mutate(co2mass = co2mass/1000, load=load/1000, "Price Ratio"=coalprice/gasprice, "Emission Rate"=co2mass/load, nonfossil=nonfossil/100000) %>% 
   summarise_all("mean") %>% 
-  rename("Interconnection"=intercn, "CO2 Emissions"=co2mass, Load=load, "Gas Price"=gasprice, "Coal Price"=coalprice)
+  rename("Interconnection"=intercn, "CO2 Emissions"=co2mass, Load=load, "Gas Price"=gasprice, "Coal Price"=coalprice, "Non fossil"=nonfossil)
 ```
 
-The table replicates table 1 from Cullen (2016). As we easily observe the interconnections are vastly different energy markets. While the EAST interconnection is a lot bigger than the other, it also 
-
-
-/// graph einheiten y achse
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+The table replicates `Table 1` from Cullen (2016) and reports the mean of several factors for each `interconnection`. We can clearly see that the East is by far the largest of the observed energy
+markets. The emissions seem to increase proportionally to the electricity consumption if we take the electricity production from non-fossil sources in consideration. This gets clearer if the look at
+the emission rates, which are defined as $ER=\frac{emissions}{load}$. Therefore the Western interconnection has by far the `cleanest` energy production, followed at some distance by Texas (`ERCOT`)
+and `East`. Furthermore we observe clear variations in price ratios.  
+This is in line with our assumptions from `Section 2`, where we stated that each interconnection has vastly different conditions and therefore run our analysis for each seperatly.  
+In the next exercise we will use this data frame and the regression theory we presented in `Chapter 3` to trace out the emission response curves and later on tranform them into carbon prices.
 
 
 ## Exercise 4.1 -- Estimated CO2 Response to Fuel Prices
@@ -952,7 +991,7 @@ final_east <- fit_east %>%
 #< task_notest
 plot_east <- ggplot(final_east, aes(x=basecoal/priceratio, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = final_east$lwr.transformed, ymax = final_east$upr.transformed),
-                   colour="lightgrey", fill="lightgrey", alpha=0.5) +
+                   colour="lightgrey", fill="lightgrey", alpha=0.5,) +
   geom_line(aes(y=fit.transformed)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +
   geom_vline(xintercept = 5.75, linetype = "dashed") + 
@@ -1025,7 +1064,7 @@ predict_wecc <- tibble(date=wecc$date, intercn=wecc$intercn, gasprice = wecc$gas
 
 reg_wecc <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=wecc)
 
-#ERCOT has no net imports of electricity, predict throws warning
+#ERCOT has no net imports of electricity (netNSflow=0), predict throws warning
 fit_wecc <- predict_wecc %>% 
   cbind(as.data.frame(predict(reg_wecc, newdata = predict_wecc, interval = 'confidence')))
 
@@ -1092,6 +1131,15 @@ costs of emission reductions. We split this exercise in two parts, first we will
 This exercise is split into 2 parts. In the first part we will transform price ratios into carbon prices and plot our result similiar to exercise `4.1`. In the second part we will adopt fixed carbon taxes, derive emission reductions based on our model and estimate the costs.
 
 To calculate carbon prices we can rearrange equation ? from exercise ? to express them as a function of price ratios and baseline prices of gas and coal. This will lead to the following equation:
+
+
+expand formula 2 into 
+we introduced this in section 2, here again:
+
+$$\tag{2}priceratio=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$$
+
+
+
 
 $$\tag{6}{P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$$
 
@@ -1263,7 +1311,7 @@ temp3 <- temp2 %>%
   
 table <- temp3 %>%
   select(c(1,2,5,3,6,4,7,8,9)) %>%
-  kable(col.names = c("Tax","abs.","%","abs.","%","abs.","%","abs.","%"), align="c", caption = "Precited Emissions and Percentage Abatement") %>%
+  kable(format="html", col.names = c("Tax","abs.","%","abs.","%","abs.","%","abs.","%"), align="c", caption = "Precited Emissions and Percentage Abatement") %>%
   add_header_above(c(" "=1, "East" = 2, "ERCOT" = 2, "West" = 2, "Total" = 2)) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), position = "center", full_width = F)%>%
   #column_spec(1:9, width = "0.4") %>%
@@ -1356,6 +1404,8 @@ The methods used here can be further used to generate additoinal results. This c
  
 ### Data Sources
 
+- European Environment Agency, "Primary Energy Consumption by Fuel", https://www.eea.europa.eu/data-and-maps/indicators/primary-energy-consumption-by-fuel-6/assessment-2
+
 - Federal Energy Regulatory Comission, "Form  No. 714 Annual Electric Balancing Authority Area
 and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.asp
 
@@ -1370,6 +1420,8 @@ and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.
 - United States Environmental Protection Agency, "SO2 Trading Program", https://ampd.epa.gov/ampd/
 
 - U.S. Energy Information Administration, "Form EIA-923", https://www.eia.gov/electricity/data/eia923/
+
+- U.S. Energy Information Administration, "Today in Energy", https://www.eia.gov/todayinenergy/detail.php?id=43035
 
 
 *All of the above links were accessable as of March 31, 2020.*

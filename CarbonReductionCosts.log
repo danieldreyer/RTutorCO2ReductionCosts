@@ -1188,3 +1188,103 @@
 ,
 {"type":["init_ps"],"time":["2020-03-08 19:58:44"],"user":["default_user"],"umph":[1583693924.3385],"ok":[true]}
 ,
+{"type":["init_ps"],"time":["2020-03-09 13:02:06"],"user":["default_user"],"umph":[1583755326.2693],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 14:10:11"],"user":["default_user"],"umph":[1583759411.7554],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 14:11:36"],"user":["default_user"],"umph":[1583759496.3888],"ok":[true],"chunk":[24],"ex":[6],"e.ind":[0],"code":["dat <- read_csv(\"Data/main_data.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-09 16:47:15"],"user":["default_user"],"umph":[1583768835.5446],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:24"],"user":["default_user"],"umph":[1583768844.7781],"ok":[true],"chunk":[26],"ex":[7],"e.ind":[0],"code":["dat <- read_csv(\"Data/main_data.csv\")  %>% \n       mutate(priceratio = coalprice/gasprice,\n              season=(month>3) + (month>6) + (month>9),\n              yearseason=year*10+season)\nbasecoal=2.25\nbasegas=5.75\n\nhead(dat)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:26"],"user":["default_user"],"umph":[1583768846.7871],"ok":[true],"chunk":[27],"ex":[7],"e.ind":[0],"code":["#east <- filter(...,...)\neast <- filter(dat, intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:28"],"user":["default_user"],"umph":[1583768848.0658],"ok":[true],"chunk":[28],"ex":[7],"e.ind":[0],"code":["# ... <- east %>% \n#  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n#  summarise_all(...)\nmean_east <- east %>% \n  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n  summarise_all(mean)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:29"],"user":["default_user"],"umph":[1583768849.5133],"ok":[true],"chunk":[29],"ex":[7],"e.ind":[0],"code":["#temp_east <- ...(gasprice = east$gasprice, priceratio = east$priceratio) %>% \n#  ...(mean_east)\npredict_east <- tibble(date=east$date, intercn=east$intercn, gasprice = east$gasprice, coalprice=east$coalprice, priceratio = east$priceratio) %>% \n  cbind(mean_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:30"],"user":["default_user"],"umph":[1583768850.9488],"ok":[true],"chunk":[30],"ex":[7],"e.ind":[0],"code":["#... <- lm(co2mass ~ ...(priceratio, df=...) + ...(load, df=...) + tlsd + tlmin + tlmax + ...(meant, df=...) + nonfossil + so2price + netNSflow + yearseason, data=east)\nreg_east <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:34"],"user":["default_user"],"umph":[1583768854.7679],"ok":[true],"chunk":[31],"ex":[7],"e.ind":[0],"code":["fit_east <- predict_east %>% \n  cbind(as.data.frame(predict(reg_east, newdata = predict_east, interval = 'confidence')))\n\n\n#co2.east$fit\n#temp_east = temp_east %>% cbind(as.data.frame(predict(reg_east, newdata = temp_east, interval = 'confidence')))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:36"],"user":["default_user"],"umph":[1583768856.4462],"ok":[true],"chunk":[32],"ex":[7],"e.ind":[0],"code":["diff_base <- abs(east$priceratio - (basecoal/basegas))\nmin_dif <- min(diff_base)\nclosest <- min_dif==diff_base\nbase_emit <- mean(fit_east$fit[which(closest)])\n\nfinal_east <- fit_east %>% \n  mutate(fit.transformed=fit/base_emit-1,\n         lwr.transformed=lwr/base_emit-1,\n         upr.transformed=upr/base_emit-1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:37"],"user":["default_user"],"umph":[1583768857.607],"ok":[true],"chunk":[33],"ex":[7],"e.ind":[0],"code":["plot_east <- ggplot(final_east, aes(x=basecoal/priceratio, y=fit.transformed)) +\n  geom_ribbon(aes_string(ymin = final_east$lwr.transformed, ymax = final_east$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5,) +\n  geom_line(aes(y=fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +\n  geom_vline(xintercept = 5.75, linetype = \"dashed\") + \n  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2.2, 12)) +\n  labs(title=\"Eastern Interconnection\", subtitle = \"y=Percentage Change in CO2 emissions\",\n       y=\"\", x=\"Gas Price $/MMBTU\") +\n  theme_minimal()\n\nplot_east"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:42"],"user":["default_user"],"umph":[1583768862.0185],"ok":[true],"chunk":[34],"ex":[7],"e.ind":[0],"code":["ercot <- filter(dat, intercn==\"ERCOT\")\n\nmean_ercot <- ercot %>% \n  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n  summarise_all(mean)\n\npredict_ercot <- tibble(date=ercot$date, intercn=ercot$intercn, gasprice = ercot$gasprice, coalprice=ercot$coalprice, priceratio = ercot$priceratio) %>% cbind(mean_ercot)\n\nreg_ercot <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=ercot)\n\n#ERCOT has no net imports of electricity, predict throws warning\nfit_ercot <- predict_ercot %>% \n  cbind(as.data.frame(predict(reg_ercot, newdata = predict_ercot, interval = 'confidence')))\n\n#base_emit <- mean(fit_ercot$fit[which(min(abs(ercot$priceratio - (basecoal/basegas)))==abs(ercot$priceratio - (basecoal/basegas)))])\n\ndiff_base <- abs(ercot$priceratio - (basecoal/basegas))\nmin_dif <- min(diff_base)\nclosest <- min_dif==diff_base\nbase_emit <- mean(fit_ercot$fit[which(closest)])\n\nfinal_ercot <- fit_ercot %>% \n  mutate(fit.transformed=fit/base_emit-1,\n         lwr.transformed=lwr/base_emit-1,\n         upr.transformed=upr/base_emit-1)\n\n\nplot_ercot <- ggplot(final_ercot, aes(x=basecoal/priceratio, y=fit.transformed)) +\n  geom_ribbon(aes_string(ymin = final_ercot$lwr.transformed, ymax = final_ercot$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +\n  geom_vline(xintercept = 5.75, linetype = \"dashed\") + \n  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2.2, 12)) +\n  labs(title=\"ERCOT Interconnection\", subtitle = \"y=Percentage Change in CO2 emissions\",\n       y=\"\", x=\"Gas Price $/MMBTU\") +\n  theme_minimal()"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:44"],"user":["default_user"],"umph":[1583768864.1563],"ok":[true],"chunk":[35],"ex":[7],"e.ind":[0],"code":["wecc <- filter(dat, intercn==\"WECC\")\n\nmean_wecc <- wecc %>% \n  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n  summarise_all(mean)\n\npredict_wecc <- tibble(date=wecc$date, intercn=wecc$intercn, gasprice = wecc$gasprice, coalprice=wecc$coalprice, priceratio = wecc$priceratio) %>% cbind(mean_wecc)\n\nreg_wecc <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=wecc)\n\n#ERCOT has no net imports of electricity (netNSflow=0), predict throws warning\nfit_wecc <- predict_wecc %>% \n  cbind(as.data.frame(predict(reg_wecc, newdata = predict_wecc, interval = 'confidence')))\n\nbase_emit <- mean(fit_wecc$fit[which(min(abs(wecc$priceratio - (basecoal/basegas)))==abs(wecc$priceratio - (basecoal/basegas)))])\n\nfinal_wecc <- fit_wecc %>% \n  mutate(fit.transformed=fit/base_emit-1,\n         lwr.transformed=lwr/base_emit-1,\n         upr.transformed=upr/base_emit-1)\n\nplot_wecc <- ggplot(final_wecc, aes(x=basecoal/priceratio, y=fit.transformed)) +\n  geom_ribbon(aes_string(ymin = final_wecc$lwr.transformed, ymax = final_wecc$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.15,.05)) +\n  geom_vline(xintercept = 5.75, linetype = \"dashed\") + \n  scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2.2, 12)) +\n  labs(title=\"Western Interconnection\", subtitle = \"y=Percentage Change in CO2 emissions\",\n       y=\"\", x=\"Gas Price $/MMBTU\") +\n  theme_minimal()"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:47:48"],"user":["default_user"],"umph":[1583768868.0423],"ok":[true],"chunk":[36],"ex":[7],"e.ind":[0],"code":["grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:53:12"],"user":["default_user"],"umph":[1583769192.3485],"ok":[true],"chunk":[38],"ex":[8],"e.ind":[0],"code":["dat <- read_csv(\"Data/main_data2.csv\")\nhead(dat,3)\n\nbasegas <- 5.75\nbasecoal <- 2.25\ngas_cc <- 0.0585\ncoal_cc <- 0.1054"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:53:13"],"user":["default_user"],"umph":[1583769193.9728],"ok":[true],"chunk":[39],"ex":[8],"e.ind":[0],"code":["#tax <- dat %>% \n#  mutate(carbontax = (priceratio*basegas-basecoal)/(coal_cc-priceratio*gas_cc)) %>% \n#  filter(carbontax >= ... & carbontax <= ...)\n#\n#head(...,...)\n#tax <- dat %>% \n##  mutate(carbontax = (priceratio*basegas-basecoal)/(coal_cc-priceratio*gas_cc)) %>% \n# filter(carbontax >= 0 & carbontax <= 80)\n\n\ntax <- dat %>% \n  mutate(carbontax = (priceratio*basegas-basecoal)/(0.1054-priceratio*0.0585)) %>% \n  filter(carbontax >= 0 & carbontax <= 80)\n\nhead(tax,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:53:15"],"user":["default_user"],"umph":[1583769195.4803],"ok":[true],"chunk":[40],"ex":[8],"e.ind":[0],"code":["#\ntax_east <- filter(tax, intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:53:17"],"user":["default_user"],"umph":[1583769197.0077],"ok":[true],"chunk":[41],"ex":[8],"e.ind":[0],"code":["plot_east <- ggplot(tax_east, aes(x=carbontax, y=-fit.transformed)) +\n  geom_ribbon(aes_string(ymin = -tax_east$lwr.transformed, ymax = -tax_east$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=-fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.01,0.15)) +\n  scale_x_continuous(limits=c(0, 80)) +\n  labs(title=\"Eastern Interconnection\",\n       y=\"CO2 Emissions abated as a Percentage of Baseline Emissions\", x=\"\", subtitle=\"y=Carbon Price $/ton\")  +\n  coord_flip()\n\nplot_east"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:53:22"],"user":["default_user"],"umph":[1583769202.2753],"ok":[true],"chunk":[42],"ex":[8],"e.ind":[0],"code":["tax_ercot <- filter(tax, intercn==\"ERCOT\")\n\nplot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=-fit.transformed)) +\n  geom_ribbon(aes_string(ymin = -tax_ercot$lwr.transformed, ymax = -tax_ercot$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=-fit.transformed)) +  \n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.01,0.15)) +\n  scale_x_continuous(limits=c(0, 80)) +\n  labs(title=\"Ercot Interconnection\",\n       y=\"CO2 Emissions abated as a Percentage of Baseline Emissions\", x=\"\", subtitle=\"y=Carbon Price $/ton\") + \n  coord_flip()"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:53:23"],"user":["default_user"],"umph":[1583769203.4241],"ok":[true],"chunk":[43],"ex":[8],"e.ind":[0],"code":["tax_wecc <- filter(tax, intercn==\"WECC\")\n\nplot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=-fit.transformed)) +\n  geom_ribbon(aes_string(ymin = -tax_wecc$lwr.transformed, ymax = -tax_wecc$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=-fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.01,0.15)) +\n  scale_x_continuous(limits=c(0, 80)) +\n  labs(title=\"Western Interconnection\",\n       y=\"CO2 Emissions abated as a Percentage of Baseline Emissions\", x=\"\", subtitle=\"y=Carbon Price $/ton\") + \n  coord_flip()"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:54:44"],"user":["default_user"],"umph":[1583769284.633],"ok":[true],"chunk":[44],"ex":[8],"e.ind":[0],"code":["grid.arrange(plot_east, plot_ercot, plot_wecc, nrow=1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 16:55:25"],"user":["default_user"],"umph":[1583769325.708],"ok":[true],"chunk":[45],"ex":[8],"e.ind":[0],"code":["find_closest_value <- function(a) {\n  vector <- 1:9\n  for(i in 0:8){\n   vector[i+1] = mean(a$fit[which.min(abs(a$carbontax - i*10))])\n  }\n  return(vector)\n}\ntemp1 = data.frame(tax=seq(0,80,10),east_emission=round(find_closest_value(tax_east)/100000,1), ercot_emission=round(find_closest_value(tax_ercot)/100000,1), wecc_emission=round(find_closest_value(tax_wecc)/100000,1))\n\ntemp2 <- temp1 %>% \n  mutate(perc_east=round((1-temp1$east_emission/temp1$east_emission[1])*100,1),\n         perc_ercot=round((1-temp1$ercot_emission/temp1$ercot_emission[1])*100,1),\n         perc_wecc=round((1-temp1$wecc_emission/temp1$wecc_emission[1])*100,1),\n         emission_all=east_emission+ercot_emission+wecc_emission)\n\ntemp3 <- temp2 %>% \n  mutate(perc_all=round((1-temp2$emission_all/temp2$emission[1])*100,1))\n  \ntable <- temp3 %>%\n  select(c(1,2,5,3,6,4,7,8,9)) %>%\n  kable(format=\"html\", col.names = c(\"Tax\",\"abs.\",\"%\",\"abs.\",\"%\",\"abs.\",\"%\",\"abs.\",\"%\"), align=\"c\", caption = \"Precited Emissions and Percentage Abatement\") %>%\n  add_header_above(c(\" \"=1, \"East\" = 2, \"ERCOT\" = 2, \"West\" = 2, \"Total\" = 2)) %>%\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"), position = \"center\", full_width = F)%>%\n  #column_spec(1:9, width = \"0.4\") %>%\n  footnote(general = \"Predicted emission are in 100.000 tons/day. Change to baseline (Tax=0).\")\n\ntable"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:20:06"],"user":["default_user"],"umph":[1583781606.4464],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:24:30"],"user":["default_user"],"umph":[1583781870.2346],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:25:30"],"user":["default_user"],"umph":[1583781930.9704],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:26:05"],"user":["default_user"],"umph":[1583781965.3283],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:27:50"],"user":["default_user"],"umph":[1583782070.8584],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:40:05"],"user":["default_user"],"umph":[1583782805.3583],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-09 20:41:17"],"user":["default_user"],"umph":[1583782877.7453],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 20:41:49"],"user":["default_user"],"umph":[1583782909.9082],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/PaGP.csv\")\nPaGP <- read_csv(\"./Data/PaGP.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 20:41:53"],"user":["default_user"],"umph":[1583782913.4536],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# head(PaGP, ...)\nhead(PaGP, 5)\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 20:41:55"],"user":["default_user"],"umph":[1583782915.3517],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["PaGP <- as.data.frame(PaGP)\nPaGP$date <- as.Date(PaGP$date)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 20:41:57"],"user":["default_user"],"umph":[1583782917.1504],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["PaGP <- PaGP %>% \n  mutate(price_naturalgas_USA_normalized = price_naturalgas_USA * 3.412,\n         price_naturalgas_Europe_normalized = price_naturalgas_Europe * 3.412,\n         price_coal_australia_normalized = price_coal_australia * 0.453, \n         price_coal_africa_normalized = price_coal_africa * 0.453)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 20:41:58"],"user":["default_user"],"umph":[1583782918.4765],"ok":[true],"chunk":[5],"ex":[2],"e.ind":[0],"code":["ggplot(data=PaGP, aes(x=date)) +\n  geom_line(aes(y=PaGP$price_coal_australia_normalized, color=\"Coal Autralia\"), size=1) +\n  geom_line(aes(y=PaGP$price_coal_africa_normalized, color=\"Coal Africa\"), size=1) +\n  geom_line(aes(y=PaGP$price_naturalgas_USA_normalized, color=\"Gas US\"), size=1) +\n  geom_line(aes(y=PaGP$price_naturalgas_Europe_normalized, color=\"Gas Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"Normalized Ressource Prices\", subtitle = \"Y=$/MwH\")+\n  scale_color_manual(name=\"Region\",values = c(\"green\", \"yellow\", \"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-09 20:42:04"],"user":["default_user"],"umph":[1583782924.1523],"ok":[true],"chunk":[6],"ex":[2],"e.ind":[0],"code":["ggplot(data=PaGP, aes(x=date)) +\n  geom_line(aes(y=PaGP$generated_coal, color=\"Coal Generation (TWh)\"), size=1, alpha=0.5) +\n  geom_line(aes(y=PaGP$generated_gas, color=\"Natural Gas Generation (TWh)\"), size=1, alpha=0.5) +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-10 00:01:15"],"user":["default_user"],"umph":[1583794875.9918],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-10 00:02:30"],"user":["default_user"],"umph":[1583794950.8968],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:02:55"],"user":["default_user"],"umph":[1583794975.7466],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/PaGP.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:03:03"],"user":["default_user"],"umph":[1583794983.5728],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# head(PaGP, ...)\nhead(dat, 5)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-10 00:12:15"],"user":["default_user"],"umph":[1583795535.2245],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:12:22"],"user":["default_user"],"umph":[1583795542.7275],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/PaGP.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:12:25"],"user":["default_user"],"umph":[1583795545.8389],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/PaGP.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:12:42"],"user":["default_user"],"umph":[1583795562.5916],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# head(PaGP, ...)\nhead(dat, 8)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-10 00:47:47"],"user":["default_user"],"umph":[1583797667.0989],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:47:59"],"user":["default_user"],"umph":[1583797679.3443],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/exercise1.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:48:00"],"user":["default_user"],"umph":[1583797680.648],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# head(dat, ...)\nhead(dat, 8)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:48:03"],"user":["default_user"],"umph":[1583797683.1799],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["# ... <- ...(dat$date, format=\"%m/%d/%Y\")\ndat$date <- as.Date(dat$date, format=\"%m/%d/%Y\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 00:48:04"],"user":["default_user"],"umph":[1583797684.5671],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=dat, aes(x=date)) +\n  geom_line(aes(y=dat$price_naturalgas_USA, color=\"Gas US\"), size=1) +\n  geom_line(aes(y=dat$price_naturalgas_Europe, color=\"Gas Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"Normalized Ressource Prices\", subtitle = \"Y=$/MWh\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-10 01:36:16"],"user":["default_user"],"umph":[1583800576.7759],"ok":[true]}
+,
