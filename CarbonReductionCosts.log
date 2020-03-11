@@ -1288,3 +1288,47 @@
 ,
 {"type":["init_ps"],"time":["2020-03-10 01:36:16"],"user":["default_user"],"umph":[1583800576.7759],"ok":[true]}
 ,
+{"type":["init_ps"],"time":["2020-03-10 14:56:08"],"user":["default_user"],"umph":[1583848568.9337],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-10 15:50:36"],"user":["default_user"],"umph":[1583851836.8135],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-10 19:48:24"],"user":["default_user"],"umph":[1583866104.1425],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:49:26"],"user":["default_user"],"umph":[1583866166.5684],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/exercise1.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:49:27"],"user":["default_user"],"umph":[1583866167.9186],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# head(dat, ...)\nhead(dat, 8)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:49:29"],"user":["default_user"],"umph":[1583866169.0964],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["# ... <- ...(dat$date, format=\"%m/%d/%Y\")\ndat$date <- as.Date(dat$date, format=\"%m/%d/%Y\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:49:30"],"user":["default_user"],"umph":[1583866170.2637],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=dat, aes(x=date)) +\n  geom_line(aes(y=dat$price_naturalgas_USA, color=\"Gas US\"), size=1) +\n  geom_line(aes(y=dat$price_naturalgas_Europe, color=\"Gas Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"Natural Gas Prices\", subtitle = \"Y=$/mmBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:49:42"],"user":["default_user"],"umph":[1583866182.8177],"ok":[true],"chunk":[5],"ex":[2],"e.ind":[0],"code":["#ggplot(data=___, aes(x=___)) +\n#  ____(aes(_=dat$generated_coal, color=\"Coal Generation (TWh)\"), size=1, alpha=0.5) +\n#  ____(aes(_=dat$generated_gas, color=\"Natural Gas Generation (TWh)\"), size=1, alpha=0.5) +\n#  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n#  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n#  scale_y_continuous(breaks=seq(0,200,25))\nggplot(data=dat, aes(x=date)) +\n  geom_line(aes(y=dat$generated_coal, color=\"Coal Generation (TWh)\"), size=1, alpha=0.5) +\n  geom_line(aes(y=dat$generated_gas, color=\"Natural Gas Generation (TWh)\"), size=1, alpha=0.5) +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-10 19:56:12"],"user":["default_user"],"umph":[1583866572.3224],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:56:53"],"user":["default_user"],"umph":[1583866613.7095],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ... <- read_csv(\"./Data/exercise1.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:56:54"],"user":["default_user"],"umph":[1583866614.9967],"ok":[true],"chunk":[2],"ex":[2],"e.ind":[0],"code":["# head(dat, ...)\nhead(dat, 8)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:56:56"],"user":["default_user"],"umph":[1583866616.3374],"ok":[true],"chunk":[3],"ex":[2],"e.ind":[0],"code":["# ... <- ...(dat$date, format=\"%m/%d/%Y\")\ndat$date <- as.Date(dat$date, format=\"%m/%d/%Y\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:56:57"],"user":["default_user"],"umph":[1583866617.8294],"ok":[true],"chunk":[4],"ex":[2],"e.ind":[0],"code":["ggplot(data=dat, aes(x=date)) +\n  geom_line(aes(y=dat$price_naturalgas_USA, color=\"Gas US\"), size=1) +\n  geom_line(aes(y=dat$price_naturalgas_Europe, color=\"Gas Europe\"), size=1) +\n  labs(x = \"Year\", y = \"\", title = \"Natural Gas Prices\", subtitle = \"Y=$/mmBTU\")+\n  scale_color_manual(name=\"Region\",values = c(\"blue\",\"red\"))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:57:01"],"user":["default_user"],"umph":[1583866621.9528],"ok":[true],"chunk":[5],"ex":[2],"e.ind":[0],"code":["#ggplot(data=___, aes(x=___)) +\n#  ____(aes(_=dat$generated_coal, color=\"Coal Generation (TWh)\"), size=1, alpha=0.5) +\n#  ____(aes(_=dat$generated_gas, color=\"Natural Gas Generation (TWh)\"), size=1, alpha=0.5) +\n#  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n#  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n#  scale_y_continuous(breaks=seq(0,200,25))\nggplot(data=dat, aes(x=date)) +\n  geom_line(aes(y=dat$generated_coal, color=\"Coal Generation (TWh)\"), size=1, alpha=0.5) +\n  geom_line(aes(y=dat$generated_gas, color=\"Natural Gas Generation (TWh)\"), size=1, alpha=0.5) +\n  labs(x = \"Year\", y = \"\", title = \"Monthly Generation by Fueltype\", subtitle = \"Y=Monthly Electricty (TWh)\")+\n  scale_color_manual(name=\"\",values = c(\"black\",\"red\"))+\n  scale_y_continuous(breaks=seq(0,200,25))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:59:47"],"user":["default_user"],"umph":[1583866787.4213],"ok":[true],"chunk":[6],"ex":[3],"e.ind":[0],"code":["Emissions <- read.csv(\"./Data/Emissions_Unit_Type.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:59:50"],"user":["default_user"],"umph":[1583866790.3377],"ok":[true],"chunk":[6],"ex":[3],"e.ind":[0],"code":["Emissions <- read.csv(\"./Data/Emissions_Unit_Type.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:59:53"],"user":["default_user"],"umph":[1583866793.3087],"ok":[true],"chunk":[7],"ex":[3],"e.ind":[0],"code":[""],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-10 19:59:57"],"user":["default_user"],"umph":[1583866797.3896],"ok":[true],"chunk":[7],"ex":[3],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise3.csv\")\nggplot(dat,aes(x=coalprice/gasprice,y=co2mass/1000,color=intercn))+\n        geom_point(alpha=0.2) +\n        geom_encircle(aes(group=intercn,fill=intercn),alpha=0.3, s_shape=1) +\n        theme_bw()+ \n        labs(y=\"\", \n        x=\"Price Ratio\", \n        subtitle=\"y=CO2 Emissions in 1000 tons/day\",\n        title=\"Distribution of data\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-10 22:11:09"],"user":["default_user"],"umph":[1583874669.7797],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-11 00:05:13"],"user":["default_user"],"umph":[1583881513.3401],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-11 00:06:45"],"user":["default_user"],"umph":[1583881605.6895],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-11 00:07:24"],"user":["default_user"],"umph":[1583881644.1742],"ok":[true]}
+,
