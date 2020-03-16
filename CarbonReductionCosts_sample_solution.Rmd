@@ -371,8 +371,8 @@ info("Linear Regression with lm()") # Run this line (Strg-Enter) to show info
 
 **Task:** Run a regression with `co2mass` as the dependent variable and `costratio` as independent variable. Store it in the variable `fit1`. 
 ```{r "3_1__5"}
-# ... <- lm(...~... , data=east)
-fit1 <- lm(co2mass ~ costratio, data=dat_east)
+# ... <- lm(...~... , data=dat_east)
+fit <- lm(co2mass ~ costratio, data=dat_east)
 ```
 
 **Task:** To show the statistics of our regression we will use stargazer(). Since we won't need every information that is shown by the default function. We will define our own and at the same time introduce custom functions which will be useful later on. Read the `Info Boxes` to find out more about `stargazer` and `custom functions` and continue with the next `task`. Press **check** to define the functiom.
@@ -410,8 +410,7 @@ Quiz: Before looking at the summary, what impact do changing cost ratios have on
   
 **Task:** Use the function we just defined to show the summary of `fit1`.
 ```{r "3_1__9"}
-#
-show.regression(fit1)
+show.regression(fit)
 ```
 
 
@@ -422,11 +421,9 @@ Our eventual goal is to plot the rensponse curves of changing ??AWD prices
 
 **Task:** To
 ```{r "3_1__10"}
-plot(fit1, 1)
-plot(fit1, 2)
+plot(fit, 1)
+plot(fit, 2)
 
-plot(fit2, 1)
-plot(fit2, 2)
 ```
 
 QQ PLOT RESIDUALS?
@@ -446,9 +443,9 @@ $$CO_{2t}=\beta_0+\beta_1\cdot costratio_t+\beta_2\cdot load_t+\epsilon_t$$
 **Task:** Just press **check**
 
 ```{r "3_1__11"}
-fit2 = lm(co2mass ~ costratio + load, data=dat_east)
+fit1 = lm(co2mass ~ costratio + load, data=dat_east)
 
-show.regression(fit1,fit2)
+show.regression(fit,fit1)
 ```
 
 TEXT
@@ -465,199 +462,97 @@ Our goal is to find the response curves of emissions to changing fuel price. The
 
 
 
-Simply evaluating the fitted values on our intitial data frame won't give us an interpretable curve though. To illustrate this problem run the code below.
 
-**Task:** Predict the fitted values of `fit2` on `dat_east` and plot the result. Just click **check**.
+**Task:** Predict the fitted values of `fit2` on `dat_east` with help of the `predict()` function.
 
 info("Predict") # Run this line (Strg-Enter) to show info
 
 ```{r "3_1__12"}
 co2.hat1 = predict(fit1, dat_east)
-co2.hat2 = predict(fit2, dat_east)
 ```
 
 
-A multivariate regression with two dependent variables spans three dimensions.
+As explained before our eventual goal is to plot the response curves of emissions to changing fuel prices (or cost ratios). Simply evaluating the fitted values on our intitial data frame as we have done in the last task won't give us an interpretable curve though. A multivariate regression with two dependent variables spans three dimensions. To illustrate this problem run the code below.
 
 
-
-```{r "3_1__13"}
-x <- dat_east$costratio
-y <- co2.hat2
-z <- dat_east$load
-
-s3d <- scatterplot3d(x,z,y, col.axis = "blue",
-angle = 55, scale.y = 0.7, pch = 16, main = "3D Regression Plane", xlab="costratio", ylab = "load", zlab = "emissions")
-s3d$plane3d(fit2, lty = "dotted")
+**Task:** Just press **check**
+```{r "3_1__13",fig.width=9, fig.height=6, dev='svg'}
+#take sample from data to limit points shown in plot
+temp<- dat_east %>% cbind(co2.hat1)
+temp1<- temp[sample(nrow(temp), 150), ]
+#assign vairables to axises
+x <- temp1$costratio
+z <- temp1$co2.hat1
+y <- temp1$load
+#set a nice color scheme
+numbercol <- 8 # number of colors
+plotcolor <- brewer.pal(numbercol,"Greys") # use Brewer to get color scheme 
+colornum <- cut(rank(z), numbercol, labels=FALSE)
+colorcode <- plotcolor[colornum] # assign color
+#plot
+s3d <- scatterplot3d(x,y,z, col.axis="gray", col.grid="gray", type="h",color=colorcode, 
+angle = 35, scale.y = 1, pch = 19, xlab="Cost Ratio", ylab = "Load", zlab = "Emissions")
+s3d$plane3d(fit1, lty = "dotted")
 ```
 
+As you can see we can a regression plane that spans over three dimensions and there no exact "line" to be drawn here. For purpose of illustration, run the code below to see what would happen if we simply plot emissions against cost ratios.
 
+**Task:** Just press **check**
 ```{r "3_1__14"}
-ggplot(dat_east,aes(x=costratio,y=co2.hat2))+
-        geom_line(aes(x=dat_east$costratio, y=co2.hat2))
+ggplot(dat_east,aes(x=costratio,y=co2.hat1))+
+        geom_line(aes(x=dat_east$costratio, y=co2.hat1))+
+        labs(y="Emissions", x="Cost Ratio")
 ```
 
 
 
-The problem hereby lies in 
+`R` hereby follows it's intential function and connects all points, which is not the desired output we want to see. We could follow the interpretation of falling emission for higher cost ratios but a more detailed analysis isn't possible. To solve this issue we will use a work around in the way that we won't predict our values on the original data we build our model on. Instead we will evaluate all independent variables but cost ratios at their respective mean.  
+We are able to do so, because the average of the fitted values $\hat{y_i}$ is equal to the average of the actual values $y_i$:  
 
+$$\frac{1}{n}\sum_{i=1}^n \hat{y_i}=\frac{1}{n}\sum_{i=1}^n y_i$$
 
-We intend to plot our results in terms of reponse curves. To be able to do so we won't predict our values on the original data frame we build our model on. Instead we will use the implication that the average predicted values from a regression model will equal the average of the dependet variables. In mathematical terms we can explain this as followed:
-A linear regression model with intercept term satifies following solution $X^tX\beta=X^ty$
-$$\sum_i\sum_jx_{ij}\beta_j=\sum_iy_i$$
+This is true for linear regressions with intercept term. The sum of the residuals are in this case zero.
 
+To implement what we have just adopted we create a new data frame. Since we just added `load` to our model for now, let's create a new dataframe with `costratio` and the mean value of `load`. This will serve as our data frame we use to run predict() on.
 
-**Task:**
+**Task:** Just press **check**.
 ```{r "3_1__15"}
-mean_dat = dat_east %>%
-  select(load ) %>%
-  summarize_all(mean)
-
-
-pred_dat = tibble(co2mass=dat_east$co2mass, costratio = dat_east$costratio) %>%
-  cbind(mean_dat)
-
-fit2 = lm(co2mass ~ costratio + load, data=dat_east)
-fit3 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)
+pred_dat = tibble(costratio = dat_east$costratio) %>%
+  cbind(load=mean(dat_east$load))
 ```
 
+Until now we have assumed that we are dealing with a simple linear relationship. This is highly unlikely in a real-world scenario. 
+
+
+**Task:** Just press **check**.
 ```{r "3_1__16"}
-show.regression(fit1, fit2, fit3)
-
-
+fit2 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)
+show.regression(fit, fit1, fit2)
 ```
 
 
-info("Predict") # Run this line (Strg-Enter) to show info
 
+
+**Task:** Run `predict()` on `fit1` and `fit2`. Use the data frame `pred_dat` to calculate the fitted values.
 ```{r "3_1__17"}
-CO2.hat1 = predict(fit1, pred_dat)
-CO2.hat2 = predict(fit2, pred_dat)
-co2.hat3 = predict(fit3, pred_dat)
+#co2.hat1 = ___
+#co2.hat2 = ___
+co2.hat1 = predict(fit1, pred_dat)
+co2.hat2 = predict(fit2, pred_dat)
 ```
 
-
+**Task:** Create a new ggplot. Use `geom_line()` to plot one line each for `co2.hat1` and `co2.hat2`, with `cost ratios` on the x-axis and `emissions` on the y-axis.
 ```{r "3_1__18"}
-plot(pred_dat$costratio, dat_east$co2mass, ylim=range(CO2.hat1, CO2.hat2))
-lines(pred_dat$costratio, CO2.hat1, col="black")
-lines(pred_dat$costratio, CO2.hat2, col="green")
-lines(pred_dat$costratio, co2.hat3, col="red")
-
-
-ggplot(pred_dat,aes(x=costratio,y=co2mass))+
-        geom_point(alpha=0.2) +
-        geom_line(aes(x=pred_dat$costratio, y=CO2.hat1)) +
-  geom_line(aes(x=pred_dat$costratio, y=CO2.hat2)) +
-  geom_line(aes(x=pred_dat$costratio, y=co2.hat3))
-  
-
+#ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
+#   geom_line(aes(___), color="red") +
+#   geom_line(aes(___), color="green") +
+ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
+    geom_line(aes(x=costratio, y=co2.hat1), color="red") +
+    geom_line(aes(x=costratio, y=co2.hat2), color="green") +
+    labs(x="Cost Ratio", y="Emissions")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Stage 2: Polynomial Regression
-
-**Task:** Just press *check*.
-```{r "3_1__19"}
-reg.cubed <- east$CR^3
-fit3 <- lm(CO2MASS ~ CR + CR.squared + CR.cubed, east)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__20"}
-p3 <- predict(fit3, east)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__21"}
-plot(CO2MASS~CR, east)
-lines(east$CR, p1, col="red")
-lines(east$CR, p2, col="blue")
-lines(east$CR, p3, col="green")
-```
-
-**Task:** Just press *check*.
-```{r "3_1__22"}
-show.regression(fit1, fit2, fit3)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__23"}
-anova(fit, fit2, fit3)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+As we can see in the graph above our output shows us nice lines for every fit that we could interpret. 
 
 
 
@@ -667,54 +562,20 @@ anova(fit, fit2, fit3)
 
 ### Stage 3: Cubic Spline
 
+In this exercise we will introduce the concept of spline regression. We 
 
 
 
 
-
-simple cubic splines
+In mathematical terms a spline regression can be noted the following way:  
 
 $$\tag{4}CO_{2t}=s(CR_{t}|\beta)$$
+
+Methodically there doesn't change much to normal polynomial regressions
 
 info("ns()") # Run this line (Strg-Enter) to show info
 
 WIP
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1256,12 +1117,17 @@ The methods used here can be further used to generate additoinal results. This c
 
 ### Bibliography
 
+- Bushnell, J. B., Mansur, E. T. & Saravia, C. (2008), ‘Vertical arrangements, market structure, and competition: An analysis of restructured US electricity markets’, American Economic Review 98(1), 237–66.
+
 - Cullen, Joseph A., and Erin T. Mansur. 2017. "Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach Using the Shale Revolution." American Economic Journal: Economic Policy, 9 (3): 106-33.
+
+- Davis, L. & Hausman, C. (2015), Market impacts of a nuclear power plant closure, Ei @ haas working paper wp-248.
 
 - Lafrancois, B. A. (2012), ‘A lot left over: Reducing CO2 emissions in the United States’ electric power sector through the use of natural gas’, Energy Policy 50, 428–435.
 
+- Mansur, E. T. & White, M. (2012), ‘Market organization and efficiency in electricity markets’, (Working Paper).
 
-/add literature, exercise 2
+- Swensson, Wretman (1992), "Model Assisted Survey Sampling", Springer-Verlag.
 
 ### R Packages
 

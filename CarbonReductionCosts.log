@@ -1456,3 +1456,83 @@
 ,
 {"type":["init_ps"],"time":["2020-03-16 01:35:02"],"user":["default_user"],"umph":[1584318902.7062],"ok":[true]}
 ,
+{"type":["init_ps"],"time":["2020-03-16 16:02:28"],"user":["default_user"],"umph":[1584370948.3177],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-16 21:54:31"],"user":["default_user"],"umph":[1584392071.35],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:54:38"],"user":["default_user"],"umph":[1584392078.7655],"ok":[true],"chunk":[7],"ex":[4],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise3.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:54:40"],"user":["default_user"],"umph":[1584392080.2455],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["# ___ <- data ___ \n#  mutate(costratio = ___/___,\n#         co2mass = co2mass/1000000),\n#         load = load/1000000) %>%\n#  filter(intercn==\"___\")\ndat_east <- dat %>% \n  mutate(costratio = coalprice/gasprice,\n         co2mass = co2mass/1000000,\n         load = load/1000000) %>%\n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:54:41"],"user":["default_user"],"umph":[1584392081.7794],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["# ... <- lm(...~... , data=east)\nfit1 <- lm(co2mass ~ costratio, data=dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:54:43"],"user":["default_user"],"umph":[1584392083.4962],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["show.regression= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            model.names = FALSE,\n            object.names = TRUE,\n            model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n}"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:54:49"],"user":["default_user"],"umph":[1584392089.0651],"ok":[true],"chunk":[11],"ex":[4],"e.ind":[0],"code":["#\nshow.regression(fit1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:55:03"],"user":["default_user"],"umph":[1584392103.3572],"ok":[true],"chunk":[12],"ex":[4],"e.ind":[0],"code":["plot(fit1, 1)\nplot(fit1, 2)\n\nplot(fit2, 1)\nplot(fit2, 2)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:55:12"],"user":["default_user"],"umph":[1584392112.412],"ok":[true],"chunk":[13],"ex":[4],"e.ind":[0],"code":["fit2 = lm(co2mass ~ costratio + load, data=dat_east)\n\nshow.regression(fit1,fit2)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:55:16"],"user":["default_user"],"umph":[1584392116.5894],"ok":[true],"chunk":[14],"ex":[4],"e.ind":[0],"code":["co2.hat2 = predict(fit2, dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:55:19"],"user":["default_user"],"umph":[1584392119.3131],"ok":[true],"chunk":[15],"ex":[4],"e.ind":[0],"code":["temp<- dat_east %>% cbind(co2.hat2)\ntemp1<- temp[sample(nrow(temp), 150), ]\n\nx <- temp1$costratio\ny <- temp1$co2.hat2\nz <- temp1$load\n\nnclr <- 8 # number of colors\nplotclr <- brewer.pal(nclr,\"Greys\") # get the colors\ncolornum <- cut(rank(y), nclr, labels=FALSE)\ncolcode <- plotclr[colornum] # assign color\n\ns3d <- scatterplot3d(x,z,y, col.axis=\"gray\", col.grid=\"gray\", type=\"h\",color=colcode, \nangle = 35, scale.y = 1, pch = 19, xlab=\"Cost Ratio\", ylab = \"Load\", zlab = \"Emissions\")\ns3d$plane3d(fit2, lty = \"dotted\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 21:55:24"],"user":["default_user"],"umph":[1584392124.5544],"ok":[true],"chunk":[16],"ex":[4],"e.ind":[0],"code":["ggplot(dat_east,aes(x=costratio,y=co2.hat2))+\n        geom_line(aes(x=dat_east$costratio, y=co2.hat2))"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-16 22:51:52"],"user":["default_user"],"umph":[1584395512.4028],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:00"],"user":["default_user"],"umph":[1584395520.7633],"ok":[true],"chunk":[7],"ex":[4],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise3.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:02"],"user":["default_user"],"umph":[1584395522.3138],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["# ___ <- data ___ \n#  mutate(costratio = ___/___,\n#         co2mass = co2mass/1000000),\n#         load = load/1000000) %>%\n#  filter(intercn==\"___\")\ndat_east <- dat %>% \n  mutate(costratio = coalprice/gasprice,\n         co2mass = co2mass/1000000,\n         load = load/1000000) %>%\n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:03"],"user":["default_user"],"umph":[1584395523.7033],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["# ... <- lm(...~... , data=east)\nfit1 <- lm(co2mass ~ costratio, data=dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:04"],"user":["default_user"],"umph":[1584395524.9915],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["show.regression= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            model.names = FALSE,\n            object.names = TRUE,\n            model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n}"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:10"],"user":["default_user"],"umph":[1584395530.0904],"ok":[true],"chunk":[11],"ex":[4],"e.ind":[0],"code":["#\nshow.regression(fit1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:11"],"user":["default_user"],"umph":[1584395531.9865],"ok":[true],"chunk":[12],"ex":[4],"e.ind":[0],"code":["plot(fit1, 1)\nplot(fit1, 2)\n\nplot(fit2, 1)\nplot(fit2, 2)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:17"],"user":["default_user"],"umph":[1584395537.8486],"ok":[true],"chunk":[13],"ex":[4],"e.ind":[0],"code":["fit2 = lm(co2mass ~ costratio + load, data=dat_east)\n\nshow.regression(fit1,fit2)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:19"],"user":["default_user"],"umph":[1584395539.8935],"ok":[true],"chunk":[14],"ex":[4],"e.ind":[0],"code":["co2.hat2 = predict(fit2, dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:21"],"user":["default_user"],"umph":[1584395541.1053],"ok":[true],"chunk":[15],"ex":[4],"e.ind":[0],"code":["#take sample of data frame to minimize points shown in plot\ntemp<- dat_east %>% cbind(co2.hat2)\ntemp1<- temp[sample(nrow(temp), 150), ]\n#assign vairables to axises\nx <- temp1$costratio\ny <- temp1$co2.hat2\nz <- temp1$load\n#set some nice color scheme\nnclr <- 8 # number of colors\nplotclr <- brewer.pal(nclr,\"Greys\") # get the colors\ncolornum <- cut(rank(y), nclr, labels=FALSE)\ncolcode <- plotclr[colornum] # assign color\n#plot\ns3d <- scatterplot3d(x,z,y, col.axis=\"gray\", col.grid=\"gray\", type=\"h\",color=colcode, \nangle = 35, scale.y = 1, pch = 19, xlab=\"Cost Ratio\", ylab = \"Load\", zlab = \"Emissions\")\ns3d$plane3d(fit2, lty = \"dotted\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:29"],"user":["default_user"],"umph":[1584395549.0443],"ok":[true],"chunk":[16],"ex":[4],"e.ind":[0],"code":["ggplot(dat_east,aes(x=costratio,y=co2.hat2))+\n        geom_line(aes(x=dat_east$costratio, y=co2.hat2))+\n        labs(y=\"Emissions\", x=\"Cost Ratio\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:43"],"user":["default_user"],"umph":[1584395563.3893],"ok":[true],"chunk":[17],"ex":[4],"e.ind":[0],"code":["pred_dat = tibble(costratio = dat_east$costratio) %>%\n  cbind(load=mean(dat_east$load))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:46"],"user":["default_user"],"umph":[1584395566.5646],"ok":[true],"chunk":[18],"ex":[4],"e.ind":[0],"code":["fit3 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)\nshow.regression(fit1, fit2, fit3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:52"],"user":["default_user"],"umph":[1584395572.5147],"ok":[true],"chunk":[19],"ex":[4],"e.ind":[0],"code":["co2.hat1 = predict(fit1, pred_dat)\nco2.hat2 = predict(fit2, pred_dat)\nco2.hat3 = predict(fit3, pred_dat)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 22:52:53"],"user":["default_user"],"umph":[1584395573.8633],"ok":[true],"chunk":[20],"ex":[4],"e.ind":[0],"code":["#ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+\n#   geom_line(aes(___), color=\"red\") +\n#   geom_line(aes(___), color=\"green\") +\n#   geom_line(aes(___), color=\"blue\")\nggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+\n    geom_line(aes(x=costratio, y=co2.hat1), color=\"red\") +\n    geom_line(aes(x=costratio, y=co2.hat2), color=\"green\") +\n    geom_line(aes(x=costratio, y=co2.hat3), color=\"blue\") +\n    labs(x=\"Cost Ratio\", y=\"Emissions\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-16 23:16:54"],"user":["default_user"],"umph":[1584397014.4491],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:04"],"user":["default_user"],"umph":[1584397024.2741],"ok":[true],"chunk":[7],"ex":[4],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise3.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:06"],"user":["default_user"],"umph":[1584397026.7481],"ok":[true],"chunk":[7],"ex":[4],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise3.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:08"],"user":["default_user"],"umph":[1584397028.1942],"ok":[false],"chunk":[8],"ex":[4],"e.ind":[1],"code":[""],"message":["\nYou have not yet made an assignment to dat_east."]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:11"],"user":["default_user"],"umph":[1584397031.2151],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["# ___ <- data ___ \n#  mutate(costratio = ___/___,\n#         co2mass = co2mass/1000000),\n#         load = load/1000000) %>%\n#  filter(intercn==\"___\")\ndat_east <- dat %>% \n  mutate(costratio = coalprice/gasprice,\n         co2mass = co2mass/1000000,\n         load = load/1000000) %>%\n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:13"],"user":["default_user"],"umph":[1584397033.256],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["# ... <- lm(...~... , data=east)\nfit <- lm(co2mass ~ costratio, data=dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:14"],"user":["default_user"],"umph":[1584397034.3904],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["show.regression= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            model.names = FALSE,\n            object.names = TRUE,\n            model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n}"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:17"],"user":["default_user"],"umph":[1584397037.7281],"ok":[true],"chunk":[11],"ex":[4],"e.ind":[0],"code":["#\nshow.regression(fit)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:22"],"user":["default_user"],"umph":[1584397042.1242],"ok":[true],"chunk":[12],"ex":[4],"e.ind":[0],"code":["plot(fit1, 1)\nplot(fit1, 2)\n\nplot(fit2, 1)\nplot(fit2, 2)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:26"],"user":["default_user"],"umph":[1584397046.729],"ok":[true],"chunk":[13],"ex":[4],"e.ind":[0],"code":["fit1 = lm(co2mass ~ costratio + load, data=dat_east)\n\nshow.regression(fit,fit1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:28"],"user":["default_user"],"umph":[1584397048.8408],"ok":[false],"chunk":[14],"ex":[4],"e.ind":[0],"code":["co2.hat1 = predict(fit2, dat_east)"],"message":["evaluation error in \n  co2.hat1 = predict(fit2, dat_east)\n  Error in predict(fit2, dat_east): object 'fit2' not found\n"]}
+,
+{"type":["check_chunk"],"time":["2020-03-16 23:17:57"],"user":["default_user"],"umph":[1584397077.2063],"ok":[false],"chunk":[14],"ex":[4],"e.ind":[0],"code":["co2.hat1 = predict(fit2, dat_east)"],"message":["evaluation error in \n  co2.hat1 = predict(fit2, dat_east)\n  Error in predict(fit2, dat_east): object 'fit2' not found\n"]}
+,
+{"type":["init_ps"],"time":["2020-03-17 00:14:57"],"user":["default_user"],"umph":[1584400497.617],"ok":[true]}
+,

@@ -18,6 +18,7 @@ library(ggalt)
 library(splines)
 library(kableExtra)
 library(scatterplot3d)
+library(RColorBrewer)
 library(RTutor)
 
 
@@ -525,8 +526,8 @@ You can find more information on the `lm()` function [here](https://www.rdocumen
 
 **Task:** Run a regression with `co2mass` as the dependent variable and `costratio` as independent variable. Store it in the variable `fit1`. 
 ```{r "3_1__15"}
-# ... <- lm(...~... , data=east)
-fit1 <- lm(co2mass ~ costratio, data=dat_east)
+# ... <- lm(...~... , data=dat_east)
+fit <- lm(co2mass ~ costratio, data=dat_east)
 ```
 
 **Task:** To show the statistics of our regression we will use stargazer(). Since we won't need every information that is shown by the default function. We will define our own and at the same time introduce custom functions which will be useful later on. Read the `Info Boxes` to find out more about `stargazer` and `custom functions` and continue with the next `task`. Press **check** to define the functiom.
@@ -593,8 +594,7 @@ Quiz: Before looking at the summary, what impact do changing cost ratios have on
   
 **Task:** Use the function we just defined to show the summary of `fit1`.
 ```{r "3_1__19"}
-#
-show.regression(fit1)
+show.regression(fit)
 ```
 
 
@@ -605,11 +605,9 @@ Our eventual goal is to plot the rensponse curves of changing ??AWD prices
 
 **Task:** To
 ```{r "3_1__20"}
-plot(fit1, 1)
-plot(fit1, 2)
+plot(fit, 1)
+plot(fit, 2)
 
-plot(fit2, 1)
-plot(fit2, 2)
 ```
 
 QQ PLOT RESIDUALS?
@@ -636,9 +634,9 @@ $$CO_{2t}=\beta_0+\beta_1\cdot costratio_t+\beta_2\cdot load_t+\epsilon_t$$
 **Task:** Just press **check**
 
 ```{r "3_1__21"}
-fit2 = lm(co2mass ~ costratio + load, data=dat_east)
+fit1 = lm(co2mass ~ costratio + load, data=dat_east)
 
-show.regression(fit1,fit2)
+show.regression(fit,fit1)
 ```
 
 TEXT
@@ -664,9 +662,8 @@ Our goal is to find the response curves of emissions to changing fuel price. The
 
 
 
-Simply evaluating the fitted values on our intitial data frame won't give us an interpretable curve though. To illustrate this problem run the code below.
 
-**Task:** Predict the fitted values of `fit2` on `dat_east` and plot the result. Just click **check**.
+**Task:** Predict the fitted values of `fit2` on `dat_east` with help of the `predict()` function.
 
 
 ***
@@ -679,199 +676,99 @@ Simply evaluating the fitted values on our intitial data frame won't give us an 
 
 ```{r "3_1__22"}
 co2.hat1 = predict(fit1, dat_east)
-co2.hat2 = predict(fit2, dat_east)
 ```
 
 
-A multivariate regression with two dependent variables spans three dimensions.
+As explained before our eventual goal is to plot the response curves of emissions to changing fuel prices (or cost ratios). Simply evaluating the fitted values on our intitial data frame as we have done in the last task won't give us an interpretable curve though. A multivariate regression with two dependent variables spans three dimensions. To illustrate this problem run the code below.
 
 
-
-```{r "3_1__23"}
-x <- dat_east$costratio
-y <- co2.hat2
-z <- dat_east$load
-
-s3d <- scatterplot3d(x,z,y, col.axis = "blue",
-angle = 55, scale.y = 0.7, pch = 16, main = "3D Regression Plane", xlab="costratio", ylab = "load", zlab = "emissions")
-s3d$plane3d(fit2, lty = "dotted")
+**Task:** Just press **check**
+```{r "3_1__23",fig.width=9, fig.height=6, dev='svg'}
+#take sample from data to limit points shown in plot
+temp<- dat_east %>% cbind(co2.hat1)
+temp1<- temp[sample(nrow(temp), 150), ]
+#assign vairables to axises
+x <- temp1$costratio
+z <- temp1$co2.hat1
+y <- temp1$load
+#set a nice color scheme
+numbercol <- 8 # number of colors
+plotcolor <- brewer.pal(numbercol,"Greys") # use Brewer to get color scheme 
+colornum <- cut(rank(z), numbercol, labels=FALSE)
+colorcode <- plotcolor[colornum] # assign color
+#plot
+s3d <- scatterplot3d(x,y,z, col.axis="gray", col.grid="gray", type="h",color=colorcode, 
+angle = 35, scale.y = 1, pch = 19, xlab="Cost Ratio", ylab = "Load", zlab = "Emissions")
+s3d$plane3d(fit1, lty = "dotted")
 ```
 
+As you can see we can a regression plane that spans over three dimensions and there no exact "line" to be drawn here. For purpose of illustration, run the code below to see what would happen if we simply plot emissions against cost ratios.
 
+**Task:** Just press **check**
 ```{r "3_1__24"}
-ggplot(dat_east,aes(x=costratio,y=co2.hat2))+
-        geom_line(aes(x=dat_east$costratio, y=co2.hat2))
+ggplot(dat_east,aes(x=costratio,y=co2.hat1))+
+        geom_line(aes(x=dat_east$costratio, y=co2.hat1))+
+        labs(y="Emissions", x="Cost Ratio")
 ```
 
 
 
-The problem hereby lies in 
+`R` hereby follows it's intential function and connects all points, which is not the desired output we want to see. We could follow the interpretation of falling emission for higher cost ratios but a more detailed analysis isn't possible. To solve this issue we will use a work around in the way that we won't predict our values on the original data we build our model on. Instead we will evaluate all independent variables but cost ratios at their respective mean.  
+We are able to do so, because the average of the fitted values $\hat{y_i}$ is equal to the average of the actual values $y_i$:  
 
+$$\frac{1}{n}\sum_{i=1}^n \hat{y_i}=\frac{1}{n}\sum_{i=1}^n y_i$$
 
-We intend to plot our results in terms of reponse curves. To be able to do so we won't predict our values on the original data frame we build our model on. Instead we will use the implication that the average predicted values from a regression model will equal the average of the dependet variables. In mathematical terms we can explain this as followed:
-A linear regression model with intercept term satifies following solution $X^tX\beta=X^ty$
-$$\sum_i\sum_jx_{ij}\beta_j=\sum_iy_i$$
+This is true for linear regressions with intercept term. The sum of the residuals are in this case zero.
 
+To implement what we have just adopted we create a new data frame. Since we just added `load` to our model for now, let's create a new dataframe with `costratio` and the mean value of `load`. This will serve as our data frame we use to run predict() on.
 
-**Task:**
+**Task:** Just press **check**.
 ```{r "3_1__25"}
-mean_dat = dat_east %>%
-  select(load ) %>%
-  summarize_all(mean)
-
-
-pred_dat = tibble(co2mass=dat_east$co2mass, costratio = dat_east$costratio) %>%
-  cbind(mean_dat)
-
-fit2 = lm(co2mass ~ costratio + load, data=dat_east)
-fit3 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)
+pred_dat = tibble(costratio = dat_east$costratio) %>%
+  cbind(load=mean(dat_east$load))
 ```
 
+Until now we have assumed that we are dealing with a simple linear relationship. This is highly unlikely in a real-world scenario. 
+
+
+**Task:** Just press **check**.
 ```{r "3_1__26"}
-show.regression(fit1, fit2, fit3)
-
-
+fit2 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)
+show.regression(fit, fit1, fit2)
 ```
 
 
 
-***
 
-### Info: Predict
-`predict()`
-
-***
-
-
+**Task:** Run `predict()` on `fit1` and `fit2`. Use the data frame `pred_dat` to calculate the fitted values.
 ```{r "3_1__27"}
-CO2.hat1 = predict(fit1, pred_dat)
-CO2.hat2 = predict(fit2, pred_dat)
-co2.hat3 = predict(fit3, pred_dat)
+#co2.hat1 = ___
+#co2.hat2 = ___
+co2.hat1 = predict(fit1, pred_dat)
+co2.hat2 = predict(fit2, pred_dat)
 ```
 
-
+**Task:** Create a new ggplot. Use `geom_line()` to plot one line each for `co2.hat1` and `co2.hat2`, with `cost ratios` on the x-axis and `emissions` on the y-axis.
 ```{r "3_1__28"}
-plot(pred_dat$costratio, dat_east$co2mass, ylim=range(CO2.hat1, CO2.hat2))
-lines(pred_dat$costratio, CO2.hat1, col="black")
-lines(pred_dat$costratio, CO2.hat2, col="green")
-lines(pred_dat$costratio, co2.hat3, col="red")
-
-
-ggplot(pred_dat,aes(x=costratio,y=co2mass))+
-        geom_point(alpha=0.2) +
-        geom_line(aes(x=pred_dat$costratio, y=CO2.hat1)) +
-  geom_line(aes(x=pred_dat$costratio, y=CO2.hat2)) +
-  geom_line(aes(x=pred_dat$costratio, y=co2.hat3))
-  
-
+#ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
+#   geom_line(aes(___), color="red") +
+#   geom_line(aes(___), color="green") +
+ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
+    geom_line(aes(x=costratio, y=co2.hat1), color="red") +
+    geom_line(aes(x=costratio, y=co2.hat2), color="green") +
+    labs(x="Cost Ratio", y="Emissions")
 ```
 
+As we can see in the graph above our output shows us nice lines for every fit that we could interpret. 
 
 
 
+***
 
+### Award: Linear Regression Expert2
+TEXT
 
-
-
-
-
-
-
-
-
-
-
-
-### Stage 2: Polynomial Regression
-
-**Task:** Just press *check*.
-```{r "3_1__29"}
-reg.cubed <- east$CR^3
-fit3 <- lm(CO2MASS ~ CR + CR.squared + CR.cubed, east)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__30"}
-p3 <- predict(fit3, east)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__31"}
-plot(CO2MASS~CR, east)
-lines(east$CR, p1, col="red")
-lines(east$CR, p2, col="blue")
-lines(east$CR, p3, col="green")
-```
-
-**Task:** Just press *check*.
-```{r "3_1__32"}
-show.regression(fit1, fit2, fit3)
-```
-
-**Task:** Just press *check*.
-```{r "3_1__33"}
-anova(fit, fit2, fit3)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+***
 
 
 
@@ -880,14 +777,16 @@ anova(fit, fit2, fit3)
 
 ### Stage 3: Cubic Spline
 
+In this exercise we will introduce the concept of spline regression. We 
 
 
 
 
-
-simple cubic splines
+In mathematical terms a spline regression can be noted the following way:  
 
 $$\tag{4}CO_{2t}=s(CR_{t}|\beta)$$
+
+Methodically there doesn't change much to normal polynomial regressions
 
 
 ***
@@ -916,42 +815,6 @@ TEXT
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Exercise 4 -- Examining Carbon Abatement
 
 
@@ -965,7 +828,7 @@ To this point we limited our data to fuel prices and generated electricity (`loa
 
 **Task:** Load the data set `main_data.csv` into a variable `dat` and show the first 3 rows.
 
-```{r "4__34",message=FALSE}
+```{r "4__29",message=FALSE}
 #... <- read_csv("./Data/...")
 #...
 dat <- read_csv("./Data/main_data.csv")
@@ -986,7 +849,7 @@ The data are gathered from several official U.S. agencies and continue to be agg
 In `Exercise 1`, we saw heavy seasonal influences for generated power, especially we observed peaks in summer and winter. To adjust for this effect we create a seasonal dummy variable that has three states for seasons (off-season/summer/winter) and takes the year in consideration. 
 
 **Task:** Calculate the seaonal variable and show the first few rows. Just press *check*.
-```{r "4__35"}
+```{r "4__30"}
 dat_final <- dat %>% 
         mutate(season=(month>3) + (month>6) + (month>9),
                        yearseason=year*10+season)
@@ -1007,7 +870,7 @@ pre-implemented version of `summarise` functions in `R`. The one we use here is 
 
 To give you an example in code form, lets pretend we have a dataframe `data` with several `car manufacturer` and their respective car models with `prices` and we want to calculate the average car price per manufacturer.
 
-```{r "4__36",eval=FALSE}
+```{r "4__31",eval=FALSE}
 example <- data %>% 
   group_by(manufacturer) %>%
   summarise(mean_price = mean(price))
@@ -1029,7 +892,7 @@ hallo hier entsteht eine info box
 
 
 **Task:** Just press **check**.
-```{r "4__37"}
+```{r "4__32"}
 dat_final %>% 
   select(intercn, co2mass, load, coalprice, gasprice, costratio, nonfossil) %>% 
   group_by(intercn) %>% 
@@ -1063,7 +926,7 @@ Building upon the model we defined in the last chapter, we will expand our regre
 First, we load and prepare the data to run the ///////// SEASONAL VARIABLE
 
 **Task:** Load the dataframe and store it in `dat`. create the seasonable dummy variable. 
-```{r "4_1__38",message=FALSE}
+```{r "4_1__33",message=FALSE}
 dat <- read_csv("Data/main_data.csv") %>% 
         mutate(season=(month>3) + (month>6) + (month>9),
                        yearseason=year*10+season)
@@ -1071,13 +934,13 @@ head(dat,3)
 ```
 
 **Task:** Filter the data set for intercn `EAST`.
-```{r "4_1__39"}
+```{r "4_1__34"}
 #east <- filter(...,...)
 east <- filter(dat, intercn=="EAST")
 ```
 
 **Task:** Calculate the `mean` of every variable we use in our regression. First, select the necessary columns and then use `summarise_all` to get the `mean`. Store the result in `mean_east`.
-```{r "4_1__40"}
+```{r "4_1__35"}
 # ... <- east %>% 
 #  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
 #  summarise_all(...)
@@ -1088,7 +951,7 @@ mean_east <- east %>%
 
 **Task:** To make our life a bit easier we will create a new data set with `gasprice`, `priceratio` and the results of the `last` task. Use `tibble()`, which creates a new data frame and `cbind()`, which takes a sequence of columns and combines them with another data frame.
 
-```{r "4_1__41"}
+```{r "4_1__36"}
 #temp_east <- ...(gasprice = east$gasprice, priceratio = east$priceratio) %>% 
 #  ...(mean_east)
 predict_east <- tibble(date=east$date, intercn=east$intercn, co2mass=east$co2mass, gasprice = east$gasprice, coalprice=east$coalprice, costratio = east$costratio) %>% 
@@ -1118,7 +981,7 @@ $D_\gamma$: Dummy variable for seasonal variation to absorb fluctuations, e.g. b
 
 
 **Task:** Perform the regression model we described in the beginning of this exercise for interconnection `EAST`. Use `ns()` for variables with spline regression (as explained in `3.3`). We want to use `5` degrees of freedom. Store the resulting model in `reg_east`.
-```{r "4_1__42"}
+```{r "4_1__37"}
 #... <- lm(co2mass ~ ...(priceratio, df=...) + ...(load, df=...) + tlsd + tlmin + tlmax + ...(meant, df=...) + nonfossil + so2price + netNSflow + yearseason, data=east)
 reg_east <- lm(co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=east)
 ```
@@ -1149,13 +1012,13 @@ where $\hat{\gamma}$ is the fitted response, $t_{\alpha/2,n-2}$ the t-value with
 
 
 
-```{r "4_1__43"}
+```{r "4_1__38"}
 fit_east <- predict_east %>% 
   cbind(as.data.frame(predict(reg_east, newdata = predict_east, interval = 'confidence')))
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__44"}
+```{r "4_1__39"}
 basecoal=2.25
 basegas=5.75
 
@@ -1171,7 +1034,7 @@ final_east <- fit_east %>%
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__45",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__40",warning=FALSE, fig.width=7, fig.height=7}
 plot_east <- ggplot(final_east, aes(x=basecoal/costratio, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = final_east$lwr.transformed, ymax = final_east$upr.transformed),
                    colour="lightgrey", fill="lightgrey", alpha=0.5,) +
@@ -1191,7 +1054,7 @@ TEXT////
 
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r "4_1__46",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__41",warning=FALSE, fig.width=7, fig.height=7}
 
 #filter for interconnection ERCOT
 ercot <- filter(dat, intercn=="ERCOT")
@@ -1237,7 +1100,7 @@ plot_ercot <- ggplot(final_ercot, aes(x=basecoal/priceratio, y=fit.transformed))
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r "4_1__47",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__42",warning=FALSE, fig.width=7, fig.height=7}
 wecc <- filter(dat, intercn=="WECC")
 
 mean_wecc <- wecc %>% 
@@ -1272,7 +1135,7 @@ plot_wecc <- ggplot(final_wecc, aes(x=basecoal/priceratio, y=fit.transformed)) +
 
 **Task:** Use grid.arrange() to display the plots next to each other. Just press *check*.
 
-```{r "4_1__48",warning=FALSE, fig.width=14, fig.height=7}
+```{r "4_1__43",warning=FALSE, fig.width=14, fig.height=7}
 grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 ```
 
@@ -1285,7 +1148,7 @@ grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 
 
 ///////// test
-```{r "4_1__49"}
+```{r "4_1__44"}
 
 main_data2 <- rbind(final_east, final_ercot, final_wecc)
 main_data2 <- main_data2[order(as.Date(main_data2$date, format="%d/%m/%Y")),]
@@ -1322,7 +1185,7 @@ To get the same percentage change as in `4.1` we assume the same base line price
 To transform the response curves we will use the same fitted model as in of `Exercise 4.1`.  To avoid repeating the same steps as before, I prepared a data set that includes the predicted `emissions` as well as the `tranformed emissions` with confidence intervals. Load the data set `main_data2.csv` and store it in `dat`. Use the `head()` command to show the first rows. To save us some time, we also declare the variables for `base prices` and `carbon content`.
 
 **Task:** Just press *check*.
-```{r "4_2__50",message=FALSE}
+```{r "4_2__45",message=FALSE}
 dat <- read_csv("Data/main_data2.csv")
 head(dat,3)
 
@@ -1341,7 +1204,7 @@ $$\tag{3}{P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,
 
 
 **Task:** Create a column `carbontax` using `Equation 3` and filter the just calculated taxes for the interval [0,80]. Save the result into data frame `tax` and display the first rows.
-```{r "4_2__51",message=FALSE}
+```{r "4_2__46",message=FALSE}
 #... <- dat %>% 
 #  mutate(carbontax = (priceratio*...-...)/(coal_cc-priceratio*gas_cc)) %>% 
 #  filter(carbontax >= ... & carbontax <= ...)
@@ -1359,13 +1222,13 @@ The overall approach is similar to the one in exercise `4.1`. We will filter for
 but the abated $CO_2$ emissions.
 
 **Task:** Filter the data frame `tax` for interconnection `EAST` and save it to `tax_east`. Since we filter for a string, don't forget to put quotes around the argument.
-```{r "4_2__52"}
+```{r "4_2__47"}
 #
 tax_east <- filter(tax, intercn=="EAST")
 ```
 
 **Task:** Just press *check*.
-```{r "4_2__53",fig.width=7, fig.height=7}
+```{r "4_2__48",fig.width=7, fig.height=7}
 plot_east <- ggplot(tax_east, aes(x=carbontax, y=-fit.transformed)) +
   geom_ribbon(aes_string(ymin = -tax_east$lwr.transformed, ymax = -tax_east$upr.transformed),
                    colour="lightgrey", fill="lightgrey", alpha=0.5) +
@@ -1382,7 +1245,7 @@ plot_east
 ///////TEXT
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r "4_2__54",fig.width=7, fig.height=7}
+```{r "4_2__49",fig.width=7, fig.height=7}
 tax_ercot <- filter(tax, intercn=="ERCOT")
 
 plot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=-fit.transformed)) +
@@ -1397,7 +1260,7 @@ plot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=-fit.transformed)) +
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r "4_2__55",fig.width=7, fig.height=7}
+```{r "4_2__50",fig.width=7, fig.height=7}
 tax_wecc <- filter(tax, intercn=="WECC")
 
 plot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=-fit.transformed)) +
@@ -1422,7 +1285,7 @@ Quiz: We have seen in an earlier exercise, that interconnection `ERCOT` has high
 &nbsp;  
   
 **Task:** Just press *check*.
-```{r "4_2__56",fig.width=21, fig.height=7}
+```{r "4_2__51",fig.width=21, fig.height=7}
 grid.arrange(plot_east, plot_ercot, plot_wecc, nrow=1)
 ```
 
@@ -1439,7 +1302,7 @@ TEXT
 
 
 **Task:** Just press *check*.
-```{r "4_2__57"}
+```{r "4_2__52"}
 find_closest_value <- function(a) {
   vector <- 1:9
   for(i in 0:8){
@@ -1478,7 +1341,7 @@ TEXT
 
 
 
-```{r "4_2__58"}
+```{r "4_2__53"}
 testvector <- tax_east$carbontax
 
 test <- tax_east %>% 
@@ -1524,7 +1387,7 @@ Concluding, our results seem to be robust  to parameter changes.
 ## Exercise 5 -- Conclusion
 
 
-```{r "5__59"}
+```{r "5__54"}
 awards()
 ```
 
@@ -1539,14 +1402,14 @@ The methods used here can be further used to generate additoinal results. This c
 //// einschub robustness test mit anderen definition von priceratios , appendix a2< number of knots NUR FUER EAST, danach kurz interpretieren
 
 
-```{r "6__60",optional=TRUE}
+```{r "6__55",optional=TRUE}
 # show that all integers between 0 and 10
 1:10
 ```
 
 
 
-```{r "6__61",optional=TRUE}
+```{r "6__56",optional=TRUE}
 # show that all integers between 0 and 10
 1:10
 ```
@@ -1559,12 +1422,17 @@ The methods used here can be further used to generate additoinal results. This c
 
 ### Bibliography
 
+- Bushnell, J. B., Mansur, E. T. & Saravia, C. (2008), ‘Vertical arrangements, market structure, and competition: An analysis of restructured US electricity markets’, American Economic Review 98(1), 237–66.
+
 - Cullen, Joseph A., and Erin T. Mansur. 2017. "Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach Using the Shale Revolution." American Economic Journal: Economic Policy, 9 (3): 106-33.
+
+- Davis, L. & Hausman, C. (2015), Market impacts of a nuclear power plant closure, Ei @ haas working paper wp-248.
 
 - Lafrancois, B. A. (2012), ‘A lot left over: Reducing CO2 emissions in the United States’ electric power sector through the use of natural gas’, Energy Policy 50, 428–435.
 
+- Mansur, E. T. & White, M. (2012), ‘Market organization and efficiency in electricity markets’, (Working Paper).
 
-/add literature, exercise 2
+- Swensson, Wretman (1992), "Model Assisted Survey Sampling", Springer-Verlag.
 
 ### R Packages
 
