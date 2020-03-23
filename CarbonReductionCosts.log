@@ -1536,3 +1536,103 @@
 ,
 {"type":["init_ps"],"time":["2020-03-17 00:14:57"],"user":["default_user"],"umph":[1584400497.617],"ok":[true]}
 ,
+{"type":["init_ps"],"time":["2020-03-17 00:28:46"],"user":["default_user"],"umph":[1584401326.9576],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-17 00:32:44"],"user":["default_user"],"umph":[1584401564.2074],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-17 22:19:49"],"user":["default_user"],"umph":[1584479989.4759],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-19 22:57:24"],"user":["default_user"],"umph":[1584655044.3904],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:25"],"user":["default_user"],"umph":[1584658465.438],"ok":[true],"chunk":[7],"ex":[4],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise3.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:27"],"user":["default_user"],"umph":[1584658467.1598],"ok":[true],"chunk":[8],"ex":[4],"e.ind":[0],"code":["# ___ <- data ___ \n#  mutate(costratio = ___/___,\n#         co2mass = co2mass/1000000),\n#         load = load/1000000) %>%\n#  filter(intercn==\"___\")\ndat_east <- dat %>% \n  mutate(costratio = coalprice/gasprice,\n         co2mass = co2mass/1000000,\n         load = load/1000000) %>%\n  filter(intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:28"],"user":["default_user"],"umph":[1584658468.8651],"ok":[true],"chunk":[9],"ex":[4],"e.ind":[0],"code":["# ... <- lm(...~... , data=dat_east)\nfit <- lm(co2mass ~ costratio, data=dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:30"],"user":["default_user"],"umph":[1584658470.2262],"ok":[true],"chunk":[10],"ex":[4],"e.ind":[0],"code":["show.regression= function(...){\n  library(stargazer)\n    stargazer(..., \n            type = \"text\", \n            style = \"aer\",  \n            digits = 3,\n            df = FALSE,\n            report = \"vct*\",\n            star.cutoffs = c(0.05, 0.01, 0.001),\n            model.names = FALSE,\n            object.names = TRUE,\n            model.numbers = FALSE, \n            omit.stat=c(\"f\", \"ser\")\n    )\n}"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:36"],"user":["default_user"],"umph":[1584658476.2097],"ok":[true],"chunk":[11],"ex":[4],"e.ind":[0],"code":["show.regression(fit)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:42"],"user":["default_user"],"umph":[1584658482.466],"ok":[true],"chunk":[12],"ex":[4],"e.ind":[0],"code":["plot(fit, 1)\nplot(fit, 2)\n"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:54:49"],"user":["default_user"],"umph":[1584658489.8421],"ok":[true],"chunk":[13],"ex":[4],"e.ind":[0],"code":["fit1 = lm(co2mass ~ costratio + load, data=dat_east)\n\nshow.regression(fit,fit1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:55:01"],"user":["default_user"],"umph":[1584658501.9679],"ok":[true],"chunk":[14],"ex":[4],"e.ind":[0],"code":["co2.hat1 = predict(fit1, dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:55:11"],"user":["default_user"],"umph":[1584658511.5288],"ok":[true],"chunk":[14],"ex":[4],"e.ind":[0],"code":["co2.hat1 = predict(fit1, dat_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:55:19"],"user":["default_user"],"umph":[1584658519.0068],"ok":[true],"chunk":[15],"ex":[4],"e.ind":[0],"code":["#take sample from data to limit points shown in plot\ntemp<- dat_east %>% cbind(co2.hat1)\ntemp1<- temp[sample(nrow(temp), 150), ]\n#assign vairables to axises\nx <- temp1$costratio\nz <- temp1$co2.hat1\ny <- temp1$load\n#set a nice color scheme\nnumbercol <- 8 # number of colors\nplotcolor <- brewer.pal(numbercol,\"Greys\") # use Brewer to get color scheme \ncolornum <- cut(rank(z), numbercol, labels=FALSE)\ncolorcode <- plotcolor[colornum] # assign color\n#plot\ns3d <- scatterplot3d(x,y,z, col.axis=\"gray\", col.grid=\"gray\", type=\"h\",color=colorcode, \nangle = 35, scale.y = 1, pch = 19, xlab=\"Cost Ratio\", ylab = \"Load\", zlab = \"Emissions\")\ns3d$plane3d(fit1, lty = \"dotted\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:55:51"],"user":["default_user"],"umph":[1584658551.436],"ok":[true],"chunk":[16],"ex":[4],"e.ind":[0],"code":["ggplot(dat_east,aes(x=costratio,y=co2.hat1))+\n        geom_line(aes(x=dat_east$costratio, y=co2.hat1))+\n        labs(y=\"Emissions\", x=\"Cost Ratio\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:55:55"],"user":["default_user"],"umph":[1584658555.871],"ok":[true],"chunk":[17],"ex":[4],"e.ind":[0],"code":["pred_dat = tibble(costratio = dat_east$costratio) %>%\n  cbind(load=mean(dat_east$load))"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:55:59"],"user":["default_user"],"umph":[1584658559.8585],"ok":[true],"chunk":[18],"ex":[4],"e.ind":[0],"code":["fit2 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)\nshow.regression(fit, fit1, fit2)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:56:06"],"user":["default_user"],"umph":[1584658566.7406],"ok":[true],"chunk":[19],"ex":[4],"e.ind":[0],"code":["#co2.hat1 = ___\n#co2.hat2 = ___\nco2.hat1 = predict(fit1, pred_dat)\nco2.hat2 = predict(fit2, pred_dat)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-19 23:56:08"],"user":["default_user"],"umph":[1584658568.1037],"ok":[true],"chunk":[20],"ex":[4],"e.ind":[0],"code":["#ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+\n#   geom_line(aes(___), color=\"red\") +\n#   geom_line(aes(___), color=\"green\") +\nggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+\n    geom_line(aes(x=costratio, y=co2.hat1), color=\"red\") +\n    geom_line(aes(x=costratio, y=co2.hat2), color=\"green\") +\n    labs(x=\"Cost Ratio\", y=\"Emissions\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-21 17:48:52"],"user":["default_user"],"umph":[1584809332.1173],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-22 15:35:51"],"user":["default_user"],"umph":[1584887751.2883],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-22 21:25:18"],"user":["default_user"],"umph":[1584908718.9963],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:30"],"user":["default_user"],"umph":[1584908730.2906],"ok":[true],"chunk":[36],"ex":[8],"e.ind":[0],"code":["dat <- read_csv(\"Data/main_data2.csv\")\nhead(dat,3)\n\nbasegas <- 5.75\nbasecoal <- 2.25\ngas_cc <- 0.0585\ncoal_cc <- 0.1054"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:31"],"user":["default_user"],"umph":[1584908731.7141],"ok":[true],"chunk":[37],"ex":[8],"e.ind":[0],"code":["#... <- dat %>% \n#  mutate(carbontax = (priceratio*...-...)/(coal_cc-priceratio*gas_cc)) %>% \n#  filter(carbontax >= ... & carbontax <= ...)\n#\n#head(...,...)\ntax <- dat %>% \n  mutate(carbontax = (priceratio*basegas-basecoal)/(coal_cc-priceratio*gas_cc)) %>% \n  filter(carbontax >= 0 & carbontax <= 80)\n\nhead(tax,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:33"],"user":["default_user"],"umph":[1584908733.1792],"ok":[true],"chunk":[38],"ex":[8],"e.ind":[0],"code":["#\ntax_east <- filter(tax, intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:42"],"user":["default_user"],"umph":[1584908742.2701],"ok":[true],"chunk":[39],"ex":[8],"e.ind":[0],"code":["plot_east <- ggplot(tax_east, aes(x=carbontax, y=-fit.transformed)) +\n  geom_ribbon(aes_string(ymin = -tax_east$lwr.transformed, ymax = -tax_east$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=-fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.01,0.15)) +\n  scale_x_continuous(limits=c(0, 80)) +\n  labs(title=\"Eastern Interconnection\",\n       y=\"CO2 Emissions abated as a Percentage of Baseline Emissions\", x=\"\", subtitle=\"y=Carbon Price $/ton\")  +\n  coord_flip()\n\nplot_east"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:50"],"user":["default_user"],"umph":[1584908750.1782],"ok":[true],"chunk":[40],"ex":[8],"e.ind":[0],"code":["tax_ercot <- filter(tax, intercn==\"ERCOT\")\n\nplot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=-fit.transformed)) +\n  geom_ribbon(aes_string(ymin = -tax_ercot$lwr.transformed, ymax = -tax_ercot$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=-fit.transformed)) +  \n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.01,0.15)) +\n  scale_x_continuous(limits=c(0, 80)) +\n  labs(title=\"Ercot Interconnection\",\n       y=\"CO2 Emissions abated as a Percentage of Baseline Emissions\", x=\"\", subtitle=\"y=Carbon Price $/ton\") + \n  coord_flip()"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:51"],"user":["default_user"],"umph":[1584908751.7062],"ok":[true],"chunk":[41],"ex":[8],"e.ind":[0],"code":["tax_wecc <- filter(tax, intercn==\"WECC\")\n\nplot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=-fit.transformed)) +\n  geom_ribbon(aes_string(ymin = -tax_wecc$lwr.transformed, ymax = -tax_wecc$upr.transformed),\n                   colour=\"lightgrey\", fill=\"lightgrey\", alpha=0.5) +\n  geom_line(aes(y=-fit.transformed)) +\n  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-.01,0.15)) +\n  scale_x_continuous(limits=c(0, 80)) +\n  labs(title=\"Western Interconnection\",\n       y=\"\", x=\"y=Carbon Price $/ton\", subtitle=\"y=Abated CO2 emissions in Percentage\") #+ \n  #coord_flip()"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:25:55"],"user":["default_user"],"umph":[1584908755.1632],"ok":[true],"chunk":[42],"ex":[8],"e.ind":[0],"code":["grid.arrange(plot_east, plot_ercot, plot_wecc, nrow=1)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-22 21:26:22"],"user":["default_user"],"umph":[1584908782.9424],"ok":[true],"chunk":[43],"ex":[8],"e.ind":[0],"code":["find_closest_value <- function(a) {\n  vector <- 1:9\n  for(i in 0:8){\n   vector[i+1] = mean(a$fit[which.min(abs(a$carbontax - i*10))])\n  }\n  return(vector)\n}\ntemp1 = data.frame(tax=seq(0,80,10),east_emission=round(find_closest_value(tax_east)/100000,1), ercot_emission=round(find_closest_value(tax_ercot)/100000,1), wecc_emission=round(find_closest_value(tax_wecc)/100000,1))\n\ntemp2 <- temp1 %>% \n  mutate(perc_east=round((1-temp1$east_emission/temp1$east_emission[1])*100,1),\n         perc_ercot=round((1-temp1$ercot_emission/temp1$ercot_emission[1])*100,1),\n         perc_wecc=round((1-temp1$wecc_emission/temp1$wecc_emission[1])*100,1),\n         emission_all=east_emission+ercot_emission+wecc_emission)\n\ntemp3 <- temp2 %>% \n  mutate(perc_all=round((1-temp2$emission_all/temp2$emission[1])*100,1))\n  \ntable <- temp3 %>%\n  select(c(1,2,5,3,6,4,7,8,9)) %>%\n  kable(format=\"html\", col.names = c(\"Tax\",\"abs.\",\"%\",\"abs.\",\"%\",\"abs.\",\"%\",\"abs.\",\"%\"), align=\"c\", caption = \"Precited Emissions and Percentage Abatement\") %>%\n  add_header_above(c(\" \"=1, \"East\" = 2, \"ERCOT\" = 2, \"West\" = 2, \"Total\" = 2)) %>%\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"), position = \"center\", full_width = F)%>%\n  #column_spec(1:9, width = \"0.4\") %>%\n  footnote(general = \"Predicted emission are in 100.000 tons/day. Change to baseline (Tax=0).\")\n\ntable"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-23 14:32:28"],"user":["default_user"],"umph":[1584970348.7842],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-23 19:20:07"],"user":["default_user"],"umph":[1584987607.0246],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 19:21:19"],"user":["default_user"],"umph":[1584987679.6977],"ok":[true],"chunk":[21],"ex":[5],"e.ind":[0],"code":["dat_east <- read_csv(\"Data/exercise3_2.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 19:21:34"],"user":["default_user"],"umph":[1584987694.2166],"ok":[true],"chunk":[22],"ex":[5],"e.ind":[0],"code":["#fit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )\nfit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 19:21:35"],"user":["default_user"],"umph":[1584987695.4948],"ok":[false],"chunk":[23],"ex":[5],"e.ind":[0],"code":["#\nshow.regression(fit3)"],"message":["evaluation error in \n  show.regression(fit3)\n  Error in show.regression(fit3): could not find function \"show.regression\"\n"]}
+,
+{"type":["init_ps"],"time":["2020-03-23 19:22:14"],"user":["default_user"],"umph":[1584987734.2869],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 19:22:20"],"user":["default_user"],"umph":[1584987740.6287],"ok":[true],"chunk":[21],"ex":[5],"e.ind":[0],"code":["dat_east <- read_csv(\"Data/exercise3_2.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 19:22:21"],"user":["default_user"],"umph":[1584987741.9389],"ok":[true],"chunk":[22],"ex":[5],"e.ind":[0],"code":["#fit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )\nfit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 19:22:27"],"user":["default_user"],"umph":[1584987747.6066],"ok":[true],"chunk":[23],"ex":[5],"e.ind":[0],"code":["#\nshow.regression(fit3)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-23 21:54:54"],"user":["default_user"],"umph":[1584996894.0979],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-23 21:55:48"],"user":["default_user"],"umph":[1584996948.8038],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-23 22:27:16"],"user":["default_user"],"umph":[1584998836.3438],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 22:27:28"],"user":["default_user"],"umph":[1584998848.2497],"ok":[true],"chunk":[21],"ex":[5],"e.ind":[0],"code":["dat_east <- read_csv(\"Data/exercise3_2.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 22:27:29"],"user":["default_user"],"umph":[1584998849.4655],"ok":[true],"chunk":[22],"ex":[5],"e.ind":[0],"code":["#fit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )\nfit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 22:27:35"],"user":["default_user"],"umph":[1584998855.8046],"ok":[true],"chunk":[23],"ex":[5],"e.ind":[0],"code":["#\nshow.regression(fit3)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-23 23:00:43"],"user":["default_user"],"umph":[1585000843.9819],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 23:00:55"],"user":["default_user"],"umph":[1585000855.1956],"ok":[true],"chunk":[21],"ex":[5],"e.ind":[0],"code":["dat_east <- read_csv(\"Data/exercise3_2.csv\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 23:00:56"],"user":["default_user"],"umph":[1585000856.318],"ok":[true],"chunk":[22],"ex":[5],"e.ind":[0],"code":["#fit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )\nfit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 23:01:02"],"user":["default_user"],"umph":[1585000862.248],"ok":[true],"chunk":[23],"ex":[5],"e.ind":[0],"code":["#\nshow.regression(fit3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-23 23:01:04"],"user":["default_user"],"umph":[1585000864.7979],"ok":[true],"chunk":[24],"ex":[5],"e.ind":[0],"code":["pred_dat = tibble(costratio = dat_east$costratio) %>%\n  cbind(load=mean(dat_east$load))\nco2.hat3 = predict(fit3, pred_dat)\nggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+\n    geom_point(alpha=0.3) + \n    geom_line(aes(x=costratio, y=co2.hat3), color=\"red\") + \n    scale_y_continuous(limits=c(4,6))"],"message":[""]}
+,
