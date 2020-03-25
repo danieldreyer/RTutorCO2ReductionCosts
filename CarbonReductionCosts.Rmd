@@ -462,7 +462,7 @@ To implement this method we create a new data set. Since we only added `load` to
 
 **Task:** Just press **check**.
 ```{r "3_1__15"}
-pred_dat = tibble(costratio = dat_east$costratio) %>%
+pred_dat = tibble(co2mass = dat_east$co2mass, costratio = dat_east$costratio) %>%
   cbind(load=mean(dat_east$load))
 ```
 
@@ -507,8 +507,7 @@ Going forward we will improve the method of fitting a polynomial function to our
 
 ### Stage 3: Cubic Spline
 
-In this exercise we will introduce the conecpt of `restricted spline regressions` and it's use for our analysis. In the world of craftman's the term splines would refer to a strip of wood that is being shaped into a smooth curve. Hereby the strip would be forced around fixed points and form a natural spline. In the world of mathematics these splines are defined as a form of piece-wise polynomial functions, which usually consist of cubic polynomials. `Knots` refer to the fixed points in mathematical splines and are placed along the range of data. As we ajust the number of knots the spline becomes more or less flexible. Mind here that this can lead to over or underfitting of the fitted curve. To confirm the correctness of our results we will later on conduct a quick robustness check where we adjust the number of knots. Finally, our model will be `restricted` , meaning that the spline is constrained to be linear in front of the first knot and after the last one.  
-
+In this exercise we will introduce the conecpt of `restricted spline regressions` and it's use for our analysis. In the world of craftman's the term splines would refer to a strip of wood that is being shaped into a smoothed curve. Hereby the strip would be forced around fixed points and form a natural spline. In the world of mathematics these splines are defined as a form of piece-wise polynomial functions, which usually consist of cubic polynomials. `Knots` refer to the fixed points in mathematical splines and are placed along the range of data. As we ajust the number of knots the spline becomes more or less flexible. Mind here that this can lead to over or underfitting of the fitted curve. To confirm the correctness of our results we will later on conduct a quick robustness check where we adjust the number of knots. At last, our model will be `restricted` , meaning that the spline is constrained to be linear in front of the first knot and after the last one.  
 
 **Task:** To start with spline regression, load the required data. We use the same data and interconnection `EAST` as in the last exercise. Just press check.
 ```{r "3_2",message=FALSE}
@@ -529,16 +528,26 @@ info("ns()") # Run this line (Strg-Enter) to show info
 
 ```
 
-The output is comparable to one of simple polynomial regressions by getting a coefficient for every knot 
+The summary statistics of our spline model is comparable to the one of simple polynomial regressions, we get a coefficient for every knot. Since splines are transformations of explanatory variables it isn't really possible to interpret these coefficients straightforward. Because of that reason we went through the trouble of introducing the method of plotting regression models. 
+
+### Newey-West Standard Error
+
+We continue to see a negative relationship between cost ratios and $CO_2$ emissions, but additionally plotted the data points of emissions. As cost ratios increase, the difference between our regression line and the observations tend to become larger. This is a strong indicator that our model suffers from `heteroskedasticity`. Since standard error methods rely on the assumption that theres no correlation between the independent variables and the variance of the dependent variables, we calculate `heteroskedasticity robust standard errors`.  
+R packages normally provide a lot of handy functions to predict fitted values and calculate robust standard errorsat the same time. However, we don't predict our fitted values on the same data frame as we build our model on. Therefore this will be a bit tricky. We will use a custom function that is based on the Newey-West estimator `NeweyWest()`, which is part of the `sandwich` package. Therefore, we will be able to calculate the error of the upper and lower bounds and use these later on to add confidence intervals to our plot. 
+////////
+
+**Task:** Just press **check** to define the function.
+```{r "3_2__5"}
+# Enter your code here.
+```
 
 
 
-### Error Newey
+ 
+Before continuing with our main analysis we have to introduce the method of calculating the errors of our model. If you are already familiar with how standard error you should know that we wont just use the standard errors. We can easily show that by plotting `fit3` with the methods we used before: 
 
-To show that our data are an example of heteroskedasticity, we can simply create a plot that follows the same method as before:
-
-**Task:** Just press check.
-```{r "3_2__5",warning=FALSE}
+**Task:** Just press **check**.
+```{r "3_2__6",warning=FALSE}
 pred_dat = tibble(costratio = dat_east$costratio) %>%
   cbind(load=mean(dat_east$load))
 co2.hat3 = predict(fit3, pred_dat)
@@ -547,15 +556,6 @@ ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
     geom_line(aes(x=costratio, y=co2.hat3), color="red") + 
     scale_y_continuous(limits=c(4,6))
 ```
-
-
-As we should expect we continue to see a negative relationship between cost ratios and $CO_2$ emissions. However, as cost ratios increase, the difference between our regression line and the observation tend to become larger. This is a strong indicator that our model suffers from `heteroskedasticity`. Since standard models relies on the assumption that theres no correlation between the independent variables and the variance of the dependent variables, we shouldn't rely on standard errors, but calculate `heteroskedasticity robust standard errors`.  
-R packages normally provide a lot of handy functions to predict fitted values and at the same time calculate robust standard errors. Because of the fact that we are not predicting on the same data frame as we build our model on, this gets a bit tricky. Therefore I wrote a custom function which is uses the `NeweyWest()` function.
-
-
-//////////////////
-
-
 
 
 

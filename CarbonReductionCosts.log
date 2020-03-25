@@ -1636,3 +1636,9 @@
 ,
 {"type":["check_chunk"],"time":["2020-03-23 23:01:04"],"user":["default_user"],"umph":[1585000864.7979],"ok":[true],"chunk":[24],"ex":[5],"e.ind":[0],"code":["pred_dat = tibble(costratio = dat_east$costratio) %>%\n  cbind(load=mean(dat_east$load))\nco2.hat3 = predict(fit3, pred_dat)\nggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+\n    geom_point(alpha=0.3) + \n    geom_line(aes(x=costratio, y=co2.hat3), color=\"red\") + \n    scale_y_continuous(limits=c(4,6))"],"message":[""]}
 ,
+{"type":["init_ps"],"time":["2020-03-24 14:08:48"],"user":["default_user"],"umph":[1585055328.0399],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-24 20:13:16"],"user":["default_user"],"umph":[1585077196.0796],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-24 22:41:03"],"user":["default_user"],"umph":[1585086063.4103],"ok":[true]}
+,

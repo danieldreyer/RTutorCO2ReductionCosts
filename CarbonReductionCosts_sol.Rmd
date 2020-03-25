@@ -348,7 +348,7 @@ ggplot(dat,aes(x=coalprice/gasprice,y=co2mass/1000,color=intercn))+
 #>
 ```
 
-As you can the distribution of data point for the `Eastern` interconnection is way different than the other two interconnections. We could probably find a model that fits `ERCOT` and `WECC`, but its unlikely to fit well for `EAST`. Because of this we will perform our analysis on each `interconnection` seperately. 
+As you can the distribution of data point for the `Eastern` interconnection is way different than the other two interconnections. We could probably find a model that fits `ERCOT` and `WECC`, but its unlikely to fit `EAST` as well. Because of this we will perform our analysis on each `interconnection` seperately. 
 
 #< award "Theorist"
 You learned about the necessary theory. You are ready to start with the analysis!
@@ -389,9 +389,8 @@ In the next chapter we will begin constructing a model that will implement the t
 
 ## Exercise 3.1 -- Emission Response Curves - A simple Approach
 
-A short recapture: We got an idea about fuel shares in the U.S. energy market and introduced `interconnection`. Furthermore we introduced the concept of `fuel switching` and necessary theory behind mapping carbon pricing. In `Chapter 3` we will combine these findings and start developing a regression model. #########We will start by proposing a simple linear regression, analyze the statistics and work our way along to a fitting model.
-
-If you are purely interested in the final model and the economic impact, you can skip to `Exercise 4.1`. `Chapter 3` will focus on regression theory, which will guide you to the final model.
+A short recapture: Up to this point we some insights into the U.S. energy market and introduced the concept of `fuel switching` as well as `interconnection`. In this exercise we will start to combine these findings and develop a model which allows us to predict the impact of changing fuel prices on emissions. We start by proposing a simple linear approach and work our way to more complex but also more precise results.  
+If you are purely interested in the final model and the economic impact, you can skip to `Exercise 4.1`. This exercise and the following will focus on regression theory, which will lay a basis to understand the methods we use for our main analysis.
 
 **Task:** To get started, load the data set `exercise3.csv`, press `edit` and `check` afterwards.
 
@@ -402,23 +401,22 @@ head(dat,3)
 #>
 ```
 
-The data are gathered from several official U.S. agencies and aggregated to a daily level and seperated by interconnection. Along the way we will extend the data set with further variables. For now you can find the variables and it's associated units below:
+The data are gathered from several official U.S. agencies and aggregated to a daily level and seperated by interconnection. Along the way we will extend the data set with additional variables. For now you can find the variables and it's associated units below:
 
-`co2mass`: $CO_2$ emissions in tons  
-`gasprice`: Capacity weighted average daily gas price per interconnetion ($ per million BTU)  
+`co2mass`: $CO_2$ Emissions in tons  
+`gasprice`: Capacity weighted average daily gas price ($ per million BTU)  
 `coalprice`: Price of Coal ($ per million BTU)  
-`load`: Daily electricity consumption per interconnection in MWh  
+`load`: Daily electricity consumption in MWh  
 
-Because of the size of the original data sets we wont do the data preparation in this problem set but rather provide the data sources. `Emission` data are measured by the Continuous Emissions Monitoring System (CEMS) of the `Environmental Protection Agency (EPA)`. The U.S. Energy Information Administration (EIA) collects data of `coal prices` in Form 923. Spot prices for `gas` can be found at the `Intercontinental Exchange (ICE)` and data for `electricity consumption` or `load` are provided by the `Federal Energy Regulatory Commission (FERC)` in Form 714.
+Due to the size of the original data sets we wont do the data preparation in this problem set but rather provide the data sources and work with the final data set. `Emission` data are measured by the Continuous Emissions Monitoring System (CEMS) of the `Environmental Protection Agency (EPA)`. The U.S. Energy Information Administration (EIA) collects data of `coal prices` in Form 923. Spot prices for `gas` can be found at the `Intercontinental Exchange (ICE)` and data for `electricity consumption` or `load` are provided by the `Federal Energy Regulatory Commission (FERC)` in Form 714.  
+As mentioned in `Exercise 2` it makes sense for us to run our model on each `interconnection` seperatly. For this purpose we will filter our data set for interconnection `EAST` and develop the model based on these data. Once we find a fitting model we will run it on each interconnection. For ease of interpretation we convert emissions and load from tons to million tons.  
 
-In `Exercise 2` we saw that it makes sense for us to run our model on each `interconnection` seperatly. For this purpose we will filter our data set for interconnection `EAST` and develop the model based on these data. Once we found a fitting model we will run it on each interconnection. Before we start with modelling we alter our data set with the implications from above. For ease of interpretation we convert emissions and load from tons to million tons.  
-
-**Task:** Use the pipe operator `%>%` to combine following tasks: Filter the data set `dat` for interconnection `EAST` and store the new data frame in variable `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice` according to `Equation 2`.
+**Task:** Use the pipe operator `%>%` to combine following tasks: Filter the data set `dat` for interconnection `EAST` and store it in `dat_east`. Additionally, calculate the cost ratio between `coalprice` and `gasprice` according to `Equation 2`.
 
 #< info "Pipe, Select, Filter, Mutate"
-The pipe operator `%>%` is a feature provided by the `dplyr` Package. Essentially it allows to exectute multiple operation on a dataframe at once. Essentially, every pipe operator returns a dataframe and passes it to the next connected function.  
-`Select` allows you to filter for certain columns of data, whereas `filter` does the same for rows.  
-If you want to create new columns or alter existing, you can use `mutate`. There are several more functions to alter your data sets, below you find a handy cheat sheet.
+The pipe operator `%>%` is a feature provided by the `dplyr` Package. Essentially it allows you to exectute multiple operation on a dataframe at once. Hereby, every pipe operator returns a dataframe and passes it to the next connected function.  
+`Select()` filters for certain columns of data, whereas `filter()` does the same for rows.  
+If you want to create new columns or alter existing, you can use `mutate()`. There are several more functions to alter your data sets, below you find a handy cheat sheet.
   
 ```{r "3_1__2",eval=FALSE}
 example %>% 
@@ -450,16 +448,15 @@ display("Fill in the gaps with variable names given in the exercise description 
 
 
 
-### Stage 1: Linear Regression
+### Linear Regression
 
-We start by proposing a simple linear regression model. In a mathematical way we can express the relationship as followed:
+We start by proposing a simple linear regression model. In a mathematical term we can express the relationship as followed:
 
 $$CO_{2t}=\beta_{0}+\beta_{1}\cdot costratio_{t}+\epsilon_t$$
 
-
 #< info "Linear Regression with lm()"
 
-`lm()` is part of the `stats` package and is part of basic `R`. As shown in the syntax example below, it enables you to regress `y` on the indepedent variables `x1` and `x2`. The model itself can be handled just like every other variable. You can give it a name or use it in other functions. Another popular function to solve linear regressions in `R` is `felm()`, that provides further functionality to include `fixed effects`. In this problem set we will strictly use `lm()`.
+`Lm()` is part of the `stats` package, which is loaded on default. As shown in the syntax example below, it enables you to regress `y` on the indepedent variables `x1` and `x2`. The model itself can be handled just like every other variable, which can be either saved or used in other functions. Another popular function to solve linear regressions in `R` is `felm()`, that provides further functionality e.g. for including `fixed effects`. In this problem set we will strictly use `lm()`.
 
 ```{r "3_1__4",eval=FALSE}
 example <- lm(y~x1+x2, data=dat_east)
@@ -476,21 +473,21 @@ You can find more information on the `lm()` function [here](https://www.rdocumen
 fit <- lm(co2mass ~ costratio, data=dat_east)
 ```
 
-**Task:** To show the statistics of our regression we will use stargazer(). Since we won't need every information that is shown by the default function. We will define our own and at the same time introduce custom functions which will be useful later on. Read the `Info Boxes` to find out more about `stargazer` and `custom functions` and continue with the next `task`. Press **check** to define the functiom.
+**Task:** To show the statistics of our regression we will use stargazer(). We won't need every information that is displayed by the default function. Therefore, we will define our own funtion of stargazer and at the same time introduce custom functions which will be useful later on. Read the `Info Boxes` to find out more about `stargazer` and `custom functions`. Just press **check** to define the functiom.  
 
 #< info "Stargazer"
-`stargazer` provides specialised `HTML` formatting for regression tables and summary statistics tables. It is easy to use, supports a large number of model types and formats data in a more pleasing way. The basic function is called by `stargazer()` and but can be customized heavily. For more information run `help(stargazer)` or read on [here](https://cran.r-project.org/web/packages/stargazer/).
+`stargazer` provides specialised `HTML` formatting for regression tables and summary statistics. It is easy to use, supports a large number of model types and formats data in a more pleasing way. The basic function is called by `stargazer()` and but can be customized heavily. For further information: `help(stargazer)` or  [here](https://cran.r-project.org/web/packages/stargazer/).
 #>
 
 #< info "Custom functions"
-`R` provides an easy framework to add your own functions. The syntax is quite similar to other programming languages you could be familiar with. As long as you are in the same session you can then use this function. Below you find the basic structure and an example:
+`R` provides an easy framework to add your own functions. The syntax is quite similar to other programming languages you could be familiar with and you can use these functions as long as you are in the same session. Below you find the basic structure and an example:
 
 ```{r "3_1__6",eval=FALSE}
 `myfunction <- function(arg1, arg2, ... ){`  
 `statements`  
-`return(object)`  
+`return(object)}`
 ```  
-Here's an simple functions that adds `5` to the input and returns it.
+Here's an simple functions that adds `5` to the input:
 ```{r "3_1__7",eval=FALSE}
 `example <- function(x) {`  
   `x + 5`  
@@ -522,7 +519,7 @@ show.regression= function(...){
 ```
 
 #< quiz "Reg1"
-question: Before looking at the summary, what impact do changing cost ratios have on emissions?
+question: Before taking a look at the summary, how do changing cost ratios effect emissions?
 
 sc:
     - With increasing cost ratios emissions will increase.
@@ -531,8 +528,7 @@ success: Great, your answer is correct!
 failure: Try again.
 #>  
   
-  
-**Task:** Use the function we just defined to show the summary of `fit1`.
+**Task:** Use the function we defined above to display the summary statistics of `fit1`.
 ```{r "3_1__9"}
 #< task
 #>
@@ -540,35 +536,24 @@ show.regression(fit)
 ```
 
 
-We observe a positive intercept term $\beta_0$ with 5.87704 and a negative coefficient for $\beta_1$ of -1.30554, meaning that emissions fall with an increasing cost ratio. The three stars next to our coefficents imply, that the p-value is smaller than 0.1. That suggests that our data our inconsistent with the null hypothesis and that the null hyphithesis may be rejected. In other words the probabiliy of finding an estimator that is at least as high as the one we predicted is smaller than one percent. 
+We observe a positive intercept term $\beta_0$ with 5.87704 and a negative coefficient for $\beta_1$ of -1.30554, meaning that emissions fall with an increasing cost ratio. The three stars next to our coefficents imply, that the p-value is smaller than 0.1. Therefore, our data are inconsistent with the null hypothesis and that it may be rejected. In other words the probabiliy of finding an estimator that is at least as high as the one we predicted is smaller than one percent.  
 
-Our eventual goal is to plot the rensponse curves of changing ??AWD prices 
-
-
-**Task:** To
-```{r "3_1__10"}
-plot(fit, 1)
-plot(fit, 2)
-
-```
-
-QQ PLOT RESIDUALS?
-
-
-
-#< info "RMSE?"
-asd
+#< info "R-squared"
+`R-Squared` is a statistical measurement that represents the correlation between `fitted values` and `observed values`. `R-squared` is hereby always positive and ranges from 0 to 1. A value closer to 1 indicates that the suggested model explains a majority of the variance in the outcome variable.  Mathematically we can descibe this as followed: 
+$$R^{2}=1-\frac{Explained\ Variation}{Total\ Variation}$$
+A problem with `R-squared` is, that it increases with higher amounts of variables in the model, even if these variables are only barely responsible for the predicted values. `Adjusted R-Squared` takes the number of variables into account, which avoid an false impression and is also shown in the summary statistics.
 #>
 
+In the next step we should always determine if the model fits the data. One possibiliy is to use the $R^2$ indicator, which measures quite low with $19.7%$. The interpretation of this indicator however, should always be taken with caution. As mentioned before, `costratio` is statistically significance, therefore we still can draw conclusions from our results.  
 
 
-### Stage 2: Multivariate Regression Model
+### Multivariate Regression Models
 
-If we look back at the implications of the energy market from `Exercise 1`, we know that there are several other factors that should influence $CO_2$ emissions. To control for other effects we can use `multivariate regression models` and include additional factors. For now we add the effects of `generated electricity`. Our regression formula changes to following:  
+If we look back at the implications of the energy market from `Exercise 1`, we know that there are several other factors that should influence $CO_2$ emissions. To include additional effects in our model we can use `Multivariate Regression Models`. For now we add the effect of `electricity consumption` or `load`. Our regression formula changes to:  
 
 $$CO_{2t}=\beta_0+\beta_1\cdot costratio_t+\beta_2\cdot load_t+\epsilon_t$$
 
-**Task:** Just press **check**
+**Task:** Just press **check**.
 
 ```{r "3_1__11"}
 fit1 = lm(co2mass ~ costratio + load, data=dat_east)
@@ -576,38 +561,22 @@ fit1 = lm(co2mass ~ costratio + load, data=dat_east)
 show.regression(fit,fit1)
 ```
 
-TEXT
+The influence of `costratio` is around half as big as before. `Load` has a positive coefficient $\beta_2$ of 0.774, which is also logical since emissions increase with more generated electricity. We conclude that the costs of fuel and the generated electricity both have a equal influence in $CO_2$ emissions. According to the p-values, all coefficients are  siginificant. we observe a big difference in the `R-squared` measurement though. In contast to our first model, the second explains a vast majority of the obvserved values With $92.5\%$.  
+Since our model is still quite simple, let's pretend we want to use `fit1` further on. However, having a well fitted model is just the first step for us. In the end we want to plot the response curves of emissions against changing costs of fuel. To achieve this, we first have to calculate the fitted values of our model. R provides a function named `predict()`, that does this for us.  
 
-#< info "R-squared"
-`R-Squared` is a statistical measurement that represents the correlation between `fitted values` and `observed values`. `R-squared` is hereby always positive and ranges from 0 to 1. A value closer to 1 indicates that the suggested model explains a majority of the variance in the outcome variable.  Mathematically we can descibe this with the following: 
-$$R^{2}=1-\frac{Explained\ Variation}{Total\ Variation}$$
-A problem with the `R-squared` measurement is, that it always increases with higher numbers of variables in the model, even if these variables are only weakly responsible for the predicted values. An solution is to take the number of variables into account, this is called `Adjusted R-Squared` and also shown in the summary output.
-#>
-
-
-
-
-
-
-Our goal is to find the response curves of emissions to changing fuel price. Therefore, we want to plot our fitted values of emissions against costs. First off, we need to predict the emission value of our model. 
-
-
-
-
-
-**Task:** Predict the fitted values of `fit2` on `dat_east` with help of the `predict()` function.
+**Task:** Predict the fitted values of `fit1` on `dat_east`.
 
 #< info "Predict"
-`predict()`
+We can predict the corresponding fitted values of our model with the `predict()` function. At minimum it takes the fitted model and a data frame: predict(`model`, newdata=`data`).
 #>
 
 ```{r "3_1__12"}
+#< task
+#>
 co2.hat1 = predict(fit1, dat_east)
 ```
 
-
-As explained before our eventual goal is to plot the response curves of emissions to changing fuel prices (or cost ratios). Simply evaluating the fitted values on our intitial data frame as we have done in the last task won't give us an interpretable curve though. A multivariate regression with two dependent variables spans three dimensions. To illustrate this problem run the code below.
-
+Now, that we calculated the fitted values we could go on and create a plot. A problem we get in this case is, that a multivariate regression with two independent variables spans three dimensions, which isn't sufficient for us in terms of scientific results. To illustrate this problem let's create a three-dimensional graph. Run the code below.
 
 **Task:** Just press **check**
 ```{r "3_1__13",fig.width=9, fig.height=6, dev='svg'}
@@ -621,7 +590,7 @@ y <- temp1$load
 z <- temp1$co2.hat1
 #set a nice color scheme
 numbercol <- 8 # number of colors
-plotcolor <- brewer.pal(numbercol,"Blues") # use Brewer to get color scheme 
+plotcolor <- brewer.pal(numbercol,"Greys") # use Brewer to get color scheme 
 colornum <- cut(rank(z), numbercol, labels=FALSE)
 colorcode <- plotcolor[colornum] # assign color
 #plot
@@ -631,7 +600,7 @@ s3d$plane3d(fit1, lty = "dotted")
 #>
 ```
 
-Because of the amount of data points we gathered in our prediction we limit our plot to a sample size. The predicted emissions are plotted as a dot in the z-axis and the regression plane is placed along side. We see that the plane spans over three dimensions and there no exact "line" to be drawn here. We could pursue this type of visualization but because of clearness we want our results to be plotted on a plane. If we would continue and simply plot these predicted values we would get a weird out. For purpose of illustration, run the code below to see what would happen if we plot emissions against cost ratios.
+Because of the amount of data points we limit them in our plot to a sample size. The predicted emissions are plotted as dots in the z-axis and the regression plane is placed along side. We see that the plane spans over three dimensions and there no exact "line" to be drawn here. We could pursue this type of visualization but because of clearness we want our results to be plotted on a two-dimensional graph. Since it is not that common to plot regressions this complex, let's see what would happen if we continue and simply plot these predicted values. For purpose of illustration, run the code below.
 
 **Task:** Just press **check**
 ```{r "3_1__14"}
@@ -642,41 +611,41 @@ ggplot(dat_east,aes(x=costratio,y=co2.hat1))+
 #>
 ```
 
-`R` hereby follows it's intential function and connects all points, which is not the desired output we want to see. We could interpret falling emission for higher cost ratios but a more detailed analysis isn't possible. To solve this issue we will use a work around in the way that we won't predict our values on the original data we build our model on. Instead we will evaluate all independent variables with exception of cost ratios at their respective mean.  
+`R` hereby follows it's intential function and tries connects all points, which is not at all the desired output we want to achieve. We could interpret falling emissions for higher cost ratios but a more detailed analysis isn't possible. To solve this issue we will use a work around in the way that we won't predict our values on the original data frame we build our model on. Instead we will evaluate all independent variables with exception of cost ratios at their respective mean (we plot emissions against cost ratios, therefore we evaluate this variable at their true values).  
 We are able to do so, because the average of the fitted values $\hat{y_i}$ is equal to the average of the actual values $y_i$:  
 
 $$\frac{1}{n}\sum_{i=1}^n \hat{y_i}=\frac{1}{n}\sum_{i=1}^n y_i$$
 
-This is true for linear regressions with intercept term (Sarndal, Swensson and Wretman, 1992). As a side note, the sum of the residuals in this case are zero.
+This is true for linear regressions with an intercept term (Sarndal, Swensson and Wretman, 1992). As a side note, the sum of the residuals are zero in this case.
 
-To implement this method we create a new data set. Since we only added `load` to our model for now, we include `costratio` and the mean value of `load`. This will serve as our data frame to run `predict()` on. We will plot the response curves again at the end of this exercise.
+To implement this method we create a new data set. Since we only added `load` to our model for now, we include `costratio` and the mean value of `load`. This will serve as our data frame to run `predict()` on. We will once again see how this approach effects our response curves at the end of this exercise.
 
 **Task:** Just press **check**.
 ```{r "3_1__15"}
 #< task_notest
-pred_dat = tibble(costratio = dat_east$costratio) %>%
+pred_dat = tibble(co2mass = dat_east$co2mass, costratio = dat_east$costratio) %>%
   cbind(load=mean(dat_east$load))
 #>
 ```
 
-Not that we are able to plot multivariate regressions into a two-dimensional grid, we continue to further develop our model. Our previous model assumed a linear relationship between emissions and fuel prices. Given the complexity of electricity markets and the statistics we gathered up until now, we should assume a more complex relationship in form of a highly non-linear response of emissions.  The type of regression that fits a non-linear relationship between the dependent and independent variables is called `Polynomial Regression` and the easiest method that makes sense for us in this case is to replace the linear model with a cubic function:
+### Non-linear models
+
+Now, that we are able to plot multivariate regressions into a two-dimensional grid, we continue to further develop our model. Our previous models assumed a linear relationship between emissions, fuel prices and load. Given the complexity of electricity markets and the statistics we gathered up to this point, we should assume a more complex relationship in form of a highly non-linear response to emissions. The type of regression that fits a non-linear relationship between dependent and independent variables is called `Polynomial Regression`. The easiest way to transform our previous model is to replace the linear variable with a cubic function:
 
 $$CO_{2t}=\beta_0+\beta_1\cdot costratio_t+\beta_2\cdot costratio_t^2+\beta_3\cdot costratio_t^3+\beta_4\cdot load_t+\epsilon_t$$
 
-**Task:** To implement a cubic function we use the `poly()` function. We could include all grades of the polynomical function but since `R` includes them on it's own, it is enough to define it as followed. Just press **check**.
+**Task:** A cubic function is implemented by using `poly()`. We could include all grades of the polynomical function but since `R` does this on it's own, it is enough to define it as followed. Just press **check**.
 ```{r "3_1__16"}
 #< task_notest
 fit2 = lm(co2mass ~ poly(costratio,3) + load, data=dat_east)
-show.regression(fit, fit1, fit2)
+show.regression(fit1, fit2)
 #>
 ```
 
-You can see the summary for every regression we have run so far. As mentioned we get a coefficient for every grade of the polynomial function. 
+The summary shows the statistics for the previous and the polynomial model. The first thing we can observe, is that R provides a coefficient for every grade of the cubic function. Mathematically this function is noted as $-10.059x-0.287x^2+1.444x^3$ and we can calculate the positive turning point with: $\frac{∂(-10.059x-0.287x^2+1.444x^3)}{∂x} = 0 => 2.74058$. This means, that `costratio` has no futher positive effect on emissions when its' value is greater than this number. The value of `R-Squared` is comparable between both models, but as mentioned before we can't purely rely on this measurement. Since we stated that electricity markets should follow a highly non-linear reponse to emissions, we can assume that the non-linear model is a better fit, even though the statistics are comparable.  
+We finish this exercise by plotting the reponse curves once again with the methods we introduced before.
 
-
-
-To finally plot our models once again , we first use 
-**Task:** Run `predict()` on `fit1` and `fit2`. Use the data frame `pred_dat` to calculate the fitted values.
+**Task:** Run `predict()` on `fit1` and `fit2`. We already predicted values for `fit1`, but this time we use the data frame `pred_dat`.
 ```{r "3_1__17"}
 #< task
 #co2.hat1 = ___
@@ -686,7 +655,7 @@ co2.hat1 = predict(fit1, pred_dat)
 co2.hat2 = predict(fit2, pred_dat)
 ```
 
-**Task:** Create a new ggplot. Use `geom_line()` to plot one line each for `co2.hat1` and `co2.hat2`, with `cost ratios` on the x-axis and `emissions` on the y-axis.
+**Task:** Create a new ggplot. Use `geom_line()` to plot one line each for `co2.hat1` and `co2.hat2`. Assign `costratio` to the x-axis and the fitted emission values to the y-axis.
 ```{r "3_1__18"}
 #< task
 #ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
@@ -700,22 +669,17 @@ ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
     labs(x="Cost Ratio", y="Emissions")
 ```
 
-The plot shows us the two regression lines for the linear and non-linear regression model. With the method of predicting our fitted values to mean values we get a clear trend to interpret our results. Furthermore, the non-linear model seems to reflect the real-world a lot better. Because of technological and capacity restriction it is unlikely that emissions can increase in a linear fashion without restrictions. That effect also applies for higher cost ratios.  
-
-Going forward we will improve the method of fitting a polynomial function to our model 
+The plot shows us the two regression lines for the linear and non-linear regression approach. With the method of predicting our fitted values to mean values we get a clear trend to interpret our results. Furthermore, the non-linear model seems to reflect the real-world a lot better. Because of technological and capacity restriction it is unlikely that emissions can increase in a linear fashion without restrictions. That effect should also apply for higher cost ratios.  
+Looking closely we still see some flaws that don't seem to be accurate. For example it is unlikely that we observe increasing emissions with higher cost ratios. Going forward we will improve the method of fitting polynomial function to our model. Click `Go to next exercise`.
 
 #< award "Regression Expert 1"
 TEXT
 #>
 
 
-
 ## Exercise 3.2 -- Restricted Cubic Spline Regressions
 
-### Stage 3: Cubic Spline
-
-In this exercise we will introduce the conecpt of `restricted spline regressions` and it's use for our analysis. In the world of craftman's the term splines would refer to a strip of wood that is being shaped into a smooth curve. Hereby the strip would be forced around fixed points and form a natural spline. In the world of mathematics these splines are defined as a form of piece-wise polynomial functions, which usually consist of cubic polynomials. `Knots` refer to the fixed points in mathematical splines and are placed along the range of data. As we ajust the number of knots the spline becomes more or less flexible. Mind here that this can lead to over or underfitting of the fitted curve. To confirm the correctness of our results we will later on conduct a quick robustness check where we adjust the number of knots. Finally, our model will be `restricted` , meaning that the spline is constrained to be linear in front of the first knot and after the last one.  
-
+In this exercise we will introduce the conecpt of `restricted spline regressions`. In the world of craftman's the term splines would refer to a strip of wood that is being shaped into a smoothed curve. The strip is hereby forced around fixed points to form a natural spline. In the world of mathematics these splines are defined as a form of piece-wise polynomial functions, which usually consist of cubic polynomials. `Knots` refer to the fixed points in mathematical splines and are placed along the range of data. As we ajust the number of knots the spline becomes more or less flexible. Mind here that this can lead to over or underfitting of the fitted curve. A way to confirm the correctness of the fit is to conduct robustness tests where we adjust the number of knots. We will do this briefly at the end of this problem set. At last, our model will be `restricted` , meaning that the spline is constrained to be linear in front of the first knot and after the last one.  
 
 **Task:** To start with spline regression, load the required data. We use the same data and interconnection `EAST` as in the last exercise. Just press check.
 ```{r "3_2",message=FALSE}
@@ -753,11 +717,38 @@ fit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )
 show.regression(fit3)
 ```
 
-The summary statistics of our spline model is comparable to the one of simple polynomial regressions. We get a coefficient for every knot. Since splines are transformations of explanatory variables it isn't possible to interpret these coefficients straightforward. Because of that reason we went through the trouble of introducing the method of plotting regression models.  
+The summary statistics of our spline model is comparable to the one of simple polynomial regressions, we get a coefficient for every knot. Since splines are transformations of explanatory variables it isn't really possible to interpret these coefficients straightforward. Because of that reason we went through the trouble of introducing the method of plotting regression models. 
+
+### Newey-West Standard Error
+
+We continue to see a negative relationship between cost ratios and $CO_2$ emissions, but additionally plotted the data points of emissions. As cost ratios increase, the difference between our regression line and the observations tend to become larger. This is a strong indicator that our model suffers from `heteroskedasticity`. Since standard error methods rely on the assumption that theres no correlation between the independent variables and the variance of the dependent variables, we calculate `heteroskedasticity robust standard errors`.  
+R packages normally provide a lot of handy functions to predict fitted values and calculate robust standard errorsat the same time. However, we don't predict our fitted values on the same data frame as we build our model on. Therefore this will be a bit tricky. We will use a custom function that is based on the Newey-West estimator `NeweyWest()`, which is part of the `sandwich` package. Therefore, we will be able to calculate the error of the upper and lower bounds and use these later on to add confidence intervals to our plot. 
+////////
+
+**Task:** Just press **check** to define the function.
+```{r "3_2__5"}
+Newey <- function(model, predict) {
+  temp <- NeweyWest(model, newdata=predict)
+  X_mat <- model.matrix(model)
+  var_fit_hac <- rowSums((X_mat %*% temp) * X_mat)
+  se_fit_hac = sqrt(var_fit_hac)
+  
+  pred_df <- pred_df %>%
+  mutate(se_fit_hac = sqrt(var_fit_hac)) %>%
+  mutate(
+    lwr_hac = pred_df$fit - 1.96*var_fit_hac,
+    upr_hac = pred_df$fit + 1.96*var_fit_hac
+  )
+}
+```
+
+
+
+ 
 Before continuing with our main analysis we have to introduce the method of calculating the errors of our model. If you are already familiar with how standard error you should know that we wont just use the standard errors. We can easily show that by plotting `fit3` with the methods we used before: 
 
-**Task:** Just press check.
-```{r "3_2__5",warning=FALSE}
+**Task:** Just press **check**.
+```{r "3_2__6",warning=FALSE}
 #< task_notest
 pred_dat = tibble(costratio = dat_east$costratio) %>%
   cbind(load=mean(dat_east$load))
@@ -769,15 +760,6 @@ ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
 #>
 ```
 
-
-### Newey-West Standard Error
-
-We continue to see a negative relationship between cost ratios and $CO_2$ emissions, but additionally plotted the data points of emissions. As cost ratios increase, the difference between our regression line and the observations tend to become larger. This is a strong indicator that our model suffers from `heteroskedasticity`. Since standard error methods rely on the assumption that theres no correlation between the independent variables and the variance of the dependent variables, we calculate `heteroskedasticity robust standard errors`.  
-R packages normally provide a lot of handy functions to predict fitted values and calculate robust standard errorsat the same time. However, we don't predict our fitted values on the same data frame as we build our model on. Therefore this will be a bit tricky. We will use a custom function that is based on the Newey-West estimator `NeweyWest()` and part of the `sandwich` package. With the help of this function we will be able to calculate the error of the upper and lower bounds and use the later on to plot confidence intervals. 
-////////
-#< info "Newey-West"
-wip
-#>
 
 
 #< award "Sp(l)ine Surgeon"

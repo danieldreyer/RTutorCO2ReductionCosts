@@ -644,7 +644,7 @@ Our goal is to find the response curves of emissions to changing fuel price. The
 ***
 
 ### Info: Predict
-`predict()`
+We can predict the corresponding fitted values of our model with the `predict()` function. At minimum it takes the fitted model and a data frame: predict(`model`, newdata=`data`).
 
 ***
 
@@ -697,7 +697,7 @@ To implement this method we create a new data set. Since we only added `load` to
 
 **Task:** Just press **check**.
 ```{r "3_1__25"}
-pred_dat = tibble(costratio = dat_east$costratio) %>%
+pred_dat = tibble(co2mass = dat_east$co2mass, costratio = dat_east$costratio) %>%
   cbind(load=mean(dat_east$load))
 ```
 
@@ -755,8 +755,7 @@ TEXT
 
 ### Stage 3: Cubic Spline
 
-In this exercise we will introduce the conecpt of `restricted spline regressions` and it's use for our analysis. In the world of craftman's the term splines would refer to a strip of wood that is being shaped into a smooth curve. Hereby the strip would be forced around fixed points and form a natural spline. In the world of mathematics these splines are defined as a form of piece-wise polynomial functions, which usually consist of cubic polynomials. `Knots` refer to the fixed points in mathematical splines and are placed along the range of data. As we ajust the number of knots the spline becomes more or less flexible. Mind here that this can lead to over or underfitting of the fitted curve. To confirm the correctness of our results we will later on conduct a quick robustness check where we adjust the number of knots. Finally, our model will be `restricted` , meaning that the spline is constrained to be linear in front of the first knot and after the last one.  
-
+In this exercise we will introduce the conecpt of `restricted spline regressions` and it's use for our analysis. In the world of craftman's the term splines would refer to a strip of wood that is being shaped into a smoothed curve. Hereby the strip would be forced around fixed points and form a natural spline. In the world of mathematics these splines are defined as a form of piece-wise polynomial functions, which usually consist of cubic polynomials. `Knots` refer to the fixed points in mathematical splines and are placed along the range of data. As we ajust the number of knots the spline becomes more or less flexible. Mind here that this can lead to over or underfitting of the fitted curve. To confirm the correctness of our results we will later on conduct a quick robustness check where we adjust the number of knots. At last, our model will be `restricted` , meaning that the spline is constrained to be linear in front of the first knot and after the last one.  
 
 **Task:** To start with spline regression, load the required data. We use the same data and interconnection `EAST` as in the last exercise. Just press check.
 ```{r "3_2__29",message=FALSE}
@@ -795,16 +794,38 @@ fit3 = lm(co2mass ~ ns(costratio,df = 5)+ns(load, df=5), data=dat_east )
 show.regression(fit3)
 ```
 
-The output is comparable to one of simple polynomial regressions by getting a coefficient for every knot 
+The summary statistics of our spline model is comparable to the one of simple polynomial regressions, we get a coefficient for every knot. Since splines are transformations of explanatory variables it isn't really possible to interpret these coefficients straightforward. Because of that reason we went through the trouble of introducing the method of plotting regression models. 
+
+### Newey-West Standard Error
+
+We continue to see a negative relationship between cost ratios and $CO_2$ emissions, but additionally plotted the data points of emissions. As cost ratios increase, the difference between our regression line and the observations tend to become larger. This is a strong indicator that our model suffers from `heteroskedasticity`. Since standard error methods rely on the assumption that theres no correlation between the independent variables and the variance of the dependent variables, we calculate `heteroskedasticity robust standard errors`.  
+R packages normally provide a lot of handy functions to predict fitted values and calculate robust standard errorsat the same time. However, we don't predict our fitted values on the same data frame as we build our model on. Therefore this will be a bit tricky. We will use a custom function that is based on the Newey-West estimator `NeweyWest()`, which is part of the `sandwich` package. Therefore, we will be able to calculate the error of the upper and lower bounds and use these later on to add confidence intervals to our plot. 
+////////
+
+**Task:** Just press **check** to define the function.
+```{r "3_2__33"}
+Newey <- function(model, predict) {
+  temp <- NeweyWest(model, newdata=predict)
+  X_mat <- model.matrix(model)
+  var_fit_hac <- rowSums((X_mat %*% temp) * X_mat)
+  se_fit_hac = sqrt(var_fit_hac)
+  
+  pred_df <- pred_df %>%
+  mutate(se_fit_hac = sqrt(var_fit_hac)) %>%
+  mutate(
+    lwr_hac = pred_df$fit - 1.96*var_fit_hac,
+    upr_hac = pred_df$fit + 1.96*var_fit_hac
+  )
+}
+```
 
 
 
-### Error Newey
+ 
+Before continuing with our main analysis we have to introduce the method of calculating the errors of our model. If you are already familiar with how standard error you should know that we wont just use the standard errors. We can easily show that by plotting `fit3` with the methods we used before: 
 
-To show that our data are an example of heteroskedasticity, we can simply create a plot that follows the same method as before:
-
-**Task:** Just press check.
-```{r "3_2__33",warning=FALSE}
+**Task:** Just press **check**.
+```{r "3_2__34",warning=FALSE}
 pred_dat = tibble(costratio = dat_east$costratio) %>%
   cbind(load=mean(dat_east$load))
 co2.hat3 = predict(fit3, pred_dat)
@@ -815,12 +836,6 @@ ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
 ```
 
 
-As we should expect we continue to see a negative relationship between cost ratios and $CO_2$ emissions. However, as cost ratios increase, the difference between our regression line and the observation tend to become larger. This is a strong indicator that our model suffers from `heteroskedasticity`. Since standard models relies on the assumption that theres no correlation between the independent variables and the variance of the dependent variables, we shouldn't rely on standard errors, but calculate `heteroskedasticity robust standard errors`.  
-R packages normally provide a lot of handy functions to predict fitted values and at the same time calculate robust standard errors. Because of the fact that we are not predicting on the same data frame as we build our model on, this gets a bit tricky. Therefore I wrote a custom function which is uses the `NeweyWest()` function.
-
-
-//////////////////
-
 
 
 ***
@@ -829,9 +844,6 @@ R packages normally provide a lot of handy functions to predict fitted values an
 TEXT
 
 ***
-
-
-
 
 
 
@@ -849,7 +861,7 @@ To this point we limited our data to fuel prices and generated electricity (`loa
 
 **Task:** Load the data set `main_data.csv` into a variable `dat` and show the first 3 rows.
 
-```{r "4__34",message=FALSE}
+```{r "4__35",message=FALSE}
 #___ <- read_csv("./Data/___")
 #___
 dat <- read_csv("./Data/main_data.csv")
@@ -869,7 +881,7 @@ The data are gathered from several official U.S. agencies and continue to be agg
 Until now we haven't considered the seasonal variance in load. As we have seen in `Exercise 1`, load heavily varies with a smaller peak in summer and a bigger one in winter. To adjust for this effect we create a dummy variable that controls for years and seasons (off-season/summer/winter). 
 
 **Task:** Calculate the seaonal variable and show the first few rows. Just press *check*.
-```{r "4__35"}
+```{r "4__36"}
 dat_final <- dat %>% 
         mutate(season=(month>3) + (month>6) + (month>9),
                        yearseason=year*10+season)
@@ -892,7 +904,7 @@ pre-implemented version of `summarise` functions in `R`. The one we use here is 
 
 To give you an example in code form, lets pretend we have a dataframe `data` with several `car manufacturer` and their respective car models with `prices` and we want to calculate the average car price per manufacturer.
 
-```{r "4__36",eval=FALSE}
+```{r "4__37",eval=FALSE}
 example <- data %>% 
   group_by(manufacturer) %>%
   summarise(mean_price = mean(price))
@@ -914,7 +926,7 @@ hallo hier entsteht eine info box
 
 
 **Task:** Just press **check**.
-```{r "4__37"}
+```{r "4__38"}
 dat_final %>% 
   select(intercn, co2mass, load, coalprice, gasprice, costratio, nonfossil) %>% 
   group_by(intercn) %>% 
@@ -948,7 +960,7 @@ Building upon the model we defined in the last chapter, we will expand our regre
 First, we load and prepare the data to run the ///////// SEASONAL VARIABLE
 
 **Task:** Load the dataframe and store it in `dat`. create the seasonable dummy variable. 
-```{r "4_1__38",message=FALSE}
+```{r "4_1__39",message=FALSE}
 dat <- read_csv("Data/main_data.csv") %>% 
         mutate(season=(month>3) + (month>6) + (month>9),
                        yearseason=year*10+season)
@@ -956,13 +968,13 @@ head(dat,3)
 ```
 
 **Task:** Filter the data set for intercn `EAST`.
-```{r "4_1__39"}
+```{r "4_1__40"}
 #east <- filter(...,...)
 east <- filter(dat, intercn=="EAST")
 ```
 
 **Task:** Calculate the `mean` of every variable we use in our regression. First, select the necessary columns and then use `summarise_all` to get the `mean`. Store the result in `mean_east`.
-```{r "4_1__40"}
+```{r "4_1__41"}
 # ... <- east %>% 
 #  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
 #  summarise_all(...)
@@ -973,7 +985,7 @@ mean_east <- east %>%
 
 **Task:** To make our life a bit easier we will create a new data set with `gasprice`, `priceratio` and the results of the `last` task. Use `tibble()`, which creates a new data frame and `cbind()`, which takes a sequence of columns and combines them with another data frame.
 
-```{r "4_1__41"}
+```{r "4_1__42"}
 #temp_east <- ...(gasprice = east$gasprice, priceratio = east$priceratio) %>% 
 #  ...(mean_east)
 predict_east <- tibble(date=east$date, intercn=east$intercn, co2mass=east$co2mass, gasprice = east$gasprice, coalprice=east$coalprice, costratio = east$costratio) %>% 
@@ -1003,7 +1015,7 @@ $D_\gamma$: Dummy variable for seasonal variation to absorb fluctuations, e.g. b
 
 
 **Task:** Perform the regression model we described in the beginning of this exercise for interconnection `EAST`. Use `ns()` for variables with spline regression (as explained in `3.3`). We want to use `5` degrees of freedom. Store the resulting model in `reg_east`.
-```{r "4_1__42"}
+```{r "4_1__43"}
 #... <- lm(co2mass ~ ...(priceratio, df=...) + ...(load, df=...) + tlsd + tlmin + tlmax + ...(meant, df=...) + nonfossil + so2price + netNSflow + yearseason, data=east)
 reg_east <- lm(co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=east)
 ```
@@ -1034,13 +1046,13 @@ where $\hat{\gamma}$ is the fitted response, $t_{\alpha/2,n-2}$ the t-value with
 
 
 
-```{r "4_1__43"}
+```{r "4_1__44"}
 fit_east <- predict_east %>% 
   cbind(as.data.frame(predict(reg_east, newdata = predict_east, interval = 'confidence')))
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__44"}
+```{r "4_1__45"}
 basecoal=2.25
 basegas=5.75
 
@@ -1056,7 +1068,7 @@ final_east <- fit_east %>%
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__45",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__46",warning=FALSE, fig.width=7, fig.height=7}
 plot_east <- ggplot(final_east, aes(x=basecoal/costratio, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = final_east$lwr.transformed, ymax = final_east$upr.transformed),
                    colour="lightgrey", fill="lightgrey", alpha=0.5,) +
@@ -1076,7 +1088,7 @@ TEXT////
 
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r "4_1__46",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__47",warning=FALSE, fig.width=7, fig.height=7}
 
 #filter for interconnection ERCOT
 ercot <- filter(dat, intercn=="ERCOT")
@@ -1122,7 +1134,7 @@ plot_ercot <- ggplot(final_ercot, aes(x=basecoal/priceratio, y=fit.transformed))
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r "4_1__47",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__48",warning=FALSE, fig.width=7, fig.height=7}
 wecc <- filter(dat, intercn=="WECC")
 
 mean_wecc <- wecc %>% 
@@ -1157,7 +1169,7 @@ plot_wecc <- ggplot(final_wecc, aes(x=basecoal/priceratio, y=fit.transformed)) +
 
 **Task:** Use grid.arrange() to display the plots next to each other. Just press *check*.
 
-```{r "4_1__48",warning=FALSE, fig.width=14, fig.height=7}
+```{r "4_1__49",warning=FALSE, fig.width=14, fig.height=7}
 grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 ```
 
@@ -1170,7 +1182,7 @@ grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 
 
 ///////// test
-```{r "4_1__49"}
+```{r "4_1__50"}
 
 main_data2 <- rbind(final_east, final_ercot, final_wecc)
 main_data2 <- main_data2[order(as.Date(main_data2$date, format="%d/%m/%Y")),]
@@ -1207,7 +1219,7 @@ We assume the same fixed and predicted fuel prices for 2025 as before and additi
 To avoid repeating the same steps as in the last exercise, I prepared a data set that includes the predicted `emissions` as well as the `tranformed emissions` with confidence intervals. Load the data set `main_data2.csv` and store it in `dat`. Use the `head()` command to show the first rows. We also declare the variables for `base prices` and `carbon content`.
 
 **Task:** Just press *check*.
-```{r "4_2__50",message=FALSE}
+```{r "4_2__51",message=FALSE}
 dat <- read_csv("Data/main_data2.csv")
 head(dat,3)
 
@@ -1222,7 +1234,7 @@ In the next step we go ahead and transform the cost ratios into carbon prices us
 $$\tag{3}{P_{co2}}=\frac{CR\cdot{P_{gas}}-{P_{coal}}}{CO_{2,coal}-CR\cdot CO_{2,gas}}$$
 
 **Task:** Create a new column `carbontax` using `Equation 3` and filter the just calculated taxes for the interval [0,80]. Save the result into data frame `tax` and display the first rows.
-```{r "4_2__51",message=FALSE}
+```{r "4_2__52",message=FALSE}
 #... <- dat %>% 
 #  mutate(carbontax = (priceratio*...-...)/(coal_cc-priceratio*gas_cc)) %>% 
 #  filter(carbontax >= ... & carbontax <= ...)
@@ -1238,12 +1250,12 @@ head(tax,3)
 The overall approach of plotting our results is similar to the one in Exercise `4.1`. We will filter for each interconnection seperatly and plot our result with `ggplot2`. First we will create a plot for interconnection `EAST` and interpret the results. Afterwards we will run the code on the other interconnections and compare them to another. In contrast to the previous Exercise though, we won't plot the emission change based on changing cost ratios, but obviously on changing `carbon prices`.
 
 **Task:** Filter the data frame `tax` for interconnection `EAST` and save it to `tax_east`. Since we filter for a string, don't forget to put quotes around the argument.
-```{r "4_2__52"}
+```{r "4_2__53"}
 tax_east <- filter(tax, intercn=="EAST")
 ```
 
 **Task:** Just press *check*.
-```{r "4_2__53",fig.width=7, fig.height=7}
+```{r "4_2__54",fig.width=7, fig.height=7}
 plot_east <- ggplot(tax_east, aes(x=carbontax, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = tax_east$lwr.transformed, ymax = tax_east$upr.transformed),
                    colour="lightgrey", fill="lightgrey", alpha=0.5) +
@@ -1263,7 +1275,7 @@ Our first plot shows the reaction of emission with the introduction of carbon pr
 Run the code chunks below to create the plot for the other interconnections and display them all together.
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r "4_2__54",fig.width=7, fig.height=7}
+```{r "4_2__55",fig.width=7, fig.height=7}
 tax_ercot <- filter(tax, intercn=="ERCOT")
 
 plot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=fit.transformed)) +
@@ -1277,7 +1289,7 @@ plot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=fit.transformed)) +
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r "4_2__55",fig.width=7, fig.height=7}
+```{r "4_2__56",fig.width=7, fig.height=7}
 tax_wecc <- filter(tax, intercn=="WECC")
 
 plot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=fit.transformed)) +
@@ -1301,7 +1313,7 @@ Quiz: We saw earlier that interconnection `ERCOT` has a higher generation of ren
 &nbsp;  
   
 **Task:** Just press *check*.
-```{r "4_2__56",fig.width=21, fig.height=7}
+```{r "4_2__57",fig.width=21, fig.height=7}
 grid.arrange(plot_east, plot_ercot, plot_wecc, nrow=1)
 ```
 
@@ -1327,7 +1339,7 @@ We can argue that additional carbon reduction will result from other factors if
 
 
 **Task:** Just press *check*.
-```{r "4_2__57"}
+```{r "4_2__58"}
 find_closest_value <- function(a) {
   vector <- 1:9
   for(i in 0:8){
@@ -1366,7 +1378,7 @@ TEXT
 
 From the results of the table we can additionally derive the costs for such a measure. Let's pretend we want to introduce a carbon tax of $30 with total daily reductions of 5.7%. This would cost us approx. 
 
-```{r "4_2__58"}
+```{r "4_2__59"}
 days=365
 costs_30 = (64.8-(64.8-61.1))/100000*30*days
 costs_30
@@ -1374,7 +1386,7 @@ costs_30
 
 Therefore it would cost around 183 millions dollars to 
 
-```{r "4_2__59"}
+```{r "4_2__60"}
 costs_60 = (64.8-58.5)*100000*60
 costs_60
 ```
@@ -1422,7 +1434,7 @@ I hope you enjoyed working through this problem set.
 
 Below you can get an overview of the awards you earned along the way.
 
-```{r "5__60"}
+```{r "5__61"}
 awards()
 ```
 
@@ -1439,14 +1451,14 @@ https://www.deraktionaer.de/artikel/mobilitaet-oel-energie/royal-dutch-shell-das
 nur plots, kurz vergleichen
 
 
-```{r "6__61",optional=TRUE}
+```{r "6__62",optional=TRUE}
 # show that all integers between 0 and 10
 1:10
 ```
 
 
 
-```{r "6__62",optional=TRUE}
+```{r "6__63",optional=TRUE}
 # show that all integers between 0 and 10
 1:10
 ```
