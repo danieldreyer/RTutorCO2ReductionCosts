@@ -1644,3 +1644,15 @@
 ,
 {"type":["init_ps"],"time":["2020-03-25 16:27:33"],"user":["default_user"],"umph":[1585150053.9985],"ok":[true]}
 ,
+{"type":["init_ps"],"time":["2020-03-26 22:01:33"],"user":["default_user"],"umph":[1585256493.2637],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-26 22:30:27"],"user":["default_user"],"umph":[1585258227.6541],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-26 22:39:16"],"user":["default_user"],"umph":[1585258756.7805],"ok":[true],"chunk":[1],"ex":[2],"e.ind":[0],"code":["# ___ <- read_csv(\"./Data/exercise1.csv\")\ndat <- read_csv(\"./Data/exercise1.csv\")"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-26 22:47:08"],"user":["default_user"],"umph":[1585259228.2997],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-26 23:03:33"],"user":["default_user"],"umph":[1585260213.6481],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-26 23:05:30"],"user":["default_user"],"umph":[1585260330.6633],"ok":[true]}
+,

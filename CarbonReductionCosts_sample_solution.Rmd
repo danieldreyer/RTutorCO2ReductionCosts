@@ -77,17 +77,16 @@ After finishing a exercise, click `Go to next exercise` at the bottom or navigat
 
 ## Exercise 1 -- Insights into Energy Markets
 
-
-In order to meet the requirement to be climate-neutral by the year 2050, the world has to become more energy efficient. Right now the world's energy consumption keeps rising daily and even though new technologies are being developed to produce more `green` electricity, we are still heavily dependant on `fossil fuels`. `Coal` is hereby one of the most important sources of energy, but at the same time the biggest cause of carbon emissions. Reason being that it is easy to store, transport, doesn't alter and is mined in huge quantities all around the world. Given that coal supplies will last for centuries, it is a major goal to find incentitives to reduce its use and therefore `emissions`.
-Anotherm major energy source is `natural gas`, which is also a type of fossil fuel, but it's $CO_2$ emissions and heat density are far more efficient. Nevertheless, natural gas wasn't considered to be an real alternative to coal because of higher costs through difficult extracting methods and handling.  
-This changed due to the `Shale Revolution`, which started in the early 2000s in the United States. Natural gas began to not only be a by-product of the oil industry, but could now be extracted in large quantities and in a targeted manner. Lanfrancois (2012) estimates, that based on the `Clean Power Plan` introduced by the Obama Administration in 2015, carbon dioxide emissions from the electricity sector could be reduced by roughly 23 to 42 percent by replacing existing coal to gas fired generators.    
+The world has to further reduce it's $CO_2$ emissions in order to meet the requirements of the Paris Convention on Climate Neutrality by 2050. Right now the energy consumption keeps rising daily and even though new technologies are being developed to increase the percentage of `green` electricity, we are still heavily dependant on `fossil fuels`. `Coal` is hereby one of the most important sources of energy, but at the same time the biggest cause of carbon emissions. Reasons being, that it is easy to store, transport, doesn't alter and is mined in large quantities around the world. Given that coal supplies will last for centuries, it is a major goal to find incentitives to reduce it's use and therefore $CO_2$ `emissions`. One solution would be to improve the efficiency of coal-generators, another one to replace it with another fuel type.
+One alternative is `natural gas`, which is obviously also a type of fossil fuel, but it's $CO_2$ emissions and heat density are far more efficient. Nevertheless, natural gas wasn't considered to be an real alternative to coal because of higher costs through more difficult extracting methods and handling.  
+This changed due to the `Shale Revolution`, which started in the early 2000s in the United States. Natural gas began to not only be a by-product of the oil industry, but could now be extracted in large quantities and in a targeted manner. Lanfrancois (2012) estimates, that based on the `Clean Power Plan` introduced by the Obama Administration in 2015, $CO_2$ emissions from the electricity sector could be reduced by roughly 23 to 42 percent by replacing existing coal to gas fired generators.    
   
 info("Shale-Revolution") # Run this line (Strg-Enter) to show info
   
-Enough background for now, let's start with some interactive tasks. In `Exercise 1` we will get insights into global energy markets and explore time-series data of historic prices and generated power.
+Let's start with some interactive tasks. In `Exercise 1` we will get insights into global energy markets and explore time-series data of historic prices and generated electricity.
 
 **Task:**
-Use the `read_csv` command to load the data set `exercise1.csv` and store it in a variable called `dat`. `Read_csv` reports the variable type of each column after execution. This will come handy later on in this exercise. In future exercises we will disable this message.  
+Use the `read_csv` function to load the data set `exercise1.csv` and store it in a variable called `dat`. `Read_csv` reports the variable type of each column after execution. This will come handy later on in this exercise. In future exercises we will disable this message.  
 
 info("read.csv() and write.csv()") # Run this line (Strg-Enter) to show info
 
@@ -103,8 +102,8 @@ dat <- read_csv("./Data/exercise1.csv")
 head(dat, 8)
 ```
 
-The data frame includes 214 observations with **monthly** data from the year 2002 to 2019. It contains generated power in the U.S. as well as prices of `natural gas` in Europe and the United States. Keep in mind that different commodities are traded in different units, coal in metric tons (`\$/mt`) and gas in million British thermal units (`\$/mmBTU`). 
-I mentioned that it would come handy to know which data types your columns inherit (hovering over the column names in the output above will give you the same information). `R` requires `dates` to be stored as type `Date` to be able to create plots along a time line. Since the date column is currently stored as type `character` we have to convert the date variable into a `date format` by using `as.Date()`.
+The data frame includes 214 observations of **monthly** data from the year 2002 to 2019. It contains generated power in the U.S. as well as prices of `natural gas` in Europe and the United States. Keep in mind that different commodities are traded in different units, coal in metric tons (`\$/mt`) and gas in million British thermal units (`\$/mmBTU`). 
+I mentioned that it would come handy to know which data types your columns inherit (hovering over the column names in the output above will give you the same information). `R` requires `dates` to be stored as type `Date` to be able to create plots along a time line. Since the date column is currently stored as type `character` we have to convert the variable into a `date format` by using `as.Date()`.
 
 **Task:**  Transform the data type with `as.Date()` and save it to the same column.
 ```{r "1__7"}
@@ -112,13 +111,18 @@ I mentioned that it would come handy to know which data types your columns inher
 dat$date <- as.Date(dat$date, format="%m/%d/%Y")
 ```
 
-Now that we imported our data set and processed it for analysis, let's start exploring. First, we create a plot that tells us more about the price development of gas in both regions. Because of the fact that the `Shale-Revolution` started with the beginning of this century, we expect a increasing supply and therefore falling prices for gas in the United States. Since commodity markets are split into regions, the European Prices should somewhat differ.  
-Besides basic funtionality that `R` provides on default, there are several packages to create highly customizable plots. We will mostly use the package `ggplot2`, which is widely considered to be one of the most powerful packages to create plots, having the downside that the handling can be a bit tricky. Therefore, you aren't required to create entire plots on your own but to fill gaps in code blocks. This way you will learn how the logic behind `ggplot2` and at the same time won't be frustrated if the output doesn't meet the exact requirements.  
+Now that we imported our data set and processed it for analysis, let's start exploring. First, we create a plot that tells us more about the price development of gas in both regions. Because of the fact that the `Shale-Revolution` started in the beginning of this century, we expect a increasing supply and therefore falling prices for gas in the United States. Since commodity markets are split into regions, the European Prices should somehow differ.  
+Besides funtionality that `R` provides on default, there are several packages that let us create highly customizable plots. We will mostly use the package `ggplot2`, which is widely considered to be one of the most powerful packages to create plots, having the downside that the handling can be a bit tricky. Therefore, you aren't required to create entire plots on your own but but you will fill in gaps. This way you get used to the logic behind `ggplot2` and at the same time would't be frustrated if your output didn't meet the exact requirements.  
   
-**Task:** Use the data frame `dat` to plot `historic prices` of natural gas in `Europe` and the `United States`. Just press *check*.
+**Task:** Use the data frame `dat` to plot `historic prices` of natural gas in `Europe` and the `United States` along `date` on the x-Axis. Just press *check*.
 
 info("ggplot2") # Run this line (Strg-Enter) to show info
 ```{r "1__8",fig.width=9, fig.height=6, dev='svg'}
+#ggplot(data=___, aes(x=___)) +
+#  geom_line(aes(y=dat$price_naturalgas_USA, color="United States"), size=1) +
+#  geom_line(aes(y=dat$price_naturalgas_Europe, color="Europe"), size=1) +
+#  labs(x = "Year", y = "", title = "Natural Gas Prices", subtitle = "Y=$/mmBTU")+
+#  scale_color_manual(name="Region",values = c("blue","red"))
 ggplot(data=dat, aes(x=date)) +
   geom_line(aes(y=dat$price_naturalgas_USA, color="United States"), size=1) +
   geom_line(aes(y=dat$price_naturalgas_Europe, color="Europe"), size=1) +
@@ -126,14 +130,13 @@ ggplot(data=dat, aes(x=date)) +
   scale_color_manual(name="Region",values = c("blue","red"))
 ```
 
-Looking at the plot our assumptions are confirmed. The spikes in 2005 and 2008 are mostly consequences of the Iraq War and the Financial Crisis. Apart from that, we observe decreasing gas prices in the U.S. from just over \$12 in 2008 to under \$2 in 2016. Since then the prices remained at roughly the same level. Natural gas prices in Europe have remained at a significantly higher level. One reason being is that fracking isn't as popular in Europe, therefore a major part of gas gets imported from Russia which drives prices. Another reason is that Europe has a widely different energy mix than the United States. According to the European Environment Agency (EEA), the consumption of gas decreased in average by 1.4% per year since 2005, whereas in the U.S. natural gas reached new all-time highs nearly every year. 
+Looking at the plot, our assumptions are confirmed. The spikes in 2005 and 2008 are mostly consequences of the Iraq War and the Financial Crisis. Apart from that, we observe decreasing gas prices in the U.S. from just over \$12 in 2008 to under \$2 in 2016. Since then the prices remained at roughly the same level.  
+Natural gas prices in Europe have remained at a significantly higher level. One reason being, that fracking isn't as popular in Europe, therefore a major part of gas gets imported from Russia which drives prices. Another reason is that Europe has a widely different energy mix in comparisn to the United States. According to the European Environment Agency (EEA), the consumption of gas decreased in average by 1.4% per year since 2005, whereas in the U.S. natural gas reached new all-time highs almost every year. 
 
-////////?Because of the lack of data provided by state officials in Europe, the analysis in this problem set will further purely focus on the U.S. market.
-
-Besides the development of prices, the consumption is another relevant factor. Before getting an insight into the generated power for coal and gas, take your first quiz:
+Besides information of fuel prices, our data frame also provides data for generated power. Before we take a look at the time-series for his, take your first quiz:  
 
 
-Quiz: Do you think that the proportion of gas generated electicity compared to coal generated electricity has increased or decreased over time?
+Quiz: Did the proportion of gas-generated electicity has increased or decreased over time in comparison to coal-generated electricity ?
 
 - increased [x]
 
@@ -141,7 +144,7 @@ Quiz: Do you think that the proportion of gas generated electicity compared to c
 
 &nbsp;
 
-**Task:** Create a new `ggplot2` for electricity generation. Plot the `date` on the x-Axisand the generated electricity on the y-Axis. We want seperate line for `gas generated power` as well as `coal generated power`. Lines are drawn with `geom_line`. For reference you can look at the code from the previous graph or conduct the `help()` function.
+**Task:** Create a new `ggplot2` for generated power. Plot the `date` on the x-Axis and the generated electricity on the y-Axis. We want seperate line for `gas generated power` as well as `coal generated power`, which can be added with `geom_line`. For reference you can look at the code from the previous graph or conduct the `help()` function.
 
 ```{r "1__9",fig.width=9, fig.height=6, dev='svg'}
 #ggplot(data=___, aes(x=___)) +
@@ -158,13 +161,12 @@ ggplot(data=dat, aes(x=date)) +
   scale_y_continuous(breaks=seq(0,200,25))
 ```
 
-The results are in line with what we should expect. With a higher supply of gas and decreasing prices, gas plants increased their share in power generation over time. Giving you a bit more background information: Coal-fired plants have lower operating costs than gas-fired generators, but are expensive to start and slow to adjust to fluctuating demands. Gas-generators can fill these gaps. There are two different types of gas-generators, one being `peaker plants`. They run in high demand hours due to their fast start-up times but on the downside have high marginal costs. The other type are `combined cycle gas turbines` (CCGT). They have low heat rates (high efficiency of turning fuel into power) and are used to provide baseline power generation throughout the day.  
-Combining the factors above and the possiblity to use both fuels to generate power in all situation, we can say that the fuels are `switchable`. However, the mechanism of `fuel switching` is a lot more complex than just about changing fuel prices. Factors like capacity of plants, transmission grid limits (Mansur & White 2012, Davis & Hausman 2015) or firms market power (Bushnell, Mansur & Saravia 2008) also play a big role. We try to include some but not all of these factors in our later analysis.  
-To wrap this up, we observe severe fluctuations, that occur yearly with a smaller peak in summer and a bigger in the winter season. The fluctuation are largely driven by Residential using air conditioning in summer and space heating in winter (EIA, "Today in Energy", 2020/3).  
+The results are in line with what we should expect. With a higher supply of gas and decreasing prices, gas plants increased their share in power generation over time. Giving you a bit more background information: Coal-fired plants have lower operating costs than gas-fired generators, but are expensive to start and slow to adjust to fluctuating demands. Gas-generators can fill these gaps. There are two different types of gas-generators, one being `peaker plants`. They run in high demand hours due to their fast start-up times, but on the downside suffer from high marginal costs. The second type are `combined cycle gas turbines` (CCGT). They have low heat rates (high efficiency of turning fuel into power) and are used to provide baseline power generation throughout the day.  
+Combining the factors above, we can say that both fuel-generators have the possiblity to generate power in all situation and meet our needs, meaning that the fuels are `switchable`. However, the mechanism of `fuel switching` is a lot more complex than just about the cost efficiency. We already mentioned some factors above, but capacity of plants, transmission grid limits (Mansur & White 2012, Davis & Hausman 2015) or firms market power (Bushnell, Mansur & Saravia 2008) also play a big role.    
+To wrap this up, we observe severe fluctuations of generated power along the year, that occur with a smaller peak in summer and a bigger one in the winter season. These fluctuation are largely driven by using air conditioning in summer and space heating in winter (EIA, "Today in Energy", 2020/3).  
   
 
-In the next exercise we will go through necessary theory for our main analysis. Click `Go to next exercise` to continue.
-
+In the next exercise we will set a connection between `fuel-switching` and how we could use this for our analysis. Click `Go to next exercise` to continue.
 
 
 
@@ -172,42 +174,58 @@ In the next exercise we will go through necessary theory for our main analysis. 
 
 ### Relationship between Fuel and Carbon Prices
 
-In this exercise we will dive into the theory of `fuel switching` and how we could exploit this for our analysis. We already introduced factors that effect the effeciency of power plants. 
+In this exercise we convert the mechanism of `fuel switching` from last exercise into a theory that we can use for our analysis. Our obvious goal is to find a connection between emissions and fuel costs to use as a basis for a model. We already introduced factors that influence the cost efficiency of certain fuel-generators as well as 
 
 
-We already introduced factors that effect the cost efficiency of fuel types or in other words the costs to produce additional power, so called `marginal costs`.
-
-
-ot an idea, that different fuel types have different costs to produce additional power, so called `marginal costs`. Cullen (2016) developed a model which builds upon the idea, that different fuel prices have different  we will As seen in the last exercise there are more factors to `marginal costs` than just the commodity prices itself. With that in mind we define the `marginal costs` of fossil-powered plants as a Equation of `heat rate` and the `costs of burning fuel`. Variable names of this exercise are explained in the info-box above:
+We already mentioned that the usage of certain generators isn't purely limited by cost efficiency. If we assume that we aren't limited by , `Marginal Costs` will play a big role in deciding what fuel-generator we use for power generation. Marginal costs are per definition not only the fuel prices itself, but include all costs that are needed to produce the additional MWh of power. 
+Cullen hereby developed a model which builds upon the idea, that we can switch freely between fuel types and that prices and emission are in one way or another correlated. With that in mind we define the `Marginal Costs` of fossil-powered plants as a Equation of `heat rate` and the `costs of burning fuel`. Variable names of this exercise are explained in the info-box below:
 
 $$\tag{1}MC=HR\cdot(P_{fuel}+CO_{2,fuel}\cdot P_{co2})=HR\cdot C_{fuel}$$
 
 info("Variable names in this exercise") # Run this line (Strg-Enter) to show info
 
-In `Exercise 1` we observed generated electricity of `coal` and `gas` and their variance over time. Because of the fact that the cost efficiency of coal is generally better, we have to introduce a incentive to reduce the use of coal in relation to gas in electricity generation. One way to introdude a change in cost efficiency is to propose `carbon prices`. This is especially viable in this case because coal contains approximately `twice` as much $CO_2$ as natural gas and therefore stronger effects the cost efficiency. Another factor that drives this momentum is that gas generators generally have a more efficient heat rate than coal generators (as metioned at the end of last exercise).  
-Combining these two facts of cost and generation efficiency lead to `steeper marginal cost` for coal generators when carbon prices are introduced. Reflecting this to our upcoming analysis, we don't observe any carbon prices, but a time-series of fuel prices that are transformed into burning costs with equation `(1)`. To implement the mechanism of `fuel change` we introduce a `coal-gas ratio`, which we define as followed:
+We have already seen in the previous exercise that the proportion of gas and coal have converged considerably over time. Because of the fact, that coal contains approximately twice as much $CO_2$ as natural gas, we can create further incentives to reduce emissions by introducing carbon prices. 
+
+
+
+In `Exercise 1` we observed amounts of generated electricity for `coal` and `gas` and their variance over time. Because of the fact that the cost efficiency of coal is generally better, we have to introduce a incentive to reduce the use of coal in relation to gas. One way to introdude a change in cost efficiency is to propose `carbon prices`. This is especially viable in this case because coal contains approximately `twice` as much $CO_2$ as natural gas and therefore the cost efficiency is more effected. Another factor that drives this momentum is that gas generators generally have a more efficient heat rate than coal generators (as we metioned at the end of last exercise).  
+Combining these two facts lead to `steeper marginal cost` for coal generators when carbon prices are introduced. Reflecting this to our upcoming analysis, we won't observe any carbon prices, but a time-series of fuel prices that are transformed into costs of burning fuel with `Equation 1`. The relative cost between coal and gas is therefore the ratio of the two:
 
 $$\tag{2}costratio=\frac{C_{coal}}{C_{gas}}$$
 
-Combining Equation `1` and `2`, we can explain `cost ratios` as a function of `fuel prices`, `carbon content` and `carbon prices`:
+By combining Equation `1` with the one above, we can explain `cost ratios` as a function of `fuel prices`, `carbon content` and `carbon prices`:
 
 $$\tag{3}costratio=\frac{C_{coal}}{C_{gas}}=\frac{P_{coal}+CO_{2,coal}\cdot P_{co2}}{P_{gas}+CO_{2,gas}\cdot P_{co2}}$$
 
-For completeness we introduce values for carbon content $CO_{2,coal}$ and  $P_{fuel}$, that will be fixed based on predictions for the year 2025. The `EIA` reports carbon content and forcasts for fuel prices. We will use these values later on in our analysis:  
+The values we use in our analysis for carbon content $CO_{2,coal}$ and  fuel prices $P_{fuel}$ will be fixed. Carbon content is reported by the `EIA` and fuel prices are predictions based on the year 2025. The values are listed below:  
 
 - Average delivered coal price `$2.25/mmBTU` and gas prices `$5.75/mmBTU` (forcast for 2025)
 - Carbon content `Natural Gas`: 117 lbs carbon/MMBTU or `0.0585 tons/MMBTU`  
 - Carbon content `Coal`: 210.8 lbs carbon/MMBTU or `0.1054 tons/MMBTU`  
 
-Lets quickly interpret `Equation 2`: The `price ratio` will rise for higher `costs of burning coal` or lower `costs of burning gas`. To make this even clearer, lets visualize the relationship, which replicates Figure 4 of Cullen.
+The idea of constructing the cost ratio of both fuels will allow us later to impelement fuel switching in our model. Because of it's importance, let's interpret `Equation 2`
+You may be wondering why we would construct a cost ratio instead of using 
+
+
+
+Quiz: What happens to our cost ratio, if natural gas doubles in price and coal prices go down 25%.
+
+- cost ratio doubles [x]
+
+- blabla [ ]
+
+&nbsp;
+
+Of course this relation is quite intuitive. By adding carbon prices as in Equation 3 the relation gets a bit more complex. For a clearer picture, lets look at the visualization below. The values are based on prices and carbon content from above:
+
 
 <img src="./Material/relationship.png" alt="drawing" width="600"/>
 Source: Cullen (2016)  
   
-Panel `(a)` shows the relationship between fixed costs of `coal` and `gas` when `carbon prices` get introduced. As shown before we observe higher marginal costs for coal and at a certain value of carbon prices, gas becomes more cost efficient. Panel `(c)` shows the results when transforming fuel prices in price ratios as defined in `Equation 2`. We can observe the same in absence of carbon prices with fixed coal prices and variable gas prices as seen in panel `(b)` and `(d)`. 
+Panel `(a)` shows the relationship between fixed costs of `coal` and `gas` when `carbon prices` get introduced. As we expalained above, we observe higher marginal costs for coal and at a certain level, gas has lower marginal costs or in other words becomes more cost efficient. Panel `(c)` displays the results when transforming fuel prices in cost ratios as defined in `Equation 2`. We can observe the same in absence of carbon prices with fixed coal prices and variable gas prices as seen in panel `(b)` and `(d)`. 
 
 
-Quiz: Do you think we can create any given price ratio under the assumption that we introduce carbon prices under fixed fuel prices? The answer is basically shown in the graphs above.
+Quiz: Based on the graph above, can we create any cost ratio under the assumption that we introduce carbon prices under fixed fuel prices?
 
 - Yes [x]
 
@@ -550,34 +568,32 @@ info("Custom function for Newey-West Standard Errors") # Run this line (Strg-Ent
 ## Exercise 4 -- Examining Carbon Abatement
 
 
-In the following chapter we shift our focus away from theory and work our way towards our final results. To approach our analysis we split it into two parts:
+In the following chapter we shift our focus away from theory and work our way towards our final results. To approach our main analysis we split it into two parts:
 
-- First, we will use the methods we introduced to determine the $CO_2$ response curves to changing fuel costs. (`Exercise 4.1`)
+- First, we determine the $CO_2$ response curves to changing fuel costs. To reflect the energy market as good as possible we will add additional factors to the model we introduced in the previous exericise. (`Exercise 4.1`)
 
-- Afterwards, we transform these fuel prices into carbon prices and plot the abatement curves. (`Exercise 4.2`)
+- Afterwards, we will, based on the theory of Exercise 2, transform our fuel prices into carbon prices and discuss the final results. (`Exercise 4.2`)
 
-To this point we limited our data to fuel prices and generated electricity (`load`). We will use this exercise to add additional factors to our data frame and get a final impression of what we are working with. 
+In Chapter 3 we introduced methods to create a good model and to keep it simple we limited our data to fuel prices and generated electricity (`load`). In this exercise we will introduce additional factors to our data frame and get a final impression of what we are working with. 
 
-**Task:** Load the data set `main_data.csv` into a variable `dat` and display the first 3 rows.
+**Task:** Load the data set `main_data.csv` with `read_csv` and store it into a variable called `dat`.
 
 ```{r "4",message=FALSE}
-#___ <- read_csv("./Data/___")
-#___
+#___ <- ___("./Data/___")
 dat <- read_csv("./Data/main_data.csv")
-head(dat,3)
 ```
 &nbsp;
-The data frame is a combination of data we used in previous exercises and in adds several factors. The variables we add here are explained below:
+The data frame is a combination of data we used before and in adds several other factors that have a influence on emissions. The variables we add are explained below:
 
-`tlsd`, `tlmin`, `tlmax`: Standard deviation, minimum and maximum of load  
-`meant`: Average daily temperature per interconnection  
-`nonFossil`: Electricity generation with non-fossil fuel in MWh  
+`tlsd`, `tlmin`, `tlmax`: Standard deviation, minimum and maximum of $load$ 
+`meant`: Average daily temperature  
+`nonFossil`: Electricity generated with non-fossil fuel in MWh  
 `so2price`: Permit prices of $SO_2$ ($/ton)  
-`netNSflow`: Electricity flowing from Canada to US by interconnection and month in MWh  
+`netNSflow`: Electricity flowing from Canada to the U.S. in MWh  
 
-The data are gathered from several official U.S. agencies and continue to be aggregated to a daily level and seperated by interconnection. The U.S. Energy Information Administration (EIA) provides data for `Non-fossil` energy production, permit prices for $SO_2$ are collected from the `EPA Clean Air Markets` and finally, `net imports` of electricity from Canada are gathered from the `National Energy Board of Canada`. Links to the sources can be found in the `References` section.
+The data are gathered from several official U.S. agencies and continue to be aggregated to a daily level and seperated by interconnection. The U.S. Energy Information Administration (EIA) provides data for `non-fossil` energy production, permit prices for $SO_2$ are collected from the `EPA Clean Air Markets` and finally, `net imports` of electricity from Canada are gathered from the `National Energy Board of Canada`. You can find links to the links to the data in the `References` section.
 
-Until now we haven't considered the seasonal variance in load. As we have seen in `Exercise 1`, load heavily varies with a smaller peak in summer and a bigger one in winter. To adjust for this effect we create a dummy variable that controls for years and seasons (off-season/summer/winter). 
+Another factor we haven't considered yet is the seasonal component in energy consumption. We already saw in `Exercise 1`, that load heavily varies during the year with a smaller peak in summer and a bigger one in winter. To adjust for this effect we create a dummy variable that controls for years and seasons (off-season/summer/winter). 
 
 **Task:** Calculate the seaonal variable and show the first few rows. Just press *check*.
 ```{r "4__2"}
@@ -588,14 +604,13 @@ dat_final <- dat %>%
 head(dat_final,3)
 ```
 
-The data set above will act as our final data frame we use our data on. 
+Now that we included all variables we wanted, we will use this data set to run our main analysis on. We already got a glimpse on the data earlier in this problem set. Now that we have our complete data we will create a summary table, which will display the means of important variables and seperates them for each interconnections. That way we can draw some important conclusions for further interpretations.
 
-**Task:** Use `group_by()` to group the dataset `dat` by `intercn`. Afterwards use `summarise_all()` to calculate the means of every column. For formatting we use the package `kable`. Just press **check**.
+**Task:** We use `group_by()` to group the dataset `dat` by `intercn`. Afterwards, run `summarise_all()` to calculate the means of every column. For formatting we use the `kable`. Just press **check**.
 
 info("Group_by() and summarise()") # Run this line (Strg-Enter) to show info
   
 info("kable()") # Run this line (Strg-Enter) to show info
-
 
 **Task:** Just press **check**.
 ```{r "4__4"}
@@ -608,14 +623,16 @@ dat_final %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), position = "center", full_width = F)
 ```
 
-The table reports the mean of important variables for each interconnection. We can clearly see that `EAST` is by far the largest of the observed energy markets. The emissions seem to increase proportionally to the electricity consumption if we take the electricity production from non-fossil sources in consideration. This gets clearer if the look at the emission rates, which are defined as $ER=\frac{emissions}{load}$. Therefore the `Western` interconnection has by far the `greenest` energy production, followed with some distance by Texas (`ERCOT`) and the `Eastern` interconnection. Furthermore we observe clear variations in price ratios.   This is in line with our assumptions from `Section 2`, where we stated that each interconnection has vastly different conditions and therefore should conduct our regression on each seperatly. In the next exercise we will use this data set and the regression theory we presented in `Chapter 3` to trace out the emission response curves.
+The table reports the mean of important variables for each interconnection. We can clearly see that `EAST` is by far the largest of the observed energy markets. The emissions seem to increase proportionally to the electricity consumption if we take the electricity production from non-fossil sources in consideration. This gets clearer if the look at the emission rates, which are defined as $ER=\frac{emissions}{load}$. Therefore the `Western` interconnection has by far the `greenest` energy production, followed with some distance by Texas (`ERCOT`) and the `Eastern` interconnection. Furthermore we observe clear variations in price ratios.   This is in line with our assumptions from `Chapter 2`, where we stated that each interconnection has vastly different conditions and therefore should conduct our regression on each seperatly. 
+
+In the next exercise we will use this data set and the regression theory we presented in `Chapter 3` to trace out the emission response curves.
 
 
 Click `Go to next exercise` to continue.
 
 ## Exercise 4.1 -- Estimated CO2 Response to Fuel Prices
 
-In this exercise we expand the regression model from the previous Exercise and determine the $CO_2$ response curves to changing fuel prices. In the first step we will perform a regresson based on the methods we introduced in the previous chapter. Afterwards we will use this model to predict emissions and plot a response curve that gives us percentage changes based on predicted fuel prices of 2025.
+In this exercise we expand the regression model from the previous Chapter and determine the $CO_2$ response curves to changing fuel prices. In the first step we will perform a regresson based on the methods we introduced in the previous chapter. Afterwards we will use this model to predict emissions and plot a response curve that gives us percentage changes based on predicted fuel prices of 2025.
 
 As a side note, the code isn't meant to be the shortest or the most efficient, but should allow you to follow each step we take to get our final results. Based on this we will explain and carry out the analysis step by step for interconnection `EAST`, afterwards apply it to `ERCOT` and `WECC` and interpret our results.
 
@@ -663,12 +680,15 @@ $$\tag{5}CO_{2t}=s(priceratio_{t}|\beta)+s(load_{t}|\theta) + s(temp_t|\omega)+X
 
 info("Model variables") # Run this line (Strg-Enter) to show info
 
-
-
-**Task:** Perform the regression model we described in the beginning of this exercise for interconnection `EAST`. Use `ns()` for variables with spline regression (as explained in `3.3`). We want to use `5` degrees of freedom. Store the resulting model in `reg_east`.
+**Task:** Since we will run this model for every interconnection we can first define our model and save it to a variable. Afterwards we can run it on each data frame. Define the model according to `Equation 5` and save it to `model`.
 ```{r "4_1__5"}
-#... <- lm(co2mass ~ ...(priceratio, df=...) + ...(load, df=...) + tlsd + tlmin + tlmax + ...(meant, df=...) + nonfossil + so2price + netNSflow + yearseason, data=east)
-reg_east <- lm(co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=east)
+#___ co2mass ~ ___(priceratio, df=...) + ___(load, df=...) + tlsd + tlmin + tlmax + ___(meant, df=...) + nonfossil + so2price + netNSflow + yearseason
+model=co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason
+```
+
+**Task:** Run the regression with `lm()`, our model `formula` and use the data frame `EAST`.
+```{r "4_1__6"}
+reg_east <- lm(model, data=east)
 ```
 
 **Task:** Predict $CO_2$ emissions based on the regression model `reg_east` and `temp_east`. We set interval to `confidence` to get the mean interval and be able to plot a confidence band later on.
@@ -686,13 +706,13 @@ info("Confidence interval") # Run this line (Strg-Enter) to show info
 
 
 
-```{r "4_1__6"}
+```{r "4_1__7"}
 fit_east <- predict_east %>% 
   cbind(as.data.frame(predict(reg_east, newdata = predict_east, interval = 'confidence')))
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__7"}
+```{r "4_1__8"}
 basecoal=2.25
 basegas=5.75
 
@@ -708,7 +728,7 @@ final_east <- fit_east %>%
 ```
 
 **Task:** Just press *check*.
-```{r "4_1__8",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__9",warning=FALSE, fig.width=7, fig.height=7}
 plot_east <- ggplot(final_east, aes(x=basecoal/costratio, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = final_east$lwr.transformed, ymax = final_east$upr.transformed),
                    colour="lightgrey", fill="lightgrey", alpha=0.5,) +
@@ -728,7 +748,7 @@ TEXT////
 
 
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
-```{r "4_1__9",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__10",warning=FALSE, fig.width=7, fig.height=7}
 
 #filter for interconnection ERCOT
 ercot <- filter(dat, intercn=="ERCOT")
@@ -742,7 +762,7 @@ mean_ercot <- ercot %>%
 predict_ercot <- tibble(date=ercot$date, intercn=ercot$intercn, gasprice = ercot$gasprice, coalprice=ercot$coalprice, priceratio = ercot$priceratio) %>% cbind(mean_ercot)
 
 #run model 
-reg_ercot <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=ercot)
+reg_ercot <- lm(model, data=ercot)
 
 #predict new co2 emission and join with predict_ercot, ERCOT has no net imports of electricity, predict throws warning
 fit_ercot <- predict_ercot %>% 
@@ -774,7 +794,7 @@ plot_ercot <- ggplot(final_ercot, aes(x=basecoal/priceratio, y=fit.transformed))
 ```
 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
-```{r "4_1__10",warning=FALSE, fig.width=7, fig.height=7}
+```{r "4_1__11",warning=FALSE, fig.width=7, fig.height=7}
 wecc <- filter(dat, intercn=="WECC")
 
 mean_wecc <- wecc %>% 
@@ -783,7 +803,7 @@ mean_wecc <- wecc %>%
 
 predict_wecc <- tibble(date=wecc$date, intercn=wecc$intercn, gasprice = wecc$gasprice, coalprice=wecc$coalprice, priceratio = wecc$priceratio) %>% cbind(mean_wecc)
 
-reg_wecc <- lm(co2mass ~ ns(priceratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason, data=wecc)
+reg_wecc <- lm(model, data=wecc)
 
 fit_wecc <- predict_wecc %>% 
   cbind(as.data.frame(predict(reg_wecc, newdata = predict_wecc, interval = 'confidence')))
@@ -809,7 +829,7 @@ plot_wecc <- ggplot(final_wecc, aes(x=basecoal/priceratio, y=fit.transformed)) +
 
 **Task:** Use grid.arrange() to display the plots next to each other. Just press *check*.
 
-```{r "4_1__11",warning=FALSE, fig.width=14, fig.height=7}
+```{r "4_1__12",warning=FALSE, fig.width=14, fig.height=7}
 grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 ```
 
@@ -822,7 +842,7 @@ grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 
 
 ///////// test
-```{r "4_1__12"}
+```{r "4_1__13"}
 
 main_data2 <- rbind(final_east, final_ercot, final_wecc)
 main_data2 <- main_data2[order(as.Date(main_data2$date, format="%d/%m/%Y")),]
