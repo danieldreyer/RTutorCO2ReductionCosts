@@ -12,7 +12,7 @@ library(yaml)
 #library(restorepoint)
 setwd("X:/libraries/RTutor_BA")
 ps.name = "CarbonReductionCosts"; sol.file = paste0(ps.name,"_sol.Rmd")
-libs = c("dplyr", "ggplot2", "gridExtra", "stargazer", "tidyverse", "ggalt",  "splines", "kableExtra", "scatterplot3d", "RColorBrewer") # character vector of all packages you load in the problem set
+libs = c("dplyr", "ggplot2", "gridExtra", "ggalt", "kableExtra", "RColorBrewer", "sandwich", "splines", "stargazer", "tidyverse", "scatterplot3d") # character vector of all packages you load in the problem set
 name.rmd.chunks(sol.file) # set auto chunk names in this file
 create.ps(sol.file=sol.file, ps.name=ps.name, user.name=NULL,libs=libs, stop.when.finished=FALSE, addons="quiz", extra.code.file="dp.R")
 show.shiny.ps(ps.name, load.sav=FALSE,  sample.solution=TRUE, is.solved=TRUE, catch.errors=TRUE, launch.browser=TRUE)
@@ -755,21 +755,28 @@ R packages normally provide a lot of handy functions to predict fitted values an
 #< info "Custom Function" 
 
 ```{r "3_2__6",eval=FALSE}
-Newey <- function(model, predict) {
-  temp <- NeweyWest(model, newdata=predict)
-  X_mat <- model.matrix(model)
-  var_fit_hac <- rowSums((X_mat %*% temp) * X_mat)
+predict.robust <- function(m, data, data_p) {
+  require(sandwich)
+    
+  reg_temp <- lm(co2mass ~ ns(costratio, df=5), data=data)
+  pred_df <- data.frame(fit=predict(m, newdata=data_p))
+  
+  # get HAV VCOV matrix, equal to NewwayWest()
+  robust_errors <- vcovHC(reg_temp, type = "HC2")
+  # get model matrix
+  mat <- model.matrix(reg_temp)
+  # point-wise variance for prediction
+  var_fit_hac <- rowSums((mat %*% robust_errors) * mat)
+  # standard errors
   se_fit_hac = sqrt(var_fit_hac)
   
-  pred_df <- pred_df %>%
-  mutate(se_fit_hac = sqrt(var_fit_hac)) %>%
-  mutate(
-    lwr_hac = pred_df$fit - 1.96*var_fit_hac,
-    upr_hac = pred_df$fit + 1.96*var_fit_hac
-  )
+  pred_df_data <- pred_df %>%
+    mutate(
+      # calculate CI intervals
+      lwr = pred_df$fit - qt(0.975, df=m$df.residual)*se_fit_hac,
+      upr = pred_df$fit + qt(0.975, df=m$df.residual)*se_fit_hac
+    )
 }
-
-#//////////////// machen
 ```
 
 #>
@@ -871,12 +878,12 @@ TEXT
 
 ## Exercise 4.1 -- Estimated CO2 Response to Fuel Prices
 
-In this exercise we will finally bring together all the findings so far and dedicate ourselves to our main results. In the first step we will perform the regression model based on the implications we made in `Exercise 3.2`. Afterwards we will use this model to predict emissions and trace our the emission response curves to changing fuel prices. Based on this we will explain and carry out the analysis step by step for interconnection `EAST`, afterwards apply it to `ERCOT` and `WECC` and interpret our results.  
-As a side note, we will dive through a bunch of code. It isn't meant to be the shortest or the most efficient, but should allow you to follow each step closely. 
+In this exercise we will finally bring together all our expertise and focus on our main results. In the first step we will perform the regression model based on the implications we made in `Exercise 3.2`. Afterwards we will use this model to predict emissions and trace our the emission response curves to changing fuel prices. We will explain and carry out the analysis step by step for interconnection `EAST`, afterwards apply it to `ERCOT` and `WECC` and interpret our results.  
+As a side note, we will dive through a bunch of code. It isn't meant to be the shortest or the most efficient, but should allow you to follow each step closely.  
+  
+As always, we start the exercise by importing our data, following that we filter for interconnection `EAST`. Afterwards, we create a new data frame with the mean values of the independent variables as shown in `Exercise 3.1`. Since these steps are pretty straight forward and we have seen the methods before, go ahead and prepare our data.
 
-First, as always, we import our data frame from the previous exercise. The first steps are pretty straight forwards. First, we filter for interconnection `EAST`. Secondly, we create a new data frame with the mean values of the independent variables as shown in `Exercise 3.1`. Since these steps are pretty straight forward and you have seen the methods before, go ahead and prepare our data.
-
-**Task:** Load the dataframe and store it in `dat`.
+**Task:** Load the dataframe and store it in `dat`. Just press *check*.
 ```{r "4_1",message=FALSE}
 #< task_notest
 dat <- read_csv("Data/exercise4_1.csv")
@@ -894,7 +901,7 @@ display("Filter() takes a data frame as first argument and a logic as second. We
 #>
 ```
 
-**Task:** Calculate the `mean` of every variable we use in our regression. First, `select()` the necessary columns and then use `summarise_all()` to calculate the means. Store the result in `mean_east`.
+**Task:** Calculate the `mean` of the independent variable of our regression model. First, we `select()` the necessary columns and then use `summarise_all()` to calculate the means. Store the result in `mean_east`.
 ```{r "4_1__3"}
 #< task
 # ___ <- east %>% 
@@ -906,19 +913,19 @@ mean_east <- east %>%
   summarise_all(mean)
 ```
 
-**Task:** To make our life a bit easier we merge the data frame with the mean values with important variables that will help us later. If we would skip that step we would have to work with two data frames. Just press *check*.
+**Task:** To make our life a bit easier we merge the data of mean values with other relevant variables. We could skip this step but would be forced to work with several data frames later on. Just press *check*.
 ```{r "4_1__4"}
 #< task_notest
-predict_east <- tibble(date=east$date, intercn=east$intercn, co2mass=east$co2mass, gasprice = east$gasprice, coalprice=east$coalprice, costratio = east$costratio) %>% 
+predict_east <- tibble(date=east$date, intercn=east$intercn, gasprice = east$gasprice, coalprice=east$coalprice, costratio = east$costratio) %>% 
   cbind(mean_east)
 #>
 ```
 
-#< award "Data Preparer??../////////"
-TEXT
+#< award "Master of preparation"
+You successfully applied the methods we introduced to prepare data for analysis! Keep going.
 #>
 
-The data preparation is done, now we can define our model. We will perform a restricted spline regression as introduced in `Exercise 3.2`. The complete model is proposed by Cullen and is defined as below. We construct splines for `costratio`, `load`  and `meant` and include the remaining control variables as well as the seasonal dummy variable in a linear form.
+The data preparation is done, now we can define our model. We will perform a restricted spline regression, which expands the model in `Exercise 3.2`. The complete model is proposed by Cullen and is defined below. We construct splines for `costratio`, `load`  and `meant` and include the remaining control variables as well as the seasonal dummy variable in a linear form.
 
 $$\tag{5}co2mass_{2t}=s(costratio_{t}|\beta)+s(load_{t}|\theta) + s(meant_t|\omega)+X_t\psi+D_\gamma+\epsilon_t$$
 
@@ -928,11 +935,11 @@ $CO_{2t}$: CO2 emissions in tons
 $priceratio_{t}$: Cost ratio of coal over gas
 $load_{t}$: daily electricity consumption per interconnection in MWh  
 $meant_{t}$: average daily temperature per interconnection  
-$X_{t}$: Factors like non-fossil electricity production (e.g. solar, hydro or wind), $SO_{2}$ price, net imports of electricity from Canada and variance in load  
-$D_\gamma$: Dummy variable for seasonal variation to absorb fluctuations, e.g. by renewable energies.
+$X_{t}$: Factors like non-fossil electricity production (e.g. solar, hydro or wind), $SO_{2}$ prices, net imports of electricity from Canada and variance in load  
+$D_\gamma$: Dummy variable for seasonal variation to absorb fluctuations
 #>
 
-**Task:** Since we will run this regression model one times each for every interconnection, we can save some work and pre-define our model. Define the model according to `Equation 5` and store it into the variable `model`.
+**Task:** Since we will run this regression model one times each for every interconnection, we can save some work and pre-define our model. Define the model according to `Equation 5` and store it as `model`.
 ```{r "4_1__5"}
 #< task
 #___ co2mass ~ ___(priceratio, df=...) + ___(load, df=...) + tlsd + tlmin + tlmax + ___(meant, df=___) + nonfossil + so2price + netNSflow + yearseason
@@ -947,62 +954,49 @@ model=co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns
 reg_east <- lm(model, data=east)
 ```
 
-We mentioned this before, but because of the fact that the spline coefficients are transformations of explanatory variables, we forego looking at the summary statistics. Instead we continue with our workflow. In the next step we predict the fitted values 
+We mentioned this before, but because of the fact that the spline coefficients are transformations of explanatory variables, we forego looking at the summary statistics. Instead we continue with our workflow. In the next step we predict the fitted values. To do this we follow the method of `Exercise 3.2` and use our custom funtion `predict.robust()`, which combines `predict()` and evaluation of`confidence intervals` from robust errors.  
 
-
-
-**Task:** Predict $CO_2$ emissions based on the regression model `reg_east` and `temp_east`. We set interval to `confidence` to get the mean interval and be able to plot a confidence band later on.
-Just press *check*.
-
-wie ist custom function defined - arguments
+**Task:** Just press *check*.
 
 #< info "Confidence interval" 
 A confidence interval answers the question for which defined probability the data points lie within the interval. Mathematically, given we have observations $x_1...x_n$ and a confidence level $\gamma$, a confidence interval has a probability $\gamma$ to contain the true underlying parameter. Most commonly, and also in our case, we use
 the 95% confidence interval and is defined as: 
 
-$$\hat{y_h} ± t_{\alpha/2,n-2} \sqrt{MSE \frac{1}{n}+\frac{(x_k-\overline{x})^2}{\sum x_i-\overline{x}^2)}}$$
+$$\hat{y} ± t_{\alpha/2,n-2} \sqrt{MSE \frac{1}{n}+\frac{(x_k-\overline{x})^2}{\sum x_i-\overline{x}^2)}}$$
 where $\hat{\gamma}$ is the fitted response, $t_{\alpha/2,n-2}$ the t-value with n-2 degrees of freedom and the equation inside the square root represents the standard error.
 #>
 
 ```{r "4_1__7"}
-test2 <- pred_df
+fit_east <- predict_east %>% 
+  cbind(predict.robust(reg_east, east, predict_east))
 ```
 
+At this point we are able to plot our results. As seen before we would visualize the relation between the absolute values of fitted $CO_2$ emissions and cost ratios. This was an elegant way to introduce our model, but our final results should give us an clearer indication. Since cost ratios can be constructed with a variety of different levels of coal and gas costs, it is unclear which specific prices of gas would imply certain changes in emissions. To avoid confusion we can simply transform our cost ratios backwards and only include decreasing costs of natural gas.  
+Secondly, we will transform emission from a absolute scale to show the relative change in relation to a base line. Meaning, we show the relative change in emissions in realtiv to predicted fuel costs for 2025, as introduced in `Exercise 2`.  
 
-
-/// reg_robust <- lm_robust(y1 ~ x, mydat, se_type = 'stata')
-/// https://ditraglia.com/econ224/lab07.pdf
-
-
-Now we are at the point were we could plot our results. By doing so we would plot the absolute values of the fitted $CO_2$ emissions against cost ratios. In `Exercise 2` we showed that we can construct cost ratios with a variety of different fuel costs. This was an elegant method for us to use for modelling, but our final results should really give us an clear impression on the indications. Therefore, we will simply transform cost ratios backwards and just show gas prices. Additionally we mentioned in `Exercise 2` that it would be to get the change in emissions in relation to base line prices instead of absolute values. We use predictions of fuel costs 
-
-
-
-In the end it would be nice to get an output that gives as an percentage change of emissions to changing costs. Therefore we can take our fitted values and transform them base 
-
-Additionally, as we saw in `Exercise 2` we can pretty much construct cost ratios with various `gas` and `coal` costs. Let's say we have 
-
-
-**Task:** Just press *check*.
+**Task:** Below I implimented the changes from above a commented each step. We can tranform cost ratios directly in the process of creating our plot in the following code chunk. Just press *check*.  
 ```{r "4_1__8"}
-# define base prices as mentioned in Exercise 2
+# define base prices as introduced in Exercise 2
 basecoal=2.25
 basegas=5.75
 
+# calculate the differences between cost ratios and the predicted cost ratio of 2025
 diff_base <- abs(east$costratio - (basecoal/basegas))
+# find the smallest value of difference
 min_dif <- min(diff_base)
+# return TRUE for the smallest difference in diff_base
 closest <- min_dif==diff_base
+# find the value of fitted emissions that is closest
 base_emit <- mean(fit_east$fit[which(closest)])
 
-final_east <- test2 %>% 
+# transform absolute fitted emissions into percentage change to baseline (also for CI's)
+final_east <- fit_east %>% 
   mutate(fit.transformed=fit/base_emit-1,
          lwr.transformed=lwr/base_emit-1,
          upr.transformed=upr/base_emit-1)
 ```
 
-
-
-**Task:** The only task left is to create our plot. Just press *check*.
+**Task:** The only thing left, is to create our plot. Just press *check*.
 ```{r "4_1__9",warning=FALSE, fig.width=7, fig.height=7}
 #< task_notest
 # transform costratio backwards to plot gas costs, save plot to variable for later use
@@ -1020,7 +1014,7 @@ plot_east <- ggplot(final_east, aes(x=basecoal/east$costratio, y=fit.transformed
   scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2.2, 12)) +
   # add labels 
   labs(title="Eastern Interconnection", subtitle = "y=Percentage Change in CO2 emissions",
-       y="", x="Gas Price $/MMBTU") +
+       y="", x="Gas Costs $/MMBTU") +
   # set theme (optional)
   theme_minimal()
 
@@ -1028,44 +1022,34 @@ plot_east
 #>
 ```
 
-TEXT////
-
-If you feel confident you can write the code for the other two interconnection by your own. Otherweise just run the two code chunks below.
-
+The plot shows us the relative change of $CO_2$ emissions when considering base line natural gas costs of \$5.75. The grey are are around the fitted values show us the 95% confidence interval using robust standard errors. Especially for natural gas prices lower than \$4 we can force a switch to cleaner plants, which leads up to roughly 12% reduced emissions. On the other side we observe a small increase in emissions with increasing gas costs. This is basically the opposite to fuel-switching we intend. With higher gas costs the marginal costs of coal generators become favorable in relation to gas-generators. Although we have to be a bit more careful about these result. Since we plot our confidence intervals and already analysed the distribution of our data we know that the majority of our data are within a cost range of around \$2 and \$9. Therefore our errors include a larger interval with higher costs.  
+Going forward we run the code for the other two interconncection. If you feel confident you can create your own plots based on our data and methods. otherwise just run the two code chunks below.  
 **Task:** Run the code for the `ERCOT` interconnection. Just press *check*.
 ```{r "4_1__10",warning=FALSE, fig.width=7, fig.height=7}
 #< task_notest
-
 #filter for interconnection ERCOT
 ercot <- filter(dat, intercn=="ERCOT")
-
 #calculate the mean for regression coefficients
 mean_ercot <- ercot %>% 
   select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
   summarise_all(mean)
-
 #join data
 predict_ercot <- tibble(date=ercot$date, intercn=ercot$intercn, gasprice = ercot$gasprice, coalprice=ercot$coalprice, costratio = ercot$costratio) %>% cbind(mean_ercot)
-
 #run model 
 reg_ercot <- lm(model, data=ercot)
-
-#predict new co2 emission and join with predict_ercot, ERCOT has no net imports of electricity, predict throws warning
+#predict fitted co2 emission and join with predict_ercot, ERCOT has no net imports of electricity, predict throws warning
 fit_ercot <- predict_ercot %>% 
-  cbind(as.data.frame(predict(reg_ercot, newdata = predict_ercot, interval = 'confidence')))
-
+  cbind(predict.robust(reg_ercot, ercot, predict_ercot))
 #find baselevel of emission in relation to baseline price of coal and gas
 diff_base <- abs(ercot$costratio - (basecoal/basegas))
 min_dif <- min(diff_base)
 closest <- min_dif==diff_base
 base_emit <- mean(fit_ercot$fit[which(closest)])
-
 #transform predicted emission into percentage change to baseline emissions
 final_ercot <- fit_ercot %>% 
   mutate(fit.transformed=fit/base_emit-1,
          lwr.transformed=lwr/base_emit-1,
          upr.transformed=upr/base_emit-1)
-
 #plot result
 plot_ercot <- ggplot(final_ercot, aes(x=basecoal/costratio, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = final_ercot$lwr.transformed, ymax = final_ercot$upr.transformed),
@@ -1075,7 +1059,7 @@ plot_ercot <- ggplot(final_ercot, aes(x=basecoal/costratio, y=fit.transformed)) 
   geom_vline(xintercept = 5.75, linetype = "dashed") + 
   scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2.2, 12)) +
   labs(title="ERCOT Interconnection", subtitle = "y=Percentage Change in CO2 emissions",
-       y="", x="Gas Price $/MMBTU") +
+       y="", x="Gas Costs $/MMBTU") +
   theme_minimal()
 #>
 ```
@@ -1083,26 +1067,30 @@ plot_ercot <- ggplot(final_ercot, aes(x=basecoal/costratio, y=fit.transformed)) 
 **Task:** Run the code for the `WECC` interconnection. Just press *check*.
 ```{r "4_1__11",warning=FALSE, fig.width=7, fig.height=7}
 #< task_notest
+#filter for interconnection WECC
 wecc <- filter(dat, intercn=="WECC")
-
+#calculate the mean for regression coefficients
 mean_wecc <- wecc %>% 
   select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
   summarise_all(mean)
-
+#join data
 predict_wecc <- tibble(date=wecc$date, intercn=wecc$intercn, gasprice = wecc$gasprice, coalprice=wecc$coalprice, costratio = wecc$costratio) %>% cbind(mean_wecc)
-
+#run model 
 reg_wecc <- lm(model, data=wecc)
-
+#predict fitted co2 emission and join with predict_wecc
 fit_wecc <- predict_wecc %>% 
-  cbind(as.data.frame(predict(reg_wecc, newdata = predict_wecc, interval = 'confidence')))
-
-base_emit <- mean(fit_wecc$fit[which(min(abs(wecc$costratio - (basecoal/basegas)))==abs(wecc$costratio - (basecoal/basegas)))])
-
+  cbind(predict.robust(reg_wecc, wecc, predict_wecc))
+#find baselevel of emission in relation to baseline price of coal and gas
+diff_base <- abs(wecc$costratio - (basecoal/basegas))
+min_dif <- min(diff_base)
+closest <- min_dif==diff_base
+base_emit <- mean(fit_wecc$fit[which(closest)])
+#transform predicted emission into percentage change to baseline emissions
 final_wecc <- fit_wecc %>% 
   mutate(fit.transformed=fit/base_emit-1,
          lwr.transformed=lwr/base_emit-1,
          upr.transformed=upr/base_emit-1)
-
+#plot result
 plot_wecc <- ggplot(final_wecc, aes(x=basecoal/costratio, y=fit.transformed)) +
   geom_ribbon(aes_string(ymin = final_wecc$lwr.transformed, ymax = final_wecc$upr.transformed),
                    colour="lightgrey", fill="lightgrey", alpha=0.5) +
@@ -1111,7 +1099,7 @@ plot_wecc <- ggplot(final_wecc, aes(x=basecoal/costratio, y=fit.transformed)) +
   geom_vline(xintercept = 5.75, linetype = "dashed") + 
   scale_x_continuous(breaks=c(2,3,4,5,6,7,8,9,10,11,12), limits=c(2.2, 12)) +
   labs(title="Western Interconnection", subtitle = "y=Percentage Change in CO2 emissions",
-       y="", x="Gas Price $/MMBTU") +
+       y="", x="Gas Costs $/MMBTU") +
   theme_minimal()
 #>
 ```
@@ -1122,34 +1110,15 @@ plot_wecc <- ggplot(final_wecc, aes(x=basecoal/costratio, y=fit.transformed)) +
 grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
 ```
 
-
-//TEXT, east oben, hier verlgeich zu ercot, wecc
-
-
-
-
-
-
-///////// test
-```{r "4_1__13"}
-
-main_data2 <- rbind(final_east, final_ercot, final_wecc)
-main_data2 <- main_data2[order(as.Date(main_data2$date, format="%d/%m/%Y")),]
-write.csv(main_data2, "X:\\libraries\\RTutor_BA\\main_data2.csv", row.names = FALSE)
-temp <- read_csv("main_data2.csv")
-write.csv(dat_east, "X:\\libraries\\RTutor_BA\\exercise3_2.csv", row.names = FALSE)
-
-write.csv(dat_final, "X:\\libraries\\RTutor_BA\\exercise4_1.csv", row.names = FALSE)
-```
-
-
-
+Roughly comparing the results we get the same response curves for all interconnections. We can achieve reductions in $CO_2$ emissions of roughly 12% when introducing gas costs of $2 and we have increasing emissions for higher costs than our base line (we explained the reason above). Although by looking closely we can detect some differences by comparing the new graphs to the Eastern Interconection.  
+For the Texas Interconnection (`ERCOT`) we observe a fall in emission that starts with lower gas costs and at the same time is steeper. If we look at the summary table of `Exercise 4` we can come up with some explanations. The proportion of non-fossil generated power is way lowere than for other regions. this will results in strong dependencies to the generators that are available at this moment. Fuel-switching will thereby occur later, but when the economic pressure is high enough, more strongly. We observe the same effect for increasing gas prices. The marginal costs for coal generators and other energy sources become more favorable with higher gas costs. Nevertheless the grid is kind of static, therefore the effects kicks in later but steeper.  
+The respone curve of the `Western Interconnection` in contrast reacts much smoother to changing gas costs. Because of the higher proportion of non-fossil power generation of roughly 30%, the region is less effected by fuel-switching in the short term. The curve responds very static over a wider range of gas costs without any change in emissions. Additionally, for higher gas price the increase in emissions is clearly lower than for other regions. With falling gas price the grid has a longer response until emissions fall. All of these point are also supported by the fact, that the emission rate of the Western Interconnection is about 25% lower.  
+  
+Nevertheless, gas prices are set by supply and demand and without introducing very specific instruments to influence the industry, it's hard to directly set pricing as an government. In the next exercise we will solve this problem by tranforming our fuel costs into carbon prices and conclude our analysis. Click `Go to next exercise` to continue.
 
 #< award "Sp(l)ine Surgeon2"
-This was a critical operation, but you mastered it! Keep going, the hardest part is over.
+You sucessfully combined most of our introduced methods. Keep going to see the final results, the hardest part is over.
 #>
-
-In the next exercise we will map the emission response curves from this exercise into carbon prices and estimate the effects of carbon prices on emissions as well as the associated costs. Click `Go to next exercise` to continue.
 
 
 ## Exercise 4.2 --  Imputed CO2 Response to Carbon Prices
@@ -1167,6 +1136,7 @@ To avoid repeating the same steps as in the last exercise, I prepared a data fra
 ```{r "4_2",message=FALSE}
 #< task_notest
 dat <- read_csv("Data/exercise4_2.csv")
+
 head(dat,3)
 
 basegas <- 5.75
@@ -1189,14 +1159,14 @@ $$\tag{3}{P_{co2}}=\frac{CR\cdot{base_{gas}}-{base_{coal}}}{CO_{2,coal}-CR\cdot 
 #head(___,___)
 #>
 dat_tax <- dat %>% 
-  mutate(carbontax = (costratio*basegas-basecoal)/(co2_coal-costratio*co2_gas)) 
+  mutate(carbontax = (costratio*basegas-basecoal)/(0.1054-costratio*0.0585))
 ```
 
 **Task:** Use `range()` to get the minimum and maximum of `carbontax`.
 ```{r "4_2__3"}
 #< task
 #>
-range(tax$carbontax)
+range(dat_tax$carbontax)
 ```
 
 As you can see we calculated negative as well as very high values of carbon taxes. Negative values wouldn't make much sense to consider for a tax in our case. The same is true for values that are extremely high. Because of that we will limit our taxes to a range of $[0,80]$.  
@@ -1235,8 +1205,7 @@ plot_east <- ggplot(tax_east, aes(x=carbontax, y=fit.transformed)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-0.15,.01)) +
   scale_x_continuous(limits=c(0, 80)) +
   labs(title="Eastern Interconnection",
-       y="", x="Carbon Price $/ton", subtitle="y=CO2 emissions in Percentage") +
-  coord_flip()
+       y="", x="Carbon Price $/ton", subtitle="y=CO2 emissions in Percentage") 
 
 #run for Interconnection ERCOT
 tax_ercot <- filter(tax, intercn=="ERCOT")
@@ -1248,8 +1217,7 @@ plot_ercot <- ggplot(tax_ercot, aes(x=carbontax, y=fit.transformed)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-0.15,.01)) +
   scale_x_continuous(limits=c(0, 80)) +
   labs(title="Ercot Interconnection",
-       y="", x="Carbon Price $/ton", subtitle="y=CO2 emissions in Percentage") +
-  coord_flip()
+       y="", x="Carbon Price $/ton", subtitle="y=CO2 emissions in Percentage") 
 
 # run for Interconnection WECC
 tax_wecc <- filter(tax, intercn=="WECC")
@@ -1261,8 +1229,7 @@ plot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=fit.transformed)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits=c(-0.15,.01)) +
   scale_x_continuous(limits=c(0, 80)) +
   labs(title="Western Interconnection",
-       y="", x="Carbon Price $/ton", subtitle="y=CO2 emissions in Percentage") +
-  coord_flip()
+       y="", x="Carbon Price $/ton", subtitle="y=CO2 emissions in Percentage") 
 #>
 ```
 
@@ -1271,34 +1238,19 @@ plot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=fit.transformed)) +
 grid.arrange(plot_east, plot_ercot, plot_wecc, nrow=1)
 ```
 
-The first plot shows the emission response curve of the Eastern Interconnection. This plot has the advantage, in comparison to the plots we made in the previous exercise, that we directly interpret the effect of certain levels of carbon prices on emissions. We see, that $CO_2$ emissions fall steeper for lower carbon prices. Purely interepreting the graph we could suggest that carbon prices between \$10 and \$40 have the most effect per dollar value. We will later on extract discrete values from our data set and calculate absolute costs of carbon taxes.  
-Following this, we can plot the results for the remaining two interconnections. Run the two code chunks below and afterwards answer the quiz before we look at the results. 
-
-wv energie verbrauch
-
-The first thing we observe, 
-
-Because of the fact that ercot is already more reliant on renewable energies we can argue that the emission reduction from switching between gas and coal- 
-is steepest with a introduction of carbon prices and slows afterwards.
-
-
-Based on our method we dont get carbon prices higher than 72 for West because of the price structure.
-In the end all interconnection end up at around a reduction of 12% 
-
-We can argue that additional carbon reduction will result from other factors if 
-
-
-If we look at the ERCOT region (Texas), the first difference that ...
+As mentioned before, setting fuel prices directly is hardly possible. Therefore the plots above correspond to positive carbon prices within a reasonable range. In counterpart to our previous view on fuel costs, we lose some depth in the movement of the curves, but also are able to directly interpret the effects of an viable instrument in form of taxes.  
+Since our method only transforms the x-Axis of our plots, the reaction curves look quite similiar and the therefore the reasons for different reactions are also the same. The central point here is to determine which levels of carbon prices would be most efficient. The Texas Interconnections reacts steeper for lower carbon prices, while the reaction of the Eastern und Western region react is more balanced.  
+Based on the results of our plots, we can achieve clear reductions in emissions by introducing even smaller tax rates. If we only take the positive effects of reduced emissions on the environment into account, we would introduce the highest possible taxes. But since we are living in a economy where every additional charge can have severe consequences we have to carefully weigh our actions.  Based on the graphical interpretation, a tax between \$10 and \$40 seems to have the most impact on $CO_2$ emissions when considering the value per dollar.
 
 &nbsp;
 #< quiz "Costs of carbon taxes"
-question: Assume we introduce a carbon tax of $20/ton, roughly how much would that cost us in billion dollars?
+question: Assume we introduce a carbon tax of $50/ton, roughly how much would that cost us in billion dollars?
 
 sc:
     - 1
     - 10
-    - 50*
-    - 100
+    - 50
+    - 100*
     - 200
 success: Great, your answer is correct!
 failure: Try again.
@@ -1306,7 +1258,7 @@ failure: Try again.
 
 &nbsp;  
 
-Continue we create a table which 
+You see, even "moderate" tax rates can lead to extreme costs. Considering that the economic effect of carbon prices is controversal, we have to find a socially acceptable level. Next, we will construct a table, which gives us information on the effects of certain levels of taxes on emissions and at the same time calculates the corresponding costs.
 
 **Task:** Just press *check*.
 ```{r "4_2__8"}
@@ -1375,7 +1327,7 @@ We can conduct two easy robustness tests for our model. First, we could change t
 We can also vary the `Knots` we use in our spline regression. We already mentioned in `Exercise 3.2` why we should test this. The process of achieving the result is equal to our previous method, below you see the output of a model with 4 degrees of freedomin comparison to our main results. As mentioned we get a less flexible curve, but the result are statistically insensitive to changes of the number of knots. Run the chunk above to get the graph (optional).
 
 ```{r "5__2",optional=TRUE, message=FALSE}
-TODO
+# function compare df=5 to x
 ```
 
 
@@ -1412,7 +1364,7 @@ TODO
 
 - Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2.2. https://CRAN.R-project.org/package=stargazer 
 
-- Kranz, S. (2020): RTutor. "Creating R problem sets with automatic assessment of student's solutions", R package version 2020.03.13, https://github.com/skranz/RTutor
+- Kranz, S. (2020): RTutor: "Creating R problem sets with automatic assessment of student's solutions", R package version 2020.03.13, https://github.com/skranz/RTutor
 
 - Ligges, U., Maechler, M., Schnackenberg, S. (2018), scatterplot3d: "Plots a three dimensional (3D) point cloud.", R package version 0.3-41, https://cran.r-project.org/web/packages/scatterplot3d/index.html
 
@@ -1422,11 +1374,13 @@ TODO
 
 - Venables ,W., Bates, D. (2019), splines: "Regression spline functions and classes.", R package version 3.6.2, Part of R.3.6.2
 
-- Wickham, H. (2016): ggplot2. "Elegant Graphics for Data Analysis", Springer-Verlag, New York, R package version 3.2.1, http://CRAN.R-project.org/package=ggplot2
+- Wickham, H. (2016): ggplot2: "Elegant Graphics for Data Analysis", Springer-Verlag, New York, R package version 3.2.1, http://CRAN.R-project.org/package=ggplot2
 
-- Wickham, H., Francois, R., Henry, L., Muller, K., (2018): dplyr. "A Grammar of Data Manipulation", R package version 0.8.3, http://CRAN.R-project.org/package=dplyr
+- Wickham, H., Francois, R., Henry, L., Muller, K., (2018): dplyr: "A Grammar of Data Manipulation", R package version 0.8.3, http://CRAN.R-project.org/package=dplyr
 
 - Zhu, H. (2019), kableExtra: "Construct Complex Table with 'kable' and Pipe Syntax", R package version 1.1.0, https://cran.r-project.org/web/packages/kableExtra/index.html
+
+- Zeileis, A. (2019), sandwich: "Model-robust standard error estimators for cross-sectional, time series, clustered, panel, and longitudinal data.", R package version 2.5-1, https://cran.r-project.org/web/packages/sandwich/index.html
 
 ### Data Sources
 

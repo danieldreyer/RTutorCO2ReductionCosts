@@ -922,6 +922,8 @@ If we look at the ERCOT region (Texas), the first difference that ...
 
 &nbsp;  
 
+Continue we create a table which 
+
 **Task:** Just press *check*.
 ```{r "4_2__8"}
 #define a function to find the value of emissions that is closest to the level of carbon taxes 
