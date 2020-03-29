@@ -1656,3 +1656,47 @@
 ,
 {"type":["init_ps"],"time":["2020-03-26 23:05:30"],"user":["default_user"],"umph":[1585260330.6633],"ok":[true]}
 ,
+{"type":["init_ps"],"time":["2020-03-27 01:31:30"],"user":["default_user"],"umph":[1585269090.6678],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-27 15:08:00"],"user":["default_user"],"umph":[1585318080.7145],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-28 00:22:57"],"user":["default_user"],"umph":[1585351377.347],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:23:04"],"user":["default_user"],"umph":[1585351384.5828],"ok":[true],"chunk":[27],"ex":[7],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise4_1.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:23:05"],"user":["default_user"],"umph":[1585351385.7441],"ok":[true],"chunk":[28],"ex":[7],"e.ind":[0],"code":["east <- filter(dat, intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:23:06"],"user":["default_user"],"umph":[1585351386.9729],"ok":[true],"chunk":[29],"ex":[7],"e.ind":[0],"code":["# ___ <- east %>% \n#  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n#  summarise_all(___)\nmean_east <- east %>% \n  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n  summarise_all(mean)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:23:07"],"user":["default_user"],"umph":[1585351387.9769],"ok":[true],"chunk":[30],"ex":[7],"e.ind":[0],"code":["predict_east <- tibble(date=east$date, intercn=east$intercn, co2mass=east$co2mass, gasprice = east$gasprice, coalprice=east$coalprice, costratio = east$costratio) %>% \n  cbind(mean_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:23:10"],"user":["default_user"],"umph":[1585351390.8071],"ok":[true],"chunk":[31],"ex":[7],"e.ind":[0],"code":["#___ co2mass ~ ___(priceratio, df=...) + ___(load, df=...) + tlsd + tlmin + tlmax + ___(meant, df=___) + nonfossil + so2price + netNSflow + yearseason\nmodel=co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:23:25"],"user":["default_user"],"umph":[1585351405.5528],"ok":[true],"chunk":[32],"ex":[7],"e.ind":[0],"code":["reg_east <- lm(model, data=east)\nshow.regression(reg_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:24:12"],"user":["default_user"],"umph":[1585351452.2099],"ok":[true],"chunk":[32],"ex":[7],"e.ind":[0],"code":["reg_east <- lm(model, data=east)\nshow.regression(reg_east)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-28 00:25:35"],"user":["default_user"],"umph":[1585351535.8792],"ok":[true]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:25:41"],"user":["default_user"],"umph":[1585351541.1091],"ok":[true],"chunk":[27],"ex":[7],"e.ind":[0],"code":["dat <- read_csv(\"Data/exercise4_1.csv\")\nhead(dat,3)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:25:42"],"user":["default_user"],"umph":[1585351542.161],"ok":[true],"chunk":[28],"ex":[7],"e.ind":[0],"code":["east <- filter(dat, intercn==\"EAST\")"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:25:43"],"user":["default_user"],"umph":[1585351543.214],"ok":[true],"chunk":[29],"ex":[7],"e.ind":[0],"code":["# ___ <- east %>% \n#  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n#  summarise_all(___)\nmean_east <- east %>% \n  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% \n  summarise_all(mean)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:25:44"],"user":["default_user"],"umph":[1585351544.4383],"ok":[true],"chunk":[30],"ex":[7],"e.ind":[0],"code":["predict_east <- tibble(date=east$date, intercn=east$intercn, co2mass=east$co2mass, gasprice = east$gasprice, coalprice=east$coalprice, costratio = east$costratio) %>% \n  cbind(mean_east)"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:25:45"],"user":["default_user"],"umph":[1585351545.8059],"ok":[true],"chunk":[31],"ex":[7],"e.ind":[0],"code":["#___ co2mass ~ ___(priceratio, df=...) + ___(load, df=...) + tlsd + tlmin + tlmax + ___(meant, df=___) + nonfossil + so2price + netNSflow + yearseason\nmodel=co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason"],"message":[""]}
+,
+{"type":["check_chunk"],"time":["2020-03-28 00:25:56"],"user":["default_user"],"umph":[1585351556.4968],"ok":[true],"chunk":[32],"ex":[7],"e.ind":[0],"code":["reg_east <- lm(model, data=east)\nshow.regression(reg_east)"],"message":[""]}
+,
+{"type":["init_ps"],"time":["2020-03-28 14:08:16"],"user":["default_user"],"umph":[1585400896.4169],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-28 20:06:18"],"user":["default_user"],"umph":[1585422378.7761],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-28 20:53:26"],"user":["default_user"],"umph":[1585425206.06],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-28 23:34:14"],"user":["default_user"],"umph":[1585434854.4117],"ok":[true]}
+,
+{"type":["init_ps"],"time":["2020-03-29 00:48:29"],"user":["default_user"],"umph":[1585439309.6714],"ok":[true]}
+,
