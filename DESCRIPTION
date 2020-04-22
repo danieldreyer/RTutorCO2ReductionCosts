@@ -2,10 +2,10 @@ Package: RTutorCO2ReductionCosts
 Type: Package
 Title: Estimating CO2 Reduction Costs
 Version: 1.0
-Date: 2020-03-04
+Date: 2020-04-20
 Author: Daniel Dreyer
 Maintainer: Daniel Dreyer <daniel.dreyer@uni-ulm.de>
-Description: RTutor problem set to interactively estimate the emission response curves to carbon pricing.
+Description: RTutor problem set that estimates the effect of carbon pricing on emissions.
 License: 	
     Problem set content: Creative Commons (CC BY-SA)
 	Package code: GPL >= 2.0

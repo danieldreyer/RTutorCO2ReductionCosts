@@ -1,6 +1,6 @@
 This package constitutes an interactive R problem set based on the RTutor package (https://github.com/skranz/RTutor). 
 
---- Add **brief** description of content and link to original paper ---
+--- A RTutor problem that interactively examines how carbon pricing would reduce emissions in the electricity sector. The analysis is based on "Inferring Carbon Abatement Costs in Electricity Markets: A Revealed Preference Approach using the Shale Revolution" by Joseph A. Cullen, Erin T. Mansur (2016) ---
 
 ## 1. Installation
 
