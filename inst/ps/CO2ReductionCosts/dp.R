@@ -1,7 +1,7 @@
-show.regression= function(...){
+ShowRegression= function(...){
   library(stargazer)
     stargazer(..., 
-            type = "html", 
+            type = "text", 
             style = "aer",  
             digits = 3,
             df = FALSE,
@@ -13,7 +13,7 @@ show.regression= function(...){
     )
 } 
 
-predict.robust <- function(m, data, data_p) {
+PredictRobust <- function(m, data, data_p) {
   require(estimatr)
   reg_temp <- lm_robust(m, data=data, se_type="HC1")
   pred_df <- as.data.frame(predict(reg_temp, data_p, interval="confidence"))
