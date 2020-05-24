@@ -15,7 +15,7 @@ ps.name = "CO2ReductionCosts"; sol.file = paste0(ps.name,"_sol.Rmd")
 libs = c("dplyr", "estimatr", "ggplot2", "gridExtra", "ggalt", "kableExtra", "sandwich", "splines", "stargazer", "tidyverse") # character vector of all packages you load in the problem set
 name.rmd.chunks(sol.file) # set auto chunk names in this file
 create.ps(sol.file=sol.file, ps.name=ps.name, user.name=NULL,libs=libs, stop.when.finished=FALSE, addons="quiz", extra.code.file="dp.R", rps.has.sol=TRUE)
-show.shiny.ps(ps.name, load.sav=FALSE,  sample.solution=TRUE, is.solved=TRUE, catch.errors=TRUE, launch.browser=TRUE)
+show.shiny.ps(ps.name, load.sav=FALSE,  sample.solution=FALSE, is.solved=TRUE, catch.errors=TRUE, launch.browser=TRUE)
 stop.without.error()
 rtutor.package.skel(sol.file=sol.file, ps.name=ps.name,libs=libs,
                     pkg.name="RTutorCO2ReductionCosts", # Name of the problem set package
@@ -140,9 +140,10 @@ For further information, use `help()`.
 #>
 
 ```{r "1__5"}
-#< task
-# ___ <- ___("./Data/exercise1.csv")
+#< fill_in
+___ <- ___("./Data/exercise1.csv")
 #>
+# Sample solution
 dat <- read_csv("./Data/exercise1.csv")
 #< hint
 display("Replace the variable name with the one given in the exercise description. No other changes are needed.")
@@ -152,9 +153,10 @@ display("Replace the variable name with the one given in the exercise descriptio
 **Task:** First, we want to get an impression on the structure of our data set. Use `head(data frame, rows)` to display the first *6* rows of the data set `dat`. Without the second argument, returns the first 5 rows on default. Alternatively, you can click on `data` and get redirected to the `Data Explorer` tab, where you can navigate around the data frame and see some basic statistics.
 
 ```{r "1__6"}
-#< task
-# head(dat,___)
+#< fill_in
+head(dat,___)
 #>
+# Sample solution
 head(dat, 6)
 #< hint
 display("The second input parameter defines the number of row that are shown. Replace ___ with the number from the task description.")
@@ -165,9 +167,10 @@ The data frame includes 214 observations of *monthly* data from the year 2002 to
 
 **Task:** Convert the data type of column `date` to the correct type and store it under the same name.
 ```{r "1__7"}
-#< task
-# ___ <- ___(___, format="%m/%d/%Y")
+#< fill_in
+___ <- ___(___, format="%m/%d/%Y")
 #>
+# Sample solution
 dat$date <- as.Date(dat$date, format="%m/%d/%Y")
 #< hint
 display("Convert the column \"dat$date\" into a date format using as.Date().")
@@ -185,13 +188,14 @@ We are able to import a variety of custom packages that extend the basic functio
 You are not required to have detailed knowledge about this package. However, you can find further information [here](https://ggplot2.tidyverse.org/) or type `help(ggplot2)`.
 #>
 ```{r "1__8",fig.width=8, fig.height=5}
-#< task
-#ggplot(data=___, aes(x=___)) +
-#  geom_line(aes(y=dat$price_naturalgas_USA, color="United States"), size=0.8) +
-#  geom_line(aes(y=dat$price_naturalgas_Europe, color="Europe"), size=0.8) +
-#  labs(x = "Year", y = "", title = "Natural Gas Prices", subtitle = "Y=$/MMBtu")+
-#  scale_color_manual(name="Region",values = c("blue","red"))
+#< fill_in
+ggplot(data=___, aes(x=___)) +
+  geom_line(aes(y=dat$price_naturalgas_USA, color="United States"), size=0.8) +
+  geom_line(aes(y=dat$price_naturalgas_Europe, color="Europe"), size=0.8) +
+  labs(x = "Year", y = "", title = "Natural Gas Prices", subtitle = "Y=$/MMBtu")+
+  scale_color_manual(name="Region",values = c("blue","red"))
 #>
+# Sample solution
 ggplot(data=dat, aes(x=date)) +
   geom_line(aes(y=dat$price_naturalgas_USA, color="United States"), size=0.8) +
   geom_line(aes(y=dat$price_naturalgas_Europe, color="Europe"), size=0.8) +
@@ -217,21 +221,21 @@ failure: Try again.
 **Task:** Create a new plot for generated electricity. Plot `date` on the x-Axis and the generated electricity on the y-Axis. Draw separate lines for `gas-generated power` as well as `coal-generated power`, which are added with `geom_line`. You can take the code from the previous graph as reference or conduct the `help()` function.
 
 ```{r "1__9",fig.width=8, fig.height=5}
-#< task
-#ggplot(data=___, aes(x=___)) +
-#  ___(aes(___=dat$generated_coal, color="Coal Generation (TWh)"), size=0.8, alpha=0.5) +
-#  ___(aes(___=dat$generated_gas, color="Natural Gas Generation (TWh)"), size=0.8, alpha=0.5) +
-#  labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
-#  scale_color_manual(name="",values = c("black","red"))+
-#  scale_y_continuous(breaks=seq(0,200,25))
-
+#< fill_in
+ggplot(data=___, aes(x=___)) +
+  ___(aes(___=dat$generated_coal, color="Coal Generation (TWh)"), size=0.8, alpha=0.5) +
+  ___(aes(___=dat$generated_gas, color="Natural Gas Generation (TWh)"), size=0.8, alpha=0.5) +
+  labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
+  scale_color_manual(name="",values = c("black","red"))+
+  scale_y_continuous(breaks=seq(0,200,25))
+#>
+# Sample solution
 ggplot(data=dat, aes(x=date)) +
   geom_line(aes(y=dat$generated_coal, color="Coal Generation (TWh)"), size=0.8, alpha=0.5) +
   geom_line(aes(y=dat$generated_gas, color="Natural Gas Generation (TWh)"), size=0.8, alpha=0.5) +
   labs(x = "Year", y = "", title = "Monthly Generation by Fueltype", subtitle = "Y=Monthly Electricty (TWh)")+
   scale_color_manual(name="",values = c("black","red"))+
   scale_y_continuous(breaks=seq(0,200,25))
-#>
 ```
 
 The results are in line with what we should expect. With a higher supply of gas and decreasing prices, gas generators increased their share in power generation over time. Giving you a bit more background: Coal-fired generators tend to have lower operating costs than gas-fired ones but are expensive to start and adjust slowly to fluctuating demands. Gas-generators can fill these gaps. The first of two different types of gas generators are `Peaker Plants`. They run in high demand hours due to their fast start-up times but suffer from high marginal costs. The second type are `Combined Cycle Gas Turbines` (CCGT), which have low heat rates (high efficiency of turning fuel into power) and are used to provide baseline power generation throughout the day.  
@@ -354,12 +358,13 @@ example %>%
 #>
 
 ```{r "3_1__3"}
-#< task
-# ___ <- data ___ 
-#  mutate(costratio = ___/___,
-#         co2mass = co2mass/1000000),
-#         load = load/1000000)
+#< fill_in
+___ <- data ___ 
+  mutate(costratio = ___/___,
+         co2mass = co2mass/1000000),
+         load = load/1000000)
 #>
+# Sample solution
 dat <- data %>% 
   mutate(costratio = coalprice/gasprice,
          co2mass = co2mass/1000000,
@@ -455,6 +460,7 @@ failure: Try again.
 ```{r "3_1__9"}
 #< task
 #>
+# Sample solution
 ShowRegression(fit)
 ```
 
@@ -479,6 +485,7 @@ $$co2mass_{t}=\beta_0+\beta_1\cdot costratio_t+\beta_2\cdot load_t+\epsilon_t$$
 ```{r "3_1__10"}
 #< task
 #>
+# Sample solution
 fit1 = lm(co2mass ~ costratio + load, data=dat)
 ShowRegression(fit,fit1)
 ```
@@ -497,15 +504,16 @@ fitted.values <- predict(model, data)
 #>
 
 ```{r "3_1__12"}
-#< task
-#co2.hat1 = ___
+#< fill_in
+co2.hat1 = ___
 #>
+# Sample solution
 co2.hat1 = predict(fit1, dat)
 ```
 
 After calculating the fitted values of our regression model, we can proceed to plot our response curve. Because of the fact, that the second model is a multivariate regression with two independent variables, a corresponding plot would span over three dimensions. It is a valid solution to visualize our results that way, but we want to produce scientific robust results and therefore will plot our results in a two-dimensional graph. Since it is not that common to plot regression models, let's see what will happen if we continue and simply plot our fitted values for `fit1`. 
 
-**Task:** Just press **check**
+**Task:** Just press *check*
 ```{r "3_1__13"}
 #< task_notest
 ggplot(dat,aes(x=costratio,y=co2.hat1))+
@@ -556,21 +564,23 @@ We conclude this exercise by plotting the response curve once again and compare 
 
 **Task:** Run `predict()` on `fit2` and use the data frame `pred_dat`.
 ```{r "3_1__16"}
-#< task
-#co2.hat2 <- ___
+#< fill_in
+co2.hat2 <- ___
 #>
+# Sample solution
 co2.hat2 <- predict(fit2, pred_dat)
 ```
 
 **Task:** Create a new plot. Use `geom_line()` to plot one line each for `co2.hat1` and `co2.hat2`. Assign `costratio` to the x-axis and the fitted emission values to the y-axis.
 ```{r "3_1__17"}
-#< task
-#ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
-#   geom_line(aes(___), color="red") +
-#   geom_line(aes(___), color="green") +
-#   scale_color_manual(name="",values = c("black","red"))+
-#   labs(x="Cost Ratio", y="Emissions")
+#< fill_in
+ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
+   geom_line(aes(___), color="red") +
+   geom_line(aes(___), color="green") +
+   scale_color_manual(name="",values = c("black","red"))+
+   labs(x="Cost Ratio", y="Emissions")
 #>
+# Sample solution
 ggplot(pred_dat,aes(x=costratio,y=dat_east$co2mass))+
     geom_line(aes(x=costratio, y=co2.hat1, color="linear")) +
     geom_line(aes(x=costratio, y=co2.hat2, color="non-linear")) +
@@ -619,10 +629,11 @@ For full documentation of the function, conduct the help() function.
 #>
 
 ```{r "3_2__3",message=FALSE}
-#< task
-#model3 <- co2mass ~ ns(___)+ns(___)
-#fit3 <- lm(model3, data=dat)
+#< fill_in
+model3 <- co2mass ~ ns(___)+ns(___)
+fit3 <- lm(model3, data=dat)
 #>
+# Sample solution
 model3 <- co2mass ~ ns(costratio,df = 5)+ns(load, df=5)
 fit3 <- lm(model3, data=dat)
 ```
@@ -631,6 +642,7 @@ fit3 <- lm(model3, data=dat)
 ```{r "3_2__4"}
 #< task
 #>
+# Sample solution
 ShowRegression(fit3)
 ```
 
@@ -678,6 +690,7 @@ PredictRobust <- function(m, data, data_p) {
 #>
 
 ```{r "3_2__7"}
+#< task_notest
 # run custom function for regression and prediction
 co2.hat3 <- PredictRobust(model3, dat, pred_dat)
 # plot fit with robust confidence intervals
@@ -686,6 +699,7 @@ ggplot(co2.hat3,aes(x=pred_dat$costratio,y=dat$co2mass))+
     geom_ribbon(aes(ymin = co2.hat3$lwr, ymax = co2.hat3$upr), color="lightgrey", fill="lightgrey", alpha=0.5) +
     geom_line(aes(x=pred_dat$costratio, y=co2.hat3$fit), color="black")+
     labs(x="Cost Ratio", y="Emissions")
+#>
 ```
 
 We are now at a point where we have made all the necessary assumptions. Click `Go to next exercise` to start with our main analysis.
@@ -708,10 +722,11 @@ In Chapter 3 we worked our way towards a fitting model and ended up with a speci
 **Task:** Load the data set `exercise4.csv` with `read_csv` and store it into a variable called `dat`.
 
 ```{r "4",message=FALSE}
-#< task
-#___ <- ___("./Data/___")
-#head(dat, 3)
+#< fill_in
+___ <- ___("./Data/___")
+head(dat, 3)
 #>
+# Sample solution
 dat <- read_csv("./Data/exercise4.csv")
 head(dat, 3)
 ```
@@ -743,11 +758,13 @@ Another factor we have not considered yet is the seasonal component in energy co
 
 **Task:** Calculate the seasonal dummy variable and show the first few rows. Just press *check*.
 ```{r "4__2"}
+#< task_notest
 dat_final <- dat %>% 
   mutate(season=(month>3) + (month>6) + (month>9),
          yearseason=year*10+season)
 
 head(dat_final,3)
+#>
 ```
 
 This data frame inherits all variables we will include in our main results. With that in mind, we create a summary table which will give us a final impression of important key values.  
@@ -825,11 +842,12 @@ display("Filter() takes a data frame as first argument and a logic as second. We
 
 **Task:** Calculate the `mean` of the given variables. First, `select()` the necessary columns and then use `summarise_all()` to calculate the means. Store the result in `mean_east`.
 ```{r "4_1__3"}
-#< task
-#___ <- east %>% 
-#  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
-#  ___
+#< fill_in
+___ <- east %>% 
+  select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
+  ___
 #>
+# Sample solution
 mean_east <- east %>% 
   select(load, tlsd, tlmin, tlmax, meant, nonfossil, so2price, netNSflow, yearseason) %>% 
   summarise_all(mean)
@@ -868,9 +886,10 @@ $\epsilon_t$: Error-term
 
 **Task:** We will run this regression model once for each interconnection. Therefore, we can save some work and pre-define our model as a variable. Define the model according to `Equation 4` and store it as `model`.
 ```{r "4_1__5"}
-#< task
-#___ <- co2mass ~ ___(costratio, df=___ + ___(load, df=___ + tlsd + tlmin + tlmax + ___(meant, df=___) + nonfossil + so2price + netNSflow + yearseason
+#< fill_in
+___ <- co2mass ~ ___(costratio, df=___ + ___(load, df=___ + tlsd + tlmin + tlmax + ___(meant, df=___) + nonfossil + so2price + netNSflow + yearseason
 #>
+# Sample solution
 model <- co2mass ~ ns(costratio, df=5) + ns(load, df=5) + tlsd + tlmin + tlmax + ns(meant, df=5) + nonfossil + so2price + netNSflow + yearseason
 ```
 
@@ -887,6 +906,7 @@ Second, we transform emissions from an absolute scale to show the relative chang
 
 **Task:** The changes are implemented below. We transform the cost ratios in the creation of our plot in the following code chunk. Just press *check*.  
 ```{r "4_1__7"}
+#< task_notest
 # define base prices as introduced in Exercise 2
 basecoal <- 2.25
 basegas <- 5.75
@@ -905,6 +925,7 @@ final_east <- fit_east %>%
   mutate(fit.transformed=fit/base_emit-1,
          lwr.transformed=lwr/base_emit-1,
          upr.transformed=upr/base_emit-1)
+#>
 ```
 
 **Task:** The only thing left is to create our plot. Just press *check*.
@@ -1031,7 +1052,9 @@ plot_wecc <- ggplot(final_wecc, aes(x=basecoal/costratio, y=fit.transformed)) +
 
 **Task:** Use grid.arrange() to display the plots next to each other. Just press *check*.
 ```{r "4_1__11",warning=FALSE, fig.width=21, fig.height=7}
+#< task_notest
 grid.arrange(plot_east, plot_ercot, plot_wecc,  nrow=1)
+#>
 ```
 
 At first glance, the response curves are comparable across all regions. We can achieve reduction in $CO_2$ emissions of roughly 12% when introducing gas costs of $2. We also observe increasing emission for gas costs that are higher than our baseline costs of \$5.75. However, we notice some differences if we look at the exact course of the curves.  
@@ -1076,10 +1099,11 @@ $$\tag{4}{P_{co2}}=\frac{CR\cdot{base_{gas}}-{base_{coal}}}{CO_{2,coal}-CR\cdot 
 
 **Task:** Calculate carbon prices according to `Equation 4` and store them in a new column named `carbontax`. Store the resulting data frame as `dat_tax`.
 ```{r "4_2__2",message=FALSE}
-#< task
-#___ <- dat %>% 
-#  mutate(carbontax = (costratio*___-___)/(___-costratio*___))
+#< fill_in
+___ <- dat %>% 
+  mutate(carbontax = (costratio*___-___)/(___-costratio*___))
 #>
+# Sample solution
 dat_tax <- dat %>% 
   mutate(carbontax = (costratio*basegas-basecoal)/(co2_gas-costratio*co2_coal))
 ```
@@ -1095,10 +1119,11 @@ We calculated negative as well as very high values of carbon taxes. Negative val
 
 **Task:** Filter `carbon taxes` according to the data range above and store the data frame into `tax`.
 ```{r "4_2__4"}
-#< task
-#___ <- dat_tax %>% 
-#  filter(carbontax >= ___ & carbontax <= ___)
+#< fill_in
+___ <- dat_tax %>% 
+  filter(carbontax >= ___ & carbontax <= ___)
 #>
+# Sample solution
 tax <- dat_tax %>% 
   filter(carbontax >= 0 & carbontax <= 80)
 ```
@@ -1159,7 +1184,9 @@ plot_wecc <- ggplot(tax_wecc, aes(x=carbontax, y=fit.transformed)) +
 
 **Task:** Just press *check*.
 ```{r "4_2__7",fig.width=21, fig.height=7, warning=FALSE}
+#< task_notest
 grid.arrange(plot_east, plot_ercot, plot_wecc, nrow=1)
+#>
 ```
 
 The plots show the effects of positive carbon taxes on $CO_2$ emissions within a reasonable range. In comparison to the previous results using cost ratios, we are now able to directly interpret the effects of a viable instrument in form of taxes.  
@@ -1221,8 +1248,10 @@ table
 #>
 ```
 
-The result mostly corresponds to Table 2 in Cullen's paper and shows us the absolute values of abated emissions including their costs. The values at `tax=0` mark the base-line emissions at our predicted prices for gas and coal. The majority of emissions as well as carbon abatement results from the Eastern Interconnection. We can achieve modest emission reductions across all tax levels. Emissions get reduced by 5.7% when introducing carbon prices of 30$. We can directly derive the total costs for such a measure, which would be approximately \$45.6 billion per year. The effects on the economy are hereby very uncertain and there's much controversy over the real costs of such an instrument, also referred as "dead-weight-loss" (Mankiw-David Hakes, 2012). In economic terms, a tax increases the price of a particular good and thus widens the spread between the prices at which buyers (sellers) are willing to buy (sell). This normally leads to a reduction in traded quantities. Since we are introducing taxes on a vital commodity like electricity, determining whether the tax justifies the economic cost is worth a topic on its own.  
-  
+The result mostly corresponds to Table 2 in Cullen's paper and shows us the absolute values of abated emissions including their costs. The values at `tax=0` mark the base-line emissions at our predicted prices for gas and coal. The majority of emissions as well as carbon abatement results from the Eastern Interconnection. We can achieve modest emission reductions across all tax levels. Emissions get reduced by 5.7% when introducing carbon prices of 30$. We can directly derive the total costs for such a measure, which would be approximately \$45.6 billion per year. 
+
+The remaining question is whether it's acceptable to introduce such costs on the economy. There's a lot of research that covers the topic of estimating which costs are socially acceptable. Current cost estimates show that the social costs of emissions are way higher than any current carbon tax (Pyndick, 2019), which indicates that even for our highest tax levels the benefits would outweigh the costs. In economic terms, we intend to internalize all negative externalitites and avoid dead-weight loss. In theoretical models we can fully control our tax rates to avoid this effect. Nevertheless, real markets have varying conditions, which we could partly control by combining our tax with additional instruments, e.g. hybrid policies including permits (Pizer, 1997).  
+
 In the next chapter we will conclude our results. Click `Go to next exercise` to continue.
 
 ## Exercise 5 -- Discussion and Conclusion
@@ -1260,8 +1289,6 @@ awards()
 
 - Environmental Protection Agency (EPA), 2020. 'Inventory of U.S. Greenhouse Gas Emissions and Sinks: 1990–2018.', US Environmental Protection Agency Report EPA-430-P-20-001.
 
-- Hakes, M. (2012), ‘Principles of microeconomics‘, South-Western Cengage Learning.
-
 - Harrell, F. (2012), 'Regression Model Strategies', Springer-verlag.
 
 - Hausman, Kellogg (2015), 'Welfare and Distributional Implications of Shale Gas,' Brookings Papers on Economic Activity, Economic Studies Program, The Brookings Institution, vol. 50(1 (Spring), pages 71-139.
@@ -1276,7 +1303,11 @@ awards()
 
 - Mansur, E. T. & White, M. (2012), ‘Market organization and efficiency in electricity markets’, (Working Paper).
 
-- Muller, Nicholas Z., Robert Mendelsohn, and William Nordhaus (2011), "Environmental Accounting for Pollution in the United States Economy." American Economic Review, 101 (5): 1649-75.
+- Muller, Nicholas Z., Robert Mendelsohn, and William Nordhaus (2011), 'Environmental Accounting for Pollution in the United States Economy.' American Economic Review, 101 (5): 1649-75.
+
+- Pindyck, R. (2019), 'The social cost of carbon revisited', Journal of Environmental Economics and Management 94 (2019), 140-160.
+
+- Pizer, W. (1997), 'Prices vs. Quantities Revisited: The Case of Climate Change', Discussion Papers 10498, Resources for the Future.
 
 - Swensson, Wretman (1992), ‘Model Assisted Survey Sampling‘, Springer-Verlag.
 
@@ -1330,5 +1361,5 @@ and Planning Area Report", https://www.ferc.gov/docs-filing/forms/form-714/data.
 
 - U.S. Energy Information Administration, "Today in Energy", https://www.eia.gov/todayinenergy/detail.php?id=43035
 
-*All the above links were accessible as of April 20, 2020.*
+*All the above links were accessible as of May 10, 2020.*
 
